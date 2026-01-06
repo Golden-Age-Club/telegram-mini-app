@@ -1,161 +1,207 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { ArrowLeft, Search, Flame, Sparkles, Gift, Star, Home, Gamepad2, Wallet, User, Play, Users } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const GameListPage = ({ user, onNavigate }) => {
   const { t } = useLanguage();
-  const [activeProvider, setActiveProvider] = useState('PG');
-  const [activeFilter, setActiveFilter] = useState('highWins');
+  const [activeProvider, setActiveProvider] = useState('all');
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const games = {
-    PG: [
-      { name: t('fortuneTiger'), image: '🐅', category: 'highWins', players: '2.1k', hot: true, new: false, buyFree: true },
-      { name: t('wildBountyShowdown'), image: '🤠', category: 'highWins', players: '1.8k', hot: false, new: true, buyFree: false },
-      { name: t('mahjongWays'), image: '🀄', category: 'newGames', players: '1.5k', hot: true, new: false, buyFree: true },
-      { name: 'Sweet Bonanza', image: '🍭', category: 'buyFree', players: '980', hot: true, new: false, buyFree: true },
-    ],
-    EGT: [
-      { name: 'Burning Hot', image: '🔥', category: 'highWins', players: '750', hot: true, new: false, buyFree: false },
-      { name: 'Shining Crown', image: '👑', category: 'favorites', players: '650', hot: false, new: false, buyFree: false },
-    ]
-  };
-
-  const filters = [
-    { id: 'highWins', name: t('highWins'), icon: '🔥' },
-    { id: 'newGames', name: t('newGames'), icon: '✨' },
-    { id: 'buyFree', name: t('buyFree'), icon: '💰' },
-    { id: 'favorites', name: t('favorites'), icon: '⭐' }
+  const providers = [
+    { id: 'all', name: 'All' },
+    { id: 'pg', name: 'PG Soft' },
+    { id: 'egt', name: 'EGT' },
+    { id: 'pragmatic', name: 'Pragmatic' },
   ];
 
-  const getFilteredGames = () => {
-    const providerGames = games[activeProvider] || [];
-    return providerGames.filter(game => {
-      if (activeFilter === 'highWins') return game.hot;
-      if (activeFilter === 'newGames') return game.new;
-      if (activeFilter === 'buyFree') return game.buyFree;
-      if (activeFilter === 'favorites') return game.category === 'favorites';
-      return true;
-    });
-  };
+  const filters = [
+    { id: 'all', name: 'All', icon: Gamepad2 },
+    { id: 'hot', name: t('highWins'), icon: Flame },
+    { id: 'new', name: t('newGames'), icon: Sparkles },
+    { id: 'bonus', name: t('buyFree'), icon: Gift },
+    { id: 'favorites', name: t('favorites'), icon: Star },
+  ];
+
+  const allGames = [
+    { name: 'Fortune Tiger', provider: 'pg', players: '2.1k', hot: true, new: false, bonus: true, gradient: 'from-orange-500 to-red-600' },
+    { name: 'Wild Bounty', provider: 'pg', players: '1.8k', hot: false, new: true, bonus: false, gradient: 'from-amber-500 to-orange-600' },
+    { name: 'Mahjong Ways', provider: 'pg', players: '1.5k', hot: true, new: false, bonus: true, gradient: 'from-emerald-500 to-teal-600' },
+    { name: 'Sweet Bonanza', provider: 'pragmatic', players: '980', hot: true, new: false, bonus: true, gradient: 'from-pink-500 to-rose-600' },
+    { name: 'Burning Hot', provider: 'egt', players: '750', hot: true, new: false, bonus: false, gradient: 'from-red-500 to-orange-600' },
+    { name: 'Shining Crown', provider: 'egt', players: '650', hot: false, new: false, bonus: false, gradient: 'from-amber-400 to-yellow-500' },
+    { name: 'Lucky Neko', provider: 'pg', players: '1.2k', hot: false, new: true, bonus: true, gradient: 'from-pink-400 to-purple-500' },
+    { name: 'Gates of Olympus', provider: 'pragmatic', players: '890', hot: true, new: false, bonus: true, gradient: 'from-blue-500 to-indigo-600' },
+  ];
+
+  const filteredGames = allGames.filter(game => {
+    const matchesProvider = activeProvider === 'all' || game.provider === activeProvider;
+    const matchesFilter = activeFilter === 'all' || 
+      (activeFilter === 'hot' && game.hot) ||
+      (activeFilter === 'new' && game.new) ||
+      (activeFilter === 'bonus' && game.bonus);
+    const matchesSearch = game.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesProvider && matchesFilter && matchesSearch;
+  });
 
   return (
-    <div className="min-h-screen bg-[#0a0a0c] text-white pb-32 selection:bg-amber-500/30">
-      {/* Cinematic Header */}
-      <header className="sticky top-0 z-50 bg-[#0a0a0c]/80 backdrop-blur-xl border-b border-white/5 px-4 py-4">
-        <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-[--bg-base] text-white pb-24">
+      {/* Header */}
+      <header className="sticky top-0 z-40 glass border-b border-[--border] px-4 py-3">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <button 
               onClick={() => onNavigate('home')}
-              className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 active:scale-90 transition-transform"
+              className="w-10 h-10 rounded-xl bg-[--bg-elevated] border border-[--border] flex items-center justify-center"
             >
-              ←
+              <ArrowLeft className="w-5 h-5" />
             </button>
-            <h1 className="text-xl font-black uppercase tracking-tighter italic">{t('gameList')}</h1>
+            <h1 className="text-lg font-semibold">{t('gameList')}</h1>
           </div>
           
-          <div className="bg-[#1a1a24] rounded-2xl px-4 py-2 border border-white/10 flex items-center gap-2">
-            <span className="text-amber-500 text-xs font-black tracking-widest">$</span>
-            <span className="text-sm font-black tabular-nums">{user?.balance?.toLocaleString() || '2,368.50'}</span>
+          <div className="flex items-center gap-2 bg-[--bg-card] border border-[--border] rounded-full px-3 py-1.5">
+            <span className="text-xs text-amber-500 font-semibold">$</span>
+            <span className="text-sm font-semibold">{user?.balance?.toLocaleString() || '2,368.50'}</span>
           </div>
+        </div>
+
+        {/* Search */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[--text-muted]" />
+          <input
+            type="text"
+            placeholder="Search games..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="input pl-10"
+          />
         </div>
       </header>
 
-      {/* Provider Switcher - Premium Toggle Style */}
-      <section className="px-4 py-6">
-        <div className="bg-[#12121a] p-1.5 rounded-2xl flex border border-white/5">
-          {['PG', 'EGT'].map((provider) => (
+      <main className="px-4 py-4 space-y-4">
+        {/* Provider Tabs */}
+        <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4">
+          {providers.map((provider) => (
             <button
-              key={provider}
-              onClick={() => setActiveProvider(provider)}
-              className={`flex-1 py-3 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] transition-all duration-300 ${
-                activeProvider === provider 
-                  ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.1)]' 
-                  : 'text-gray-500 hover:text-gray-300'
+              key={provider.id}
+              onClick={() => setActiveProvider(provider.id)}
+              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+                activeProvider === provider.id
+                  ? 'bg-amber-500 text-black'
+                  : 'bg-[--bg-card] border border-[--border] text-[--text-secondary]'
               }`}
             >
-              {provider} Slots
+              {provider.name}
             </button>
           ))}
         </div>
-      </section>
 
-      {/* Modern Filter Pill Slider */}
-      <section className="px-4 pb-6 overflow-x-auto no-scrollbar">
-        <div className="flex gap-2">
+        {/* Filter Pills */}
+        <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4">
           {filters.map((filter) => (
             <button
               key={filter.id}
               onClick={() => setActiveFilter(filter.id)}
-              className={`flex items-center px-5 py-2.5 rounded-full whitespace-nowrap transition-all border ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
                 activeFilter === filter.id
-                  ? 'bg-amber-500/10 border-amber-500 text-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
-                  : 'bg-[#12121a] border-white/5 text-gray-500'
+                  ? 'bg-[--bg-elevated] border border-amber-500/50 text-amber-500'
+                  : 'bg-[--bg-card] border border-[--border] text-[--text-secondary]'
               }`}
             >
-              <span className="mr-2 text-sm">{filter.icon}</span>
-              <span className="text-[10px] font-black uppercase tracking-widest">{filter.name}</span>
+              <filter.icon className="w-4 h-4" />
+              {filter.name}
             </button>
           ))}
         </div>
-      </section>
 
-      {/* Game Grid - List with Depth */}
-      <main className="px-4 space-y-4">
-        {getFilteredGames().map((game, index) => (
-          <div
-            key={index}
-            onClick={() => onNavigate('gameView', { game: game.name })}
-            className="group relative bg-[#12121a] border border-white/5 rounded-[2rem] p-4 flex items-center justify-between hover:border-amber-500/30 transition-all active:scale-[0.98]"
-          >
-            <div className="flex items-center gap-4">
-              {/* Game Avatar with Inner Glow */}
-              <div className="relative w-16 h-16 bg-gradient-to-br from-[#1a1a24] to-black rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-white/5 overflow-hidden">
-                <div className="absolute inset-0 bg-amber-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                {game.image}
+        {/* Games List */}
+        <div className="space-y-3 stagger-children">
+          {filteredGames.map((game, index) => (
+            <button
+              key={index}
+              onClick={() => onNavigate('gameView', { game: game.name })}
+              className="w-full card p-4 flex items-center gap-4 hover:border-[--border-hover] transition-all active:scale-[0.99]"
+            >
+              {/* Game Icon */}
+              <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${game.gradient} flex items-center justify-center flex-shrink-0`}>
+                <Gamepad2 className="w-8 h-8 text-white/80" />
               </div>
 
-              <div>
+              {/* Game Info */}
+              <div className="flex-1 min-w-0 text-left">
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-black uppercase tracking-tighter text-sm">{game.name}</h3>
-                  {game.hot && <span className="text-[8px] font-black bg-red-500/10 text-red-500 px-2 py-0.5 rounded-full border border-red-500/20">HOT</span>}
-                  {game.new && <span className="text-[8px] font-black bg-blue-500/10 text-blue-500 px-2 py-0.5 rounded-full border border-blue-500/20">NEW</span>}
+                  <h3 className="font-semibold truncate">{game.name}</h3>
+                  {game.hot && <span className="badge badge-hot">HOT</span>}
+                  {game.new && <span className="badge badge-new">NEW</span>}
                 </div>
-                <div className="flex items-center gap-3 text-[10px] font-bold text-gray-500 uppercase tracking-tighter">
-                  <span>👥 {game.players}</span>
-                  {game.buyFree && <span className="text-amber-500/80">⚡ Buy Free</span>}
+                <div className="flex items-center gap-3 text-sm text-[--text-muted]">
+                  <span className="flex items-center gap-1">
+                    <Users className="w-3.5 h-3.5" />
+                    {game.players}
+                  </span>
+                  {game.bonus && (
+                    <span className="text-amber-500 flex items-center gap-1">
+                      <Gift className="w-3.5 h-3.5" />
+                      Buy Free
+                    </span>
+                  )}
                 </div>
               </div>
-            </div>
 
-            <button className="bg-white/5 hover:bg-white text-white hover:text-black w-12 h-12 rounded-2xl flex items-center justify-center transition-all border border-white/10 group-hover:border-white/40">
-              ▶
+              {/* Play Button */}
+              <div className="w-12 h-12 rounded-xl bg-[--bg-elevated] border border-[--border] flex items-center justify-center flex-shrink-0 hover:bg-amber-500 hover:border-amber-500 hover:text-black transition-all">
+                <Play className="w-5 h-5" />
+              </div>
             </button>
+          ))}
+        </div>
+
+        {filteredGames.length === 0 && (
+          <div className="text-center py-12">
+            <Gamepad2 className="w-12 h-12 text-[--text-muted] mx-auto mb-4" />
+            <p className="text-[--text-secondary]">No games found</p>
           </div>
-        ))}
+        )}
       </main>
 
-      {/* Floating Bottom Navigation */}
-      <nav className="fixed bottom-6 left-6 right-6 z-50">
-        <div className="bg-[#12121a]/80 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-2 flex justify-around items-center shadow-2xl">
-          {[
-            { id: 'home', icon: '🏠', label: t('home') },
-            { id: 'games', icon: '🎮', label: t('games'), active: true },
-            { id: 'wallet', icon: '💰', label: t('wallet') },
-            { id: 'profile', icon: '👤', label: t('profile') }
-          ].map((item) => (
+      {/* Bottom Navigation */}
+      <BottomNav currentPage="games" onNavigate={onNavigate} />
+    </div>
+  );
+};
+
+const BottomNav = ({ currentPage, onNavigate }) => {
+  const { t } = useLanguage();
+  
+  const navItems = [
+    { id: 'home', icon: Home, label: t('home') },
+    { id: 'games', icon: Gamepad2, label: t('games') },
+    { id: 'wallet', icon: Wallet, label: t('wallet') },
+    { id: 'profile', icon: User, label: t('profile') },
+  ];
+
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-4 pt-2">
+      <div className="glass border border-[--border] rounded-2xl p-2 flex justify-around items-center shadow-lg">
+        {navItems.map((item) => {
+          const isActive = currentPage === item.id;
+          return (
             <button
               key={item.id}
               onClick={() => onNavigate(item.id)}
-              className={`flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all ${
-                item.active ? 'bg-amber-500 text-black' : 'text-gray-500 hover:text-white'
+              className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${
+                isActive 
+                  ? 'bg-amber-500 text-black' 
+                  : 'text-[--text-muted] hover:text-white'
               }`}
             >
-              <span className="text-lg">{item.icon}</span>
-              <span className="text-[8px] font-black uppercase tracking-widest">{item.label}</span>
+              <item.icon className="w-5 h-5" />
+              <span className="text-[10px] font-semibold">{item.label}</span>
             </button>
-          ))}
-        </div>
-      </nav>
-    </div>
+          );
+        })}
+      </div>
+    </nav>
   );
 };
 

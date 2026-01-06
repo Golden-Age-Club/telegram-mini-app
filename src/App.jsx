@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { LanguageProvider } from './contexts/LanguageContext.jsx';
 import LandingPage from './components/LandingPage.jsx';
 import LoginPage from './components/LoginPage.jsx';

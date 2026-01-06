@@ -1,116 +1,142 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
+import { Sparkles, Shield, Zap, ChevronRight, Play, Star } from 'lucide-react';
 
 const LandingPage = ({ onNavigate }) => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
+
+  const features = [
+    { icon: Zap, title: 'Instant Play', desc: 'No downloads required' },
+    { icon: Star, title: 'VIP Rewards', desc: 'Exclusive bonuses' },
+    { icon: Shield, title: 'Secure', desc: 'Bank-level encryption' }
+  ];
+
+  const featuredGames = [
+    { name: 'Fortune Tiger', provider: 'PG Soft', color: 'from-orange-500 to-red-600' },
+    { name: 'Sweet Bonanza', provider: 'Pragmatic', color: 'from-pink-500 to-purple-600' },
+    { name: 'Mahjong Ways', provider: 'PG Soft', color: 'from-emerald-500 to-teal-600' },
+    { name: 'Gates of Olympus', provider: 'Pragmatic', color: 'from-blue-500 to-indigo-600' }
+  ];
+
   return (
-    <div className="min-h-screen bg-[#0a0a0c] text-white selection:bg-yellow-500/30 overflow-x-hidden">
-      {/* Cinematic Background Glows */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full"></div>
-        <div className="absolute top-[20%] -right-[10%] w-[30%] h-[50%] bg-amber-500/10 blur-[120px] rounded-full"></div>
+    <div className="min-h-screen bg-[--bg-base] text-white overflow-hidden">
+      {/* Ambient Background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-[128px]" />
+        <div className="absolute bottom-1/4 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-[128px]" />
       </div>
 
-      {/* Luxury Header */}
-      <nav className="relative z-10 px-6 py-8 flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-gradient-to-tr from-amber-400 to-yellow-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.3)]">
-            <span className="text-xl">🎰</span>
+      {/* Header */}
+      <header className="relative z-10 px-6 py-6 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/25">
+            <Sparkles className="w-5 h-5 text-black" />
           </div>
-          <span className="text-2xl font-black italic tracking-tighter uppercase">Royale</span>
+          <span className="text-xl font-bold tracking-tight">Royale</span>
         </div>
+        
         <button 
           onClick={() => onNavigate('login')}
-          className="text-xs font-black uppercase tracking-widest px-5 py-2 border border-white/10 rounded-full hover:bg-white hover:text-black transition-all"
+          className="px-4 py-2 text-sm font-medium text-[--text-secondary] hover:text-white transition-colors"
         >
-          Login
+          Sign In
         </button>
-      </nav>
+      </header>
 
-      {/* Hero Content */}
-      <main className="relative z-10 px-6 pt-12 pb-24 text-center">
-        <div className="inline-block px-4 py-1.5 mb-6 rounded-full border border-amber-500/20 bg-amber-500/5 backdrop-blur-md">
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500">
-            ✨ Next Generation Gaming
-          </span>
+      {/* Hero */}
+      <main className={`relative z-10 px-6 pt-8 pb-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        {/* Badge */}
+        <div className="flex justify-center mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20">
+            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+            <span className="text-xs font-semibold text-amber-500 uppercase tracking-wider">Premium Gaming</span>
+          </div>
         </div>
-        
-        <h1 className="text-5xl font-black tracking-tighter leading-[0.9] mb-6 uppercase">
-          Elevate Your <br />
-          <span className="bg-gradient-to-b from-white to-gray-500 bg-clip-text text-transparent">
-            Fortune
-          </span>
+
+        {/* Headline */}
+        <h1 className="text-center text-4xl sm:text-5xl font-bold tracking-tight mb-4">
+          <span className="block text-white">Play. Win.</span>
+          <span className="block text-gradient">Repeat.</span>
         </h1>
-        
-        <p className="max-w-xs mx-auto text-gray-400 text-sm font-medium leading-relaxed mb-10">
-          The world's most immersive PG Soft experience, integrated directly into your Telegram.
+
+        <p className="text-center text-[--text-secondary] max-w-sm mx-auto mb-8">
+          Experience premium slots and casino games directly in Telegram. Instant deposits, fast withdrawals.
         </p>
 
-        {/* Primary CTA Area */}
-        <div className="flex flex-col gap-4 max-w-sm mx-auto mb-20">
+        {/* CTA Buttons */}
+        <div className="flex flex-col gap-3 max-w-sm mx-auto mb-16">
           <button 
             onClick={() => onNavigate('login')}
-            className="group relative bg-white text-black font-black uppercase tracking-widest py-5 rounded-2xl overflow-hidden transition-transform active:scale-95 shadow-[0_20px_40px_rgba(255,255,255,0.1)]"
+            className="btn btn-primary py-4 text-base"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <span className="relative z-10">🚀 Enter the Arena</span>
+            <Play className="w-5 h-5" />
+            Start Playing
           </button>
           
           <button 
             onClick={() => onNavigate('games')}
-            className="bg-[#1a1a24]/50 backdrop-blur-md border border-white/5 py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:border-white/20 transition-all"
+            className="btn btn-secondary py-4"
           >
-            Explore Catalog
+            Browse Games
+            <ChevronRight className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Features: The "Royale" Standards */}
-        <div className="grid grid-cols-1 gap-4 mb-20">
-          {[
-            { icon: '⚡', title: 'Instant Play', desc: 'No downloads, no lag' },
-            { icon: '💎', title: 'VIP Rewards', desc: 'Tier-based commission system' },
-            { icon: '🛡️', title: 'Secure', desc: 'End-to-end encryption' }
-          ].map((feat, i) => (
-            <div key={i} className="flex items-center gap-4 bg-gradient-to-r from-[#12121a] to-transparent p-4 rounded-2xl border-l-2 border-amber-500/50">
-              <div className="text-2xl">{feat.icon}</div>
-              <div className="text-left">
-                <h4 className="font-bold text-sm uppercase tracking-tight">{feat.title}</h4>
-                <p className="text-xs text-gray-500">{feat.desc}</p>
+        {/* Features */}
+        <div className="grid grid-cols-3 gap-3 mb-16">
+          {features.map((feat, i) => (
+            <div 
+              key={i}
+              className="card p-4 text-center"
+              style={{ animationDelay: `${i * 100}ms` }}
+            >
+              <div className="w-10 h-10 rounded-xl bg-[--bg-elevated] flex items-center justify-center mx-auto mb-3">
+                <feat.icon className="w-5 h-5 text-amber-500" />
               </div>
+              <h3 className="text-sm font-semibold mb-1">{feat.title}</h3>
+              <p className="text-xs text-[--text-muted]">{feat.desc}</p>
             </div>
           ))}
         </div>
 
-        {/* Infinite Game Slider Preview */}
-        <div className="relative">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-8">
-            Featured Titles
-          </h3>
-          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 snap-x">
-            {['Fortune Tiger', 'Sweet Bonanza', 'Mahjong Ways', 'Wild Bounty'].map((game, index) => (
-              <div 
-                key={index} 
-                className="flex-shrink-0 w-40 aspect-[3/4] bg-[#1a1a24] rounded-3xl p-6 border border-white/5 flex flex-col justify-end items-start group hover:border-amber-500/50 transition-all snap-center"
+        {/* Featured Games */}
+        <div className="mb-12">
+          <h2 className="text-center text-xs font-semibold text-[--text-muted] uppercase tracking-widest mb-6">
+            Featured Games
+          </h2>
+          
+          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 -mx-6 px-6">
+            {featuredGames.map((game, i) => (
+              <button
+                key={i}
+                onClick={() => onNavigate('games')}
+                className="flex-shrink-0 w-36 group"
               >
-                <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🎰</div>
-                <p className="text-xs font-black uppercase tracking-tighter leading-tight text-left">
-                  {game}
-                </p>
-              </div>
+                <div className={`aspect-[3/4] rounded-2xl bg-gradient-to-br ${game.color} p-4 flex flex-col justify-end mb-3 transition-transform group-hover:scale-[1.02] group-active:scale-[0.98]`}>
+                  <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center mb-2">
+                    <Play className="w-5 h-5 text-white" />
+                  </div>
+                </div>
+                <h3 className="text-sm font-semibold truncate">{game.name}</h3>
+                <p className="text-xs text-[--text-muted]">{game.provider}</p>
+              </button>
             ))}
           </div>
         </div>
-      </main>
 
-      {/* Footer */}
-      <footer className="px-6 py-12 text-center bg-black/40 border-t border-white/5">
-        <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-600 mb-4">
-          Royale • Official Partner
-        </p>
-        <div className="flex justify-center gap-6 opacity-40">
-          <span className="text-xs font-black italic">PG SOFT</span>
-          <span className="text-xs font-black italic">EGT</span>
-          <span className="text-xs font-black italic">PRAGMATIC</span>
+        {/* Trust Indicators */}
+        <div className="text-center">
+          <p className="text-xs text-[--text-muted] mb-4">Trusted by 50,000+ players worldwide</p>
+          <div className="flex justify-center gap-6 opacity-50">
+            <span className="text-xs font-bold">PG SOFT</span>
+            <span className="text-xs font-bold">PRAGMATIC</span>
+            <span className="text-xs font-bold">EGT</span>
+          </div>
         </div>
-      </footer>
+      </main>
     </div>
   );
 };

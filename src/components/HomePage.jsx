@@ -1,156 +1,214 @@
-import React from 'react';
+import { Home, Gamepad2, Wallet, User, Plus, TrendingUp, Flame, Crown, Sparkles } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const HomePage = ({ user, onNavigate }) => {
   const { t } = useLanguage();
 
-  const gameCategories = [
-    {
-      id: 'pg-high-wins',
-      title: t('highWins'),
-      subtitle: 'PG SOFT',
-      bgColor: 'from-orange-500 via-red-500 to-rose-600',
-      icon: '🎰',
-      accent: 'text-orange-200'
-    },
-    {
-      id: 'egt-steady-wins', 
-      title: t('steadyWins'),
-      subtitle: 'EGT INTERACTIVE',
-      bgColor: 'from-emerald-500 via-green-600 to-teal-700',
-      icon: '💎',
-      accent: 'text-green-200'
-    }
+  const quickActions = [
+    { icon: TrendingUp, label: 'Hot Games', color: 'text-red-500', bg: 'bg-red-500/10' },
+    { icon: Crown, label: 'VIP', color: 'text-amber-500', bg: 'bg-amber-500/10' },
+    { icon: Sparkles, label: 'New', color: 'text-cyan-500', bg: 'bg-cyan-500/10' },
+  ];
+
+  const featuredGames = [
+    { name: 'Fortune Tiger', provider: 'PG Soft', players: '2.1k', hot: true, gradient: 'from-orange-500 to-red-600' },
+    { name: 'Sweet Bonanza', provider: 'Pragmatic', players: '1.8k', hot: true, gradient: 'from-pink-500 to-rose-600' },
+  ];
+
+  const popularGames = [
+    { name: 'Lucky Neko', provider: 'PG Soft', gradient: 'from-pink-400 to-purple-500' },
+    { name: 'Shining Crown', provider: 'EGT', gradient: 'from-amber-400 to-orange-500' },
+    { name: '40 Super Hot', provider: 'EGT', gradient: 'from-red-500 to-orange-600' },
+    { name: 'Mahjong Ways', provider: 'PG Soft', gradient: 'from-emerald-400 to-teal-500' },
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0c] text-slate-100 font-sans selection:bg-blue-500">
-      {/* Premium Header */}
-      <header className="sticky top-0 z-50 bg-[#12121a]/80 backdrop-blur-md border-b border-white/5 px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-400 rounded-xl shadow-lg shadow-blue-500/20 flex items-center justify-center">
-            <span className="text-xl">💎</span>
+    <div className="min-h-screen bg-[--bg-base] text-white pb-24">
+      {/* Header */}
+      <header className="sticky top-0 z-40 glass border-b border-[--border] px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-black" />
+            </div>
+            <div>
+              <p className="text-xs text-[--text-muted] font-medium">Welcome back</p>
+              <p className="font-semibold">{user?.name?.split(' ')[0] || 'Player'}</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xs uppercase tracking-widest text-gray-400 font-bold leading-none">Club</h1>
-            <p className="text-lg font-black italic tracking-tighter leading-none text-white">ROYALE</p>
-          </div>
-        </div>
 
-        <div className="flex items-center bg-black/40 border border-white/10 rounded-2xl pl-2 pr-1 py-1 shadow-inner">
-          <span className="text-yellow-400 text-xs mr-2 font-bold">LIVE</span>
-          <span className="bg-gradient-to-r from-yellow-200 to-yellow-500 bg-clip-text text-transparent font-black tracking-tight mr-2">
-            ${user?.balance?.toLocaleString() || '2,368.50'}
-          </span>
-          <button className="bg-blue-600 hover:bg-blue-500 p-1.5 rounded-xl transition-all active:scale-95">
-            <span className="text-xs">➕</span>
+          <button 
+            onClick={() => onNavigate('wallet')}
+            className="flex items-center gap-2 bg-[--bg-card] border border-[--border] rounded-full pl-4 pr-2 py-2"
+          >
+            <span className="text-sm font-semibold text-gradient">
+              ${user?.balance?.toLocaleString() || '2,368.50'}
+            </span>
+            <div className="w-7 h-7 rounded-full bg-amber-500 flex items-center justify-center">
+              <Plus className="w-4 h-4 text-black" />
+            </div>
           </button>
         </div>
       </header>
 
-      <main className="p-4 pb-24 space-y-8">
-        
-        {/* Featured Banner/Categories */}
-        <section className="grid grid-cols-1 gap-4">
-          {gameCategories.map((category) => (
-            <div
-              key={category.id}
-              onClick={() => onNavigate('games')}
-              className={`group relative overflow-hidden rounded-3xl bg-gradient-to-r ${category.bgColor} p-6 shadow-2xl transition-all hover:-translate-y-1 active:scale-95`}
-            >
-              {/* Decorative elements */}
-              <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 opacity-20 text-9xl">
-                {category.icon}
-              </div>
-              
-              <div className="relative z-10">
-                <span className={`text-xs font-black tracking-widest uppercase ${category.accent} opacity-80`}>
-                  {category.subtitle}
-                </span>
-                <h3 className="text-3xl font-black text-white mt-1 mb-4 leading-tight">
-                  {category.title}
-                </h3>
-                <button className="bg-white/20 backdrop-blur-md border border-white/30 px-4 py-2 rounded-full text-sm font-bold hover:bg-white/30 transition-colors">
-                  Play Now →
-                </button>
-              </div>
+      <main className="px-4 py-6 space-y-8">
+        {/* Balance Card */}
+        <section className="card p-5 bg-gradient-to-br from-amber-500/20 via-[--bg-card] to-[--bg-card] border-amber-500/20">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="text-sm text-[--text-secondary] mb-1">Total Balance</p>
+              <p className="text-3xl font-bold">${user?.balance?.toLocaleString() || '2,368.50'}</p>
             </div>
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/20 flex items-center justify-center">
+              <Wallet className="w-6 h-6 text-amber-500" />
+            </div>
+          </div>
+          
+          <div className="flex gap-3">
+            <button 
+              onClick={() => onNavigate('wallet')}
+              className="btn btn-primary flex-1 py-3"
+            >
+              Deposit
+            </button>
+            <button 
+              onClick={() => onNavigate('wallet')}
+              className="btn btn-secondary flex-1 py-3"
+            >
+              Withdraw
+            </button>
+          </div>
+        </section>
+
+        {/* Quick Actions */}
+        <section className="flex gap-3">
+          {quickActions.map((action, i) => (
+            <button 
+              key={i}
+              onClick={() => onNavigate('games')}
+              className="flex-1 card p-4 flex flex-col items-center gap-2 hover:border-[--border-hover] transition-colors"
+            >
+              <div className={`w-10 h-10 rounded-xl ${action.bg} flex items-center justify-center`}>
+                <action.icon className={`w-5 h-5 ${action.color}`} />
+              </div>
+              <span className="text-xs font-medium text-[--text-secondary]">{action.label}</span>
+            </button>
           ))}
         </section>
 
-        {/* Provider Shortcuts */}
+        {/* Featured Games */}
         <section>
-          <div className="flex justify-between items-end mb-4 px-1">
-            <h2 className="text-sm font-bold uppercase tracking-widest text-gray-500">{t('providers')}</h2>
-            <span className="text-xs text-blue-400 font-bold">View All</span>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold">{t('todaysPicks')}</h2>
+            <button 
+              onClick={() => onNavigate('games')}
+              className="text-sm text-amber-500 font-medium"
+            >
+              See All
+            </button>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            {['PG SOFT', 'EGT'].map((provider) => (
-              <button key={provider} className="flex items-center gap-3 bg-[#1a1a24] border border-white/5 p-3 rounded-2xl hover:bg-[#232330] transition-all">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs ${provider === 'PG SOFT' ? 'bg-orange-500' : 'bg-red-600'}`}>
-                  {provider[0]}
+          
+          <div className="space-y-3">
+            {featuredGames.map((game, i) => (
+              <button
+                key={i}
+                onClick={() => onNavigate('gameView', { game: game.name })}
+                className={`w-full p-4 rounded-2xl bg-gradient-to-r ${game.gradient} flex items-center justify-between group transition-transform active:scale-[0.98]`}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+                    <Gamepad2 className="w-7 h-7 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-white">{game.name}</h3>
+                      {game.hot && (
+                        <span className="badge badge-hot">
+                          <Flame className="w-3 h-3 mr-1" />
+                          HOT
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-white/70">{game.provider} • {game.players} playing</p>
+                  </div>
                 </div>
-                <div className="text-left">
-                  <p className="text-xs text-gray-400 font-medium">Provider</p>
-                  <p className="text-sm font-bold">{provider}</p>
+                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                  <span className="text-white">▶</span>
                 </div>
               </button>
             ))}
           </div>
         </section>
 
-        {/* Today's Picks - Modern Grid */}
+        {/* Popular Games Grid */}
         <section>
-          <h2 className="text-center text-sm font-black uppercase tracking-[0.3em] text-white/40 mb-6 flex items-center justify-center gap-3">
-            <span className="h-[1px] w-8 bg-gradient-to-r from-transparent to-white/20"></span>
-            {t('todaysPicks')}
-            <span className="h-[1px] w-8 bg-gradient-to-l from-transparent to-white/20"></span>
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold">Popular Games</h2>
+            <button 
+              onClick={() => onNavigate('games')}
+              className="text-sm text-amber-500 font-medium"
+            >
+              See All
+            </button>
+          </div>
           
-          <div className="grid grid-cols-2 gap-4">
-            {[
-              { name: 'Fortune Tiger', img: '🐅', color: 'bg-orange-500/10' },
-              { name: 'Lucky Neko', img: '🐱', color: 'bg-pink-500/10' },
-              { name: 'Shining Crown', img: '👑', color: 'bg-yellow-500/10' },
-              { name: '40 Super Hot', img: '🔥', color: 'bg-red-500/10' }
-            ].map((game, i) => (
-              <div 
+          <div className="grid grid-cols-2 gap-3">
+            {popularGames.map((game, i) => (
+              <button
                 key={i}
-                className="group relative bg-[#1a1a24] border border-white/5 rounded-3xl p-4 flex flex-col items-center justify-center transition-all hover:border-blue-500/50 hover:shadow-[0_0_20px_rgba(59,130,246,0.15)]"
+                onClick={() => onNavigate('gameView', { game: game.name })}
+                className="card p-4 text-left hover:border-[--border-hover] transition-all active:scale-[0.98]"
               >
-                <div className={`w-20 h-20 ${game.color} rounded-2xl flex items-center justify-center text-4xl mb-3 shadow-inner`}>
-                  {game.img}
+                <div className={`w-full aspect-square rounded-xl bg-gradient-to-br ${game.gradient} flex items-center justify-center mb-3`}>
+                  <Gamepad2 className="w-10 h-10 text-white/80" />
                 </div>
-                <p className="text-sm font-bold text-gray-200">{game.name}</p>
-                <div className="mt-2 flex gap-1">
-                  <span className="w-1 h-1 rounded-full bg-blue-500 animate-pulse"></span>
-                  <span className="text-[10px] text-blue-400 font-bold uppercase tracking-tighter">Live Play</span>
-                </div>
-              </div>
+                <h3 className="font-medium text-sm truncate">{game.name}</h3>
+                <p className="text-xs text-[--text-muted]">{game.provider}</p>
+              </button>
             ))}
           </div>
         </section>
       </main>
 
-      {/* Modern Floating Bottom Nav */}
-      <nav className="fixed bottom-4 left-4 right-4 bg-[#1a1a24]/90 backdrop-blur-xl border border-white/10 rounded-[2.5rem] shadow-2xl z-50 overflow-hidden">
-        <div className="flex justify-around items-center h-16">
-          <NavItem active icon="🏠" label={t('home')} />
-          <NavItem icon="🎮" label={t('games')} />
-          <NavItem icon="👛" label={t('wallet')} />
-          <NavItem icon="👤" label={t('profile')} />
-        </div>
-      </nav>
+      {/* Bottom Navigation */}
+      <BottomNav currentPage="home" onNavigate={onNavigate} />
     </div>
   );
 };
 
-const NavItem = ({ icon, label, active = false }) => (
-  <button className={`flex flex-col items-center justify-center w-full h-full transition-all ${active ? 'text-blue-400' : 'text-gray-500 hover:text-white'}`}>
-    <span className={`text-xl mb-0.5 ${active ? 'scale-110' : ''}`}>{icon}</span>
-    <span className="text-[10px] font-black uppercase tracking-widest">{label}</span>
-    {active && <span className="absolute bottom-1 w-1 h-1 rounded-full bg-blue-400 shadow-[0_0_8px_#60a5fa]"></span>}
-  </button>
-);
+const BottomNav = ({ currentPage, onNavigate }) => {
+  const { t } = useLanguage();
+  
+  const navItems = [
+    { id: 'home', icon: Home, label: t('home') },
+    { id: 'games', icon: Gamepad2, label: t('games') },
+    { id: 'wallet', icon: Wallet, label: t('wallet') },
+    { id: 'profile', icon: User, label: t('profile') },
+  ];
+
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-4 pt-2">
+      <div className="glass border border-[--border] rounded-2xl p-2 flex justify-around items-center shadow-lg">
+        {navItems.map((item) => {
+          const isActive = currentPage === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => onNavigate(item.id)}
+              className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${
+                isActive 
+                  ? 'bg-amber-500 text-black' 
+                  : 'text-[--text-muted] hover:text-white'
+              }`}
+            >
+              <item.icon className="w-5 h-5" />
+              <span className="text-[10px] font-semibold">{item.label}</span>
+            </button>
+          );
+        })}
+      </div>
+    </nav>
+  );
+};
 
 export default HomePage;
