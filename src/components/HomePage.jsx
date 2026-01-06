@@ -1,13 +1,26 @@
-import { Home, Gamepad2, Wallet, User, Plus, TrendingUp, Flame, Crown, Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import { Home, Gamepad2, Wallet, User, Plus, TrendingUp, Flame, Crown, Sparkles, Gift, X } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import SpinWheel from './SpinWheel';
+import ScratchCard from './ScratchCard';
+import Confetti from './Confetti';
 
 const HomePage = ({ user, onNavigate }) => {
   const { t } = useLanguage();
+  const [showWheel, setShowWheel] = useState(false);
+  const [showScratch, setShowScratch] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [balance, setBalance] = useState(user?.balance || 2368.50);
 
   const quickActions = [
-    { icon: TrendingUp, label: 'Hot Games', color: 'text-red-500', bg: 'bg-red-500/10' },
-    { icon: Crown, label: 'VIP', color: 'text-amber-500', bg: 'bg-amber-500/10' },
-    { icon: Sparkles, label: 'New', color: 'text-cyan-500', bg: 'bg-cyan-500/10' },
+    { icon: TrendingUp, label: 'Hot Games', color: 'text-red-500', bg: 'bg-red-500/10', action: () => onNavigate('games') },
+    { icon: Crown, label: 'VIP', color: 'text-amber-500', bg: 'bg-amber-500/10', action: () => {} },
+    { icon: Sparkles, label: 'New', color: 'text-cyan-500', bg: 'bg-cyan-500/10', action: () => onNavigate('games') },
+  ];
+
+  const bonusGames = [
+    { icon: '🎡', label: 'Spin Wheel', desc: 'Daily bonus', action: () => setShowWheel(true) },
+    { icon: '🎫', label: 'Scratch Card', desc: 'Instant win', action: () => setShowScratch(true) },
   ];
 
   const featuredGames = [
@@ -22,8 +35,23 @@ const HomePage = ({ user, onNavigate }) => {
     { name: 'Mahjong Ways', provider: 'PG Soft', gradient: 'from-emerald-400 to-teal-500' },
   ];
 
+  const handleWheelComplete = (result) => {
+    setBalance(prev => prev + result.value);
+    setShowConfetti(true);
+    setTimeout(() => setShowWheel(false), 2000);
+  };
+
+  const handleScratchComplete = (prize) => {
+    setBalance(prev => prev + prize.value);
+    setShowConfetti(true);
+    setTimeout(() => setShowScratch(false), 2000);
+  };
+
   return (
     <div className="min-h-screen bg-[--bg-base] text-white pb-24">
+      {/* Confetti Effect */}
+      <Confetti active={showConfetti} onComplete={() => setShowConfetti(false)} />
+
       {/* Header */}
       <header className="sticky top-0 z-40 glass border-b border-[--border] px-4 py-3">
         <div className="flex items-center justify-between">
@@ -42,7 +70,7 @@ const HomePage = ({ user, onNavigate }) => {
             className="flex items-center gap-2 bg-[--bg-card] border border-[--border] rounded-full pl-4 pr-2 py-2"
           >
             <span className="text-sm font-semibold text-gradient">
-              ${user?.balance?.toLocaleString() || '2,368.50'}
+              ${balance.toLocaleString()}
             </span>
             <div className="w-7 h-7 rounded-full bg-amber-500 flex items-center justify-center">
               <Plus className="w-4 h-4 text-black" />
@@ -57,7 +85,7 @@ const HomePage = ({ user, onNavigate }) => {
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-sm text-[--text-secondary] mb-1">Total Balance</p>
-              <p className="text-3xl font-bold">${user?.balance?.toLocaleString() || '2,368.50'}</p>
+              <p className="text-3xl font-bold">${balance.toLocaleString()}</p>
             </div>
             <div className="w-12 h-12 rounded-2xl bg-amber-500/20 flex items-center justify-center">
               <Wallet className="w-6 h-6 text-amber-500" />
@@ -80,12 +108,34 @@ const HomePage = ({ user, onNavigate }) => {
           </div>
         </section>
 
+        {/* Bonus Games */}
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <Gift className="w-5 h-5 text-amber-500" />
+            <h2 className="font-semibold">Daily Bonuses</h2>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3">
+            {bonusGames.map((game, i) => (
+              <button 
+                key={i}
+                onClick={game.action}
+                className="card p-4 text-left hover:border-amber-500/50 transition-all active:scale-[0.98]"
+              >
+                <span className="text-3xl mb-2 block">{game.icon}</span>
+                <h3 className="font-semibold">{game.label}</h3>
+                <p className="text-xs text-[--text-muted]">{game.desc}</p>
+              </button>
+            ))}
+          </div>
+        </section>
+
         {/* Quick Actions */}
         <section className="flex gap-3">
           {quickActions.map((action, i) => (
             <button 
               key={i}
-              onClick={() => onNavigate('games')}
+              onClick={action.action}
               className="flex-1 card p-4 flex flex-col items-center gap-2 hover:border-[--border-hover] transition-colors"
             >
               <div className={`w-10 h-10 rounded-xl ${action.bg} flex items-center justify-center`}>
@@ -169,6 +219,40 @@ const HomePage = ({ user, onNavigate }) => {
           </div>
         </section>
       </main>
+
+      {/* Spin Wheel Modal */}
+      {showWheel && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="relative bg-[--bg-card] rounded-3xl p-6 border border-[--border] max-w-sm w-full animate-scale-in">
+            <button 
+              onClick={() => setShowWheel(false)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-[--bg-elevated] flex items-center justify-center"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            
+            <h2 className="text-xl font-bold text-center mb-6">🎡 Daily Spin</h2>
+            <SpinWheel onComplete={handleWheelComplete} />
+          </div>
+        </div>
+      )}
+
+      {/* Scratch Card Modal */}
+      {showScratch && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="relative bg-[--bg-card] rounded-3xl p-6 border border-[--border] max-w-sm w-full animate-scale-in">
+            <button 
+              onClick={() => setShowScratch(false)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-[--bg-elevated] flex items-center justify-center"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            
+            <h2 className="text-xl font-bold text-center mb-6">🎫 Scratch & Win</h2>
+            <ScratchCard onComplete={handleScratchComplete} />
+          </div>
+        </div>
+      )}
 
       {/* Bottom Navigation */}
       <BottomNav currentPage="home" onNavigate={onNavigate} />
