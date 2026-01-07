@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Globe, Bell, Shield, MessageCircle, ChevronRight, Crown, Trophy, Target, X, Check, Sparkles, Star, Zap } from 'lucide-react';
+import { Globe, Bell, Shield, MessageCircle, ChevronRight, Crown, Trophy, Target, X, Check } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const Profile = ({ user, navigate }) => {
@@ -7,18 +7,17 @@ const Profile = ({ user, navigate }) => {
   const { t, changeLanguage, currentLanguage, languages } = useLanguage();
   const [showLanguageModal, setShowLanguageModal] = useState(false);
 
-  // Set dark header in Telegram
   useEffect(() => {
     if (tg) {
-      tg.setHeaderColor('#0a0a0f');
-      tg.setBackgroundColor('#0a0a0f');
+      tg.setHeaderColor('#0f1923');
+      tg.setBackgroundColor('#0f1923');
     }
   }, [tg]);
 
   const stats = [
-    { icon: Target, label: 'Total Bets', value: '1,247', color: 'from-blue-500/20 to-blue-600/20' },
-    { icon: Trophy, label: 'Wins', value: '892', color: 'from-emerald-500/20 to-emerald-600/20' },
-    { icon: Star, label: 'Best Win', value: '$4,800', color: 'from-purple-500/20 to-purple-600/20' },
+    { icon: Target, label: 'Bets', value: '1,247' },
+    { icon: Trophy, label: 'Wins', value: '892' },
+    { icon: Crown, label: 'Best', value: '$4,800' },
   ];
 
   const menuItems = [
@@ -26,76 +25,63 @@ const Profile = ({ user, navigate }) => {
       icon: Globe, 
       label: t('language'), 
       value: languages.find(l => l.code === currentLanguage)?.name,
-      action: () => setShowLanguageModal(true),
-      color: 'from-blue-500/20 to-blue-600/20',
-      iconColor: 'text-blue-400'
+      action: () => setShowLanguageModal(true)
     },
-    { icon: Bell, label: 'Notifications', value: 'On', color: 'from-amber-500/20 to-amber-600/20', iconColor: 'text-[var(--gold)]' },
-    { icon: Shield, label: 'Security', value: '2FA Active', color: 'from-emerald-500/20 to-emerald-600/20', iconColor: 'text-emerald-400' },
-    { icon: MessageCircle, label: 'VIP Support', value: '24/7', color: 'from-purple-500/20 to-purple-600/20', iconColor: 'text-purple-400' },
+    { icon: Bell, label: 'Notifications', value: 'On' },
+    { icon: Shield, label: 'Security', value: '2FA' },
+    { icon: MessageCircle, label: 'Support', value: '24/7' },
   ];
 
   return (
     <div className="page">
-      {/* Profile Header */}
-      <div className="px-4 pt-4 pb-6">
-        <div className="card card-gold p-6 relative overflow-hidden">
-          {/* Shimmer effect */}
-          <div className="absolute inset-0 animate-shimmer pointer-events-none" />
-          
-          <div className="relative">
-            <div className="flex items-center gap-4 mb-5">
-              <div className="relative">
-                <img 
-                  src={user?.avatar} 
-                  alt="Profile"
-                  className="w-20 h-20 rounded-2xl bg-[var(--bg-elevated)] border-2 border-[var(--gold)]"
-                />
-                <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-lg bg-gradient-to-br from-[var(--gold-light)] to-[var(--gold-dark)] flex items-center justify-center shadow-lg shadow-[var(--gold-glow)]">
-                  <Crown className="w-4 h-4 text-black" />
-                </div>
-              </div>
-              <div>
-                <h2 className="text-2xl font-black text-white">{user?.name || 'Player'}</h2>
-                <p className="text-sm text-[var(--text-muted)]">@{user?.username}</p>
-                <div className="flex items-center gap-1 mt-1">
-                  <Zap className="w-3 h-3 text-[var(--gold)]" />
-                  <span className="text-xs font-bold text-[var(--gold)]">VIP MEMBER</span>
-                </div>
-              </div>
-            </div>
+      {/* Header */}
+      <div className="header-bar">
+        <div className="w-5" />
+        <span className="font-bold text-white">Profile</span>
+        <div className="balance-chip">
+          <div className="coin-icon">$</div>
+          <span className="text-[var(--gold)]">{user?.balance?.toLocaleString() || '2,368.50'}</span>
+        </div>
+      </div>
 
-            {/* VIP Progress */}
-            <div className="bg-[var(--bg-primary)] rounded-xl p-4 border border-[var(--border-gold)]">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Crown className="w-5 h-5 text-[var(--gold)]" />
-                  <span className="font-bold text-white">VIP Level 3</span>
-                </div>
-                <span className="text-sm font-bold text-[var(--gold)]">65%</span>
+      {/* Profile Card */}
+      <div className="p-4">
+        <div className="card p-4">
+          <div className="flex items-center gap-4 mb-4">
+            <img 
+              src={user?.avatar} 
+              alt="Profile"
+              className="w-16 h-16 rounded-2xl bg-[var(--bg-elevated)]"
+            />
+            <div>
+              <h2 className="text-xl font-bold text-white">{user?.name || 'Player'}</h2>
+              <p className="text-sm text-[var(--text-muted)]">@{user?.username}</p>
+            </div>
+          </div>
+
+          {/* VIP Progress */}
+          <div className="bg-[var(--bg-elevated)] rounded-xl p-3">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Crown className="w-4 h-4 text-[var(--gold)]" />
+                <span className="font-semibold text-white text-sm">VIP Level 3</span>
               </div>
-              <div className="h-3 bg-black/40 rounded-full overflow-hidden border border-[var(--border)]">
-                <div className="h-full w-[65%] bg-gradient-to-r from-[var(--gold-dark)] via-[var(--gold)] to-[var(--gold-light)] rounded-full animate-pulse-gold" />
-              </div>
-              <p className="text-xs text-[var(--text-muted)] mt-2">350 XP to Level 4 • Unlock exclusive rewards</p>
+              <span className="text-xs text-[var(--text-muted)]">65%</span>
+            </div>
+            <div className="h-2 bg-[var(--bg-primary)] rounded-full overflow-hidden">
+              <div className="h-full w-[65%] bg-gradient-to-r from-[var(--gold)] to-[var(--orange)] rounded-full" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="px-4 pb-6">
-        <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="w-4 h-4 text-[var(--gold)]" />
-          <h2 className="text-sm font-bold text-[var(--gold)] uppercase tracking-wider">Your Stats</h2>
-        </div>
+      <div className="px-4 pb-4">
         <div className="grid grid-cols-3 gap-3">
           {stats.map((stat, i) => (
-            <div key={i} className="card p-4 text-center">
-              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mx-auto mb-2 border border-white/5`}>
-                <stat.icon className="w-5 h-5 text-[var(--gold)]" />
-              </div>
-              <p className="font-black text-lg text-white">{stat.value}</p>
+            <div key={i} className="card p-3 text-center">
+              <stat.icon className="w-5 h-5 text-[var(--gold)] mx-auto mb-1" />
+              <p className="font-bold text-white">{stat.value}</p>
               <p className="text-xs text-[var(--text-muted)]">{stat.label}</p>
             </div>
           ))}
@@ -104,11 +90,7 @@ const Profile = ({ user, navigate }) => {
 
       {/* Menu */}
       <div className="px-4 pb-8">
-        <div className="flex items-center gap-2 mb-3">
-          <Shield className="w-4 h-4 text-[var(--gold)]" />
-          <h2 className="text-sm font-bold text-[var(--gold)] uppercase tracking-wider">Settings</h2>
-        </div>
-        <div className="card divide-y divide-white/5">
+        <div className="rounded-2xl overflow-hidden">
           {menuItems.map((item, i) => (
             <button
               key={i}
@@ -116,16 +98,19 @@ const Profile = ({ user, navigate }) => {
                 tg?.HapticFeedback?.selectionChanged();
                 item.action?.();
               }}
-              className="w-full p-4 flex items-center gap-4"
+              className="menu-item w-full"
+              style={{
+                borderRadius: i === 0 ? '16px 16px 0 0' : i === menuItems.length - 1 ? '0 0 16px 16px' : '0'
+              }}
             >
-              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center border border-white/5`}>
-                <item.icon className={`w-5 h-5 ${item.iconColor}`} />
+              <div className="menu-icon">
+                <item.icon className="w-5 h-5 text-[var(--text-secondary)]" />
               </div>
-              <span className="flex-1 text-left font-bold text-white">{item.label}</span>
+              <span className="flex-1 text-left font-semibold text-white">{item.label}</span>
               {item.value && (
-                <span className="text-sm text-[var(--gold)] font-semibold">{item.value}</span>
+                <span className="text-sm text-[var(--text-muted)]">{item.value}</span>
               )}
-              <ChevronRight className="w-5 h-5 text-[var(--gold)]" />
+              <ChevronRight className="w-5 h-5 text-[var(--text-muted)]" />
             </button>
           ))}
         </div>
@@ -136,10 +121,7 @@ const Profile = ({ user, navigate }) => {
         <div className="modal-overlay" onClick={() => setShowLanguageModal(false)}>
           <div className="modal max-h-[70vh]" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Globe className="w-5 h-5 text-[var(--gold)]" />
-                <h3 className="font-bold text-white">{t('language')}</h3>
-              </div>
+              <h3 className="font-bold text-white">{t('language')}</h3>
               <button 
                 onClick={() => setShowLanguageModal(false)}
                 className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center"
@@ -156,14 +138,14 @@ const Profile = ({ user, navigate }) => {
                     changeLanguage(lang.code);
                     setShowLanguageModal(false);
                   }}
-                  className={`w-full p-3 flex items-center gap-3 rounded-xl transition-colors border ${
+                  className={`w-full p-3 flex items-center gap-3 rounded-xl transition-colors ${
                     currentLanguage === lang.code 
-                      ? 'bg-[var(--gold)]/10 border-[var(--border-gold)]' 
-                      : 'border-transparent hover:bg-white/5'
+                      ? 'bg-[var(--bg-elevated)]' 
+                      : 'hover:bg-[var(--bg-card)]'
                   }`}
                 >
                   <span className="text-2xl">{lang.flag}</span>
-                  <span className="flex-1 text-left text-white font-medium">{lang.name}</span>
+                  <span className="flex-1 text-left text-white">{lang.name}</span>
                   {currentLanguage === lang.code && (
                     <Check className="w-5 h-5 text-[var(--gold)]" />
                   )}

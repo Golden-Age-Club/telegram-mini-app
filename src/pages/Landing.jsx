@@ -1,135 +1,77 @@
 import { useEffect } from 'react';
-import { Play, Shield, Zap, Star, Crown, Sparkles } from 'lucide-react';
+import { Sparkles, Zap } from 'lucide-react';
 
 const Landing = ({ navigate }) => {
   const tg = window.Telegram?.WebApp;
 
   useEffect(() => {
     if (tg) {
-      tg.setHeaderColor('#0a0a0f');
-      tg.setBackgroundColor('#0a0a0f');
-    }
-  }, [tg]);
+      tg.setHeaderColor('#0f1923');
+      tg.setBackgroundColor('#0f1923');
+      tg.expand?.();
+      tg.ready?.();
 
-  useEffect(() => {
-    if (tg?.MainButton) {
-      tg.MainButton.setText('🎰 START PLAYING');
-      tg.MainButton.color = '#ffd700';
-      tg.MainButton.textColor = '#000000';
-      tg.MainButton.show();
-      tg.MainButton.onClick(() => {
-        tg.HapticFeedback?.impactOccurred('heavy');
-        navigate('home');
-      });
+      tg.MainButton?.setText('🎰 Start Playing');
+      tg.MainButton?.show();
+      tg.MainButton?.onClick(() => navigate('home'));
     }
+
     return () => {
       tg?.MainButton?.hide();
       tg?.MainButton?.offClick();
     };
   }, [tg, navigate]);
 
-  const features = [
-    { icon: Zap, title: 'Instant Wins', desc: 'Real-time payouts' },
-    { icon: Crown, title: 'VIP Rewards', desc: 'Exclusive bonuses' },
-    { icon: Shield, title: '100% Secure', desc: 'Bank-level encryption' },
-  ];
-
   return (
-    <div className="page">
-      {/* Hero Section */}
-      <div className="flex flex-col items-center pt-8 pb-6 px-4 text-center">
-        {/* Logo */}
-        <div className="relative mb-6">
-          <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-yellow-400 via-yellow-500 to-amber-600 flex items-center justify-center shadow-2xl animate-pulse-gold">
-            <Crown className="w-12 h-12 text-black" />
-          </div>
-          <div className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-xs font-bold shadow-lg">
-            VIP
-          </div>
+    <div className="page items-center justify-center px-6">
+      {/* Logo Area */}
+      <div className="text-center mb-8">
+        <div className="w-24 h-24 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-amber-500 via-orange-500 to-red-600 flex items-center justify-center shadow-lg shadow-orange-500/30 animate-float">
+          <span className="text-5xl">🎰</span>
         </div>
         
-        {/* Title */}
-        <h1 className="text-4xl font-black mb-2">
-          <span className="text-gold">ROYALE</span>
+        <h1 className="text-3xl font-black text-white mb-2">
+          MEGA CASINO
         </h1>
-        <p className="text-lg text-[var(--text-secondary)] mb-2">Premium Casino</p>
-        
-        {/* Tagline */}
-        <div className="flex items-center gap-2 text-[var(--gold)] text-sm font-semibold mb-6">
-          <Sparkles className="w-4 h-4" />
-          <span>Play • Win • Withdraw</span>
-          <Sparkles className="w-4 h-4" />
-        </div>
-
-        {/* Stats */}
-        <div className="flex gap-6 mb-8">
-          <div className="text-center">
-            <p className="text-2xl font-bold text-gold">$2.5M+</p>
-            <p className="text-xs text-[var(--text-muted)]">Won Today</p>
-          </div>
-          <div className="w-px bg-[var(--border)]" />
-          <div className="text-center">
-            <p className="text-2xl font-bold text-gold">50K+</p>
-            <p className="text-xs text-[var(--text-muted)]">Players</p>
-          </div>
-          <div className="w-px bg-[var(--border)]" />
-          <div className="text-center">
-            <p className="text-2xl font-bold text-gold">99.9%</p>
-            <p className="text-xs text-[var(--text-muted)]">Uptime</p>
-          </div>
-        </div>
+        <p className="text-[var(--text-muted)]">
+          Play & Win Big Prizes
+        </p>
       </div>
 
       {/* Features */}
-      <div className="px-4 space-y-3 mb-8">
-        {features.map((feat, i) => (
-          <div 
-            key={i}
-            className="card card-gold flex items-center gap-4 p-4"
-          >
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-amber-600/20 flex items-center justify-center border border-[var(--border-gold)]">
-              <feat.icon className="w-7 h-7 text-[var(--gold)]" />
+      <div className="w-full max-w-xs space-y-3 mb-8">
+        {[
+          { icon: '💰', title: 'Huge Jackpots', desc: 'Win up to $100,000' },
+          { icon: '🎁', title: 'Daily Bonuses', desc: 'Free spins every day' },
+          { icon: '⚡', title: 'Instant Payouts', desc: 'Withdraw anytime' },
+        ].map((feature, i) => (
+          <div key={i} className="card p-4 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-600/20 flex items-center justify-center">
+              <span className="text-2xl">{feature.icon}</span>
             </div>
             <div>
-              <h3 className="font-bold text-white">{feat.title}</h3>
-              <p className="text-sm text-[var(--text-muted)]">{feat.desc}</p>
+              <p className="font-bold text-white">{feature.title}</p>
+              <p className="text-sm text-[var(--text-muted)]">{feature.desc}</p>
             </div>
-            <Star className="w-5 h-5 text-[var(--gold)] ml-auto opacity-50" />
           </div>
         ))}
       </div>
 
-      {/* Jackpot Banner */}
-      <div className="px-4 mb-8">
-        <div className="card p-4 text-center bg-gradient-to-r from-purple-900/50 via-[var(--bg-secondary)] to-red-900/50 border-purple-500/30">
-          <p className="text-xs text-purple-400 font-semibold mb-1">🎰 MEGA JACKPOT</p>
-          <p className="text-3xl font-black text-gold animate-pulse">$127,849.50</p>
-          <p className="text-xs text-[var(--text-muted)] mt-1">Growing every second...</p>
-        </div>
-      </div>
-
-      {/* CTA for non-Telegram */}
+      {/* CTA Button (fallback for non-Telegram) */}
       {!tg?.MainButton && (
-        <div className="px-4 pb-8">
-          <button 
-            onClick={() => navigate('home')}
-            className="btn-primary w-full py-4 text-base"
-          >
-            <Play className="w-5 h-5" />
-            START PLAYING
-          </button>
-        </div>
+        <button 
+          onClick={() => navigate('home')}
+          className="btn-primary w-full max-w-xs py-4"
+        >
+          <Zap className="w-5 h-5" />
+          Start Playing
+        </button>
       )}
 
-      {/* Trust badges */}
-      <div className="px-4 pb-8 text-center">
-        <p className="text-xs text-[var(--text-muted)] mb-3">Trusted Partners</p>
-        <div className="flex justify-center gap-4 opacity-40">
-          <span className="text-xs font-bold">PG SOFT</span>
-          <span className="text-xs font-bold">PRAGMATIC</span>
-          <span className="text-xs font-bold">EGT</span>
-        </div>
-      </div>
+      {/* Footer */}
+      <p className="text-xs text-[var(--text-muted)] mt-8 text-center">
+        18+ | Play Responsibly
+      </p>
     </div>
   );
 };
