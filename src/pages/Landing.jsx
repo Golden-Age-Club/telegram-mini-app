@@ -1,30 +1,27 @@
 import { useEffect } from 'react';
-import { Sparkles, Play, Shield, Zap, Star } from 'lucide-react';
+import { Play, Shield, Zap, Star, Crown, Sparkles } from 'lucide-react';
 
 const Landing = ({ navigate }) => {
   const tg = window.Telegram?.WebApp;
 
-  // Set dark header in Telegram
   useEffect(() => {
     if (tg) {
-      tg.setHeaderColor('#09090b');
-      tg.setBackgroundColor('#09090b');
+      tg.setHeaderColor('#0a0a0f');
+      tg.setBackgroundColor('#0a0a0f');
     }
   }, [tg]);
 
-  // Use Telegram MainButton
   useEffect(() => {
     if (tg?.MainButton) {
-      tg.MainButton.setText('🎮 Start Playing');
-      tg.MainButton.color = '#f59e0b';
+      tg.MainButton.setText('🎰 START PLAYING');
+      tg.MainButton.color = '#ffd700';
       tg.MainButton.textColor = '#000000';
       tg.MainButton.show();
       tg.MainButton.onClick(() => {
-        tg.HapticFeedback?.impactOccurred('medium');
+        tg.HapticFeedback?.impactOccurred('heavy');
         navigate('home');
       });
     }
-
     return () => {
       tg?.MainButton?.hide();
       tg?.MainButton?.offClick();
@@ -32,26 +29,55 @@ const Landing = ({ navigate }) => {
   }, [tg, navigate]);
 
   const features = [
-    { icon: Zap, title: 'Instant Play', desc: 'No downloads' },
-    { icon: Star, title: 'VIP Rewards', desc: 'Exclusive bonuses' },
-    { icon: Shield, title: 'Secure', desc: 'Bank-level security' },
+    { icon: Zap, title: 'Instant Wins', desc: 'Real-time payouts' },
+    { icon: Crown, title: 'VIP Rewards', desc: 'Exclusive bonuses' },
+    { icon: Shield, title: '100% Secure', desc: 'Bank-level encryption' },
   ];
 
   return (
     <div className="page">
-      {/* Hero */}
-      <div className="flex flex-col items-center pt-12 pb-8 px-4">
-        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center mb-6 shadow-lg shadow-amber-500/30">
-          <Sparkles className="w-10 h-10 text-black" />
+      {/* Hero Section */}
+      <div className="flex flex-col items-center pt-8 pb-6 px-4 text-center">
+        {/* Logo */}
+        <div className="relative mb-6">
+          <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-yellow-400 via-yellow-500 to-amber-600 flex items-center justify-center shadow-2xl animate-pulse-gold">
+            <Crown className="w-12 h-12 text-black" />
+          </div>
+          <div className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-xs font-bold shadow-lg">
+            VIP
+          </div>
         </div>
         
-        <h1 className="text-3xl font-bold text-center mb-2 text-white">
-          Royale Gaming
+        {/* Title */}
+        <h1 className="text-4xl font-black mb-2">
+          <span className="text-gold">ROYALE</span>
         </h1>
+        <p className="text-lg text-[var(--text-secondary)] mb-2">Premium Casino</p>
         
-        <p className="text-[var(--text-muted)] text-center max-w-xs">
-          Premium slots and casino games. Play, win, and withdraw instantly.
-        </p>
+        {/* Tagline */}
+        <div className="flex items-center gap-2 text-[var(--gold)] text-sm font-semibold mb-6">
+          <Sparkles className="w-4 h-4" />
+          <span>Play • Win • Withdraw</span>
+          <Sparkles className="w-4 h-4" />
+        </div>
+
+        {/* Stats */}
+        <div className="flex gap-6 mb-8">
+          <div className="text-center">
+            <p className="text-2xl font-bold text-gold">$2.5M+</p>
+            <p className="text-xs text-[var(--text-muted)]">Won Today</p>
+          </div>
+          <div className="w-px bg-[var(--border)]" />
+          <div className="text-center">
+            <p className="text-2xl font-bold text-gold">50K+</p>
+            <p className="text-xs text-[var(--text-muted)]">Players</p>
+          </div>
+          <div className="w-px bg-[var(--border)]" />
+          <div className="text-center">
+            <p className="text-2xl font-bold text-gold">99.9%</p>
+            <p className="text-xs text-[var(--text-muted)]">Uptime</p>
+          </div>
+        </div>
       </div>
 
       {/* Features */}
@@ -59,31 +85,51 @@ const Landing = ({ navigate }) => {
         {features.map((feat, i) => (
           <div 
             key={i}
-            className="card flex items-center gap-4 p-4"
+            className="card card-gold flex items-center gap-4 p-4"
           >
-            <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center">
-              <feat.icon className="w-6 h-6 text-amber-500" />
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-amber-600/20 flex items-center justify-center border border-[var(--border-gold)]">
+              <feat.icon className="w-7 h-7 text-[var(--gold)]" />
             </div>
             <div>
-              <h3 className="font-semibold text-white">{feat.title}</h3>
+              <h3 className="font-bold text-white">{feat.title}</h3>
               <p className="text-sm text-[var(--text-muted)]">{feat.desc}</p>
             </div>
+            <Star className="w-5 h-5 text-[var(--gold)] ml-auto opacity-50" />
           </div>
         ))}
       </div>
 
-      {/* CTA for non-Telegram browsers */}
+      {/* Jackpot Banner */}
+      <div className="px-4 mb-8">
+        <div className="card p-4 text-center bg-gradient-to-r from-purple-900/50 via-[var(--bg-secondary)] to-red-900/50 border-purple-500/30">
+          <p className="text-xs text-purple-400 font-semibold mb-1">🎰 MEGA JACKPOT</p>
+          <p className="text-3xl font-black text-gold animate-pulse">$127,849.50</p>
+          <p className="text-xs text-[var(--text-muted)] mt-1">Growing every second...</p>
+        </div>
+      </div>
+
+      {/* CTA for non-Telegram */}
       {!tg?.MainButton && (
         <div className="px-4 pb-8">
           <button 
             onClick={() => navigate('home')}
-            className="btn-primary w-full py-4"
+            className="btn-primary w-full py-4 text-base"
           >
             <Play className="w-5 h-5" />
-            Start Playing
+            START PLAYING
           </button>
         </div>
       )}
+
+      {/* Trust badges */}
+      <div className="px-4 pb-8 text-center">
+        <p className="text-xs text-[var(--text-muted)] mb-3">Trusted Partners</p>
+        <div className="flex justify-center gap-4 opacity-40">
+          <span className="text-xs font-bold">PG SOFT</span>
+          <span className="text-xs font-bold">PRAGMATIC</span>
+          <span className="text-xs font-bold">EGT</span>
+        </div>
+      </div>
     </div>
   );
 };
