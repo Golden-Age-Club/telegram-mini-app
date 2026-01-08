@@ -1,149 +1,257 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Flame, Star } from 'lucide-react';
+import { ChevronRight, Trophy, TrendingUp, Users } from 'lucide-react';
+import Layout from '../components/Layout';
+import GameCard from '../components/GameCard';
 import SlotMachine from '../components/SlotMachine';
+import Roulette from '../components/Roulette';
 import CardFlip from '../components/CardFlip';
 import Confetti from '../components/Confetti';
 
 const Game = ({ user, updateBalance, navigate, gameData }) => {
-  const tg = window.Telegram?.WebApp;
   const [showConfetti, setShowConfetti] = useState(false);
   const [lastWin, setLastWin] = useState(null);
-  const [activeGame, setActiveGame] = useState('slots');
+  const [activeGame, setActiveGame] = useState(gameData?.game || 'slots');
+  const [gameStats, setGameStats] = useState({
+    totalWins: 0,
+    biggestWin: 0,
+    gamesPlayed: 0,
+    winStreak: 0
+  });
 
-  useEffect(() => {
-    if (tg) {
-      tg.setHeaderColor('#000000');
-      tg.setBackgroundColor('#000000');
-      
-      tg.BackButton?.show();
-      tg.BackButton?.onClick(() => navigate('home'));
-    }
-
-    return () => {
-      tg?.BackButton?.hide();
-      tg?.BackButton?.offClick();
-    };
-  }, [tg, navigate]);
-
-  const relatedGames = [
-    { id: 1, name: 'Caishen Wins', gradient: 'from-red-600 to-orange-500' },
-    { id: 2, name: 'Lucky Neko', gradient: 'from-amber-500 to-yellow-400' },
-    { id: 3, name: 'Shining Crown', gradient: 'from-purple-600 to-pink-500' },
-    { id: 4, name: 'Super Hot', gradient: 'from-red-500 to-red-700' },
+  const gameOptions = [
+    { 
+      id: 'slots', 
+      name: 'Golden Age Slots', 
+      icon: '🎰', 
+      subtitle: 'Premium Vegas Experience',
+      isHot: true,
+      component: SlotMachine
+    },
+    { 
+      id: 'roulette', 
+      name: 'Emerald Roulette', 
+      icon: '🎯', 
+      subtitle: 'European Casino Style',
+      isLive: true,
+      component: Roulette
+    },
+    { 
+      id: 'cards', 
+      name: 'Royal Blackjack', 
+      icon: '🃏', 
+      subtitle: 'Classic Card Game',
+      isNew: true,
+      component: CardFlip
+    },
   ];
+
+  const currentGameData = gameOptions.find(g => g.id === activeGame);
+  const GameComponent = currentGameData?.component;
 
   const handleWin = (amount) => {
     setLastWin(amount);
     setShowConfetti(true);
     updateBalance(amount);
-    tg?.HapticFeedback?.notificationOccurred('success');
+    
+    setGameStats(prev => ({
+      ...prev,
+      totalWins: prev.totalWins + amount,
+      biggestWin: Math.max(prev.biggestWin, amount),
+      gamesPlayed: prev.gamesPlayed + 1,
+      winStreak: prev.winStreak + 1
+    }));
+
+    // Telegram haptic feedback
+    window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('success');
   };
 
   const handleLose = (amount) => {
     updateBalance(-amount);
-    tg?.HapticFeedback?.notificationOccurred('error');
+    setGameStats(prev => ({
+      ...prev,
+      gamesPlayed: prev.gamesPlayed + 1,
+      winStreak: 0
+    }));
+    
+    window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('error');
+  };
+
+  const handleGameSwitch = (gameId) => {
+    setActiveGame(gameId);
+    setLastWin(null);
+    window.Telegram?.WebApp?.HapticFeedback?.impactOccurred('light');
   };
 
   return (
-    <div className="page">
-      <Confetti active={showConfetti} onComplete={() => setShowConfetti(false)} />
+    <Layout 
+      title={currentGameData?.name} 
+      user={user} 
+      showBack={true} 
+      onBack={() => navigate('home')}
+    >
+      <div className="page space-y-6">
+        {showConfetti && <Confetti onComplete={() => setShowConfetti(false)} />}
 
-      {/* Header */}
-      <div className="header-bar">
-        <button 
-          onClick={() => navigate('home')}
-          className="flex items-center gap-1 text-white"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-        <div className="balance-chip">
-          <div className="coin-icon">$</div>
-          <span className="text-[var(--gold)]">{user?.balance?.toLocaleString() || '2,368.50'}</span>
-        </div>
-      </div>
-
-      {/* Mega Win Display */}
-      {lastWin && lastWin >= 100 && (
-        <div className="p-4">
-          <div className="mega-win">
-            <div className="relative z-10">
-              <p className="mega-win-title">MEGA WIN!</p>
-              <p className="mega-win-amount">{lastWin.toLocaleString()}.00</p>
+        {/* Mega Win Display */}
+        {lastWin && lastWin >= 100 && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+            <div className="card text-center max-w-sm mx-4 glow-gold">
+              <div className="text-6xl mb-4">🎉</div>
+              <h2 className="text-2xl font-bold text-gradient-gold mb-2">MEGA WIN!</h2>
+              <div className="text-4xl font-bold text-gradient-emerald mb-4">
+                ${lastWin.toLocaleString()}
+              </div>
+              <button 
+                onClick={() => setLastWin(null)}
+                className="btn btn-primary"
+              >
+                Continue Playing
+              </button>
             </div>
-            <div className="absolute inset-0 flex items-center justify-center opacity-30">
-              <span className="text-8xl">💰</span>
+          </div>
+        )}
+
+        {/* Game Selection Tabs */}
+        <div className="px-4">
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {gameOptions.map((game) => (
+              <button
+                key={game.id}
+                onClick={() => handleGameSwitch(game.id)}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg whitespace-nowrap transition-all ${
+                  activeGame === game.id
+                    ? 'bg-gradient-to-r from-amber-600 to-amber-500 text-white'
+                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                }`}
+              >
+                <span className="text-xl">{game.icon}</span>
+                <div className="text-left">
+                  <div className="font-medium text-sm">{game.name}</div>
+                  <div className="text-xs opacity-80">{game.subtitle}</div>
+                </div>
+                {game.isHot && <span className="text-xs bg-red-500 px-2 py-1 rounded-full">HOT</span>}
+                {game.isLive && <span className="text-xs bg-emerald-500 px-2 py-1 rounded-full">LIVE</span>}
+                {game.isNew && <span className="text-xs bg-blue-500 px-2 py-1 rounded-full">NEW</span>}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Game Stats */}
+        <div className="px-4">
+          <div className="grid-2 gap-4">
+            <div className="card text-center">
+              <div className="text-2xl mb-2">💰</div>
+              <div className="text-sm text-gray-400">Total Wins</div>
+              <div className="text-lg font-bold text-gradient-emerald">
+                ${gameStats.totalWins.toLocaleString()}
+              </div>
+            </div>
+            <div className="card text-center">
+              <div className="text-2xl mb-2">🔥</div>
+              <div className="text-sm text-gray-400">Win Streak</div>
+              <div className="text-lg font-bold text-gradient-gold">
+                {gameStats.winStreak}
+              </div>
             </div>
           </div>
         </div>
-      )}
 
-      {/* Game Tabs */}
-      <div className="tab-container py-3">
-        <button 
-          onClick={() => setActiveGame('slots')}
-          className={`tab ${activeGame === 'slots' ? 'active' : ''}`}
-        >
-          🎰 Slots
-        </button>
-        <button 
-          onClick={() => setActiveGame('cards')}
-          className={`tab ${activeGame === 'cards' ? 'active' : ''}`}
-        >
-          🃏 Cards
-        </button>
-      </div>
-
-      {/* Game Area */}
-      <div className="px-4 pb-4">
-        <div className="card p-4">
-          {activeGame === 'slots' ? (
-            <SlotMachine onWin={handleWin} onLose={handleLose} />
-          ) : (
-            <CardFlip onWin={handleWin} onLose={handleLose} />
-          )}
+        {/* Main Game Area */}
+        <div className="px-4">
+          <div className="card p-6 bg-gradient-to-br from-black via-gray-900 to-black border-amber-500/20">
+            <div className="mb-4 text-center">
+              <h2 className="text-xl font-bold text-gradient-gold mb-2">
+                {currentGameData?.name}
+              </h2>
+              <p className="text-gray-400 text-sm">{currentGameData?.subtitle}</p>
+            </div>
+            
+            {GameComponent && (
+              <GameComponent 
+                onWin={handleWin} 
+                onLose={handleLose}
+                user={user}
+              />
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Related Games */}
-      <div className="px-4 pb-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-bold text-white">More Games</h3>
-          <button className="text-xs text-[var(--text-muted)] flex items-center gap-1">
-            See all <ChevronRight className="w-4 h-4" />
-          </button>
+        {/* Game Statistics */}
+        <div className="px-4">
+          <div className="card">
+            <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <TrendingUp size={20} className="text-emerald-400" />
+              Your Statistics
+            </h3>
+            <div className="grid-2 gap-4">
+              <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Trophy size={16} className="text-amber-400" />
+                  <span className="text-sm text-gray-400">Biggest Win</span>
+                </div>
+                <span className="font-bold text-amber-400">
+                  ${gameStats.biggestWin.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Users size={16} className="text-blue-400" />
+                  <span className="text-sm text-gray-400">Games Played</span>
+                </div>
+                <span className="font-bold text-blue-400">
+                  {gameStats.gamesPlayed}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="flex gap-3 overflow-x-auto no-scrollbar">
-          {relatedGames.map((game) => (
-            <button
-              key={game.id}
-              onClick={() => tg?.HapticFeedback?.impactOccurred('light')}
-              className={`w-20 h-20 rounded-xl bg-gradient-to-br ${game.gradient} flex-shrink-0 flex flex-col items-center justify-center gap-1`}
+
+        {/* Other Games */}
+        <div className="px-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-white">Other Games</h3>
+            <button 
+              onClick={() => navigate('home')}
+              className="text-amber-400 text-sm hover:text-amber-300 transition-colors flex items-center gap-1"
             >
-              <span className="text-2xl">🎰</span>
-              <span className="text-[10px] text-white font-medium px-1 text-center leading-tight">{game.name}</span>
+              View All <ChevronRight size={16} />
             </button>
-          ))}
+          </div>
+          
+          <div className="space-y-2">
+            {gameOptions
+              .filter(game => game.id !== activeGame)
+              .map((game) => (
+                <GameCard
+                  key={game.id}
+                  game={game}
+                  variant="compact"
+                  onClick={() => handleGameSwitch(game.id)}
+                />
+              ))}
+          </div>
         </div>
-      </div>
 
-      {/* Quick Actions */}
-      <div className="px-4 pb-8">
-        <div className="grid grid-cols-2 gap-3">
-          <button 
-            onClick={() => navigate('wallet')}
-            className="btn-primary w-full"
-          >
-            Deposit
-          </button>
-          <button 
-            onClick={() => navigate('home')}
-            className="btn-secondary w-full"
-          >
-            More Games
-          </button>
+        {/* Quick Actions */}
+        <div className="px-4 pb-8">
+          <div className="grid-2 gap-4">
+            <button 
+              onClick={() => navigate('wallet')}
+              className="btn btn-success"
+            >
+              💰 Deposit
+            </button>
+            <button 
+              onClick={() => navigate('home')}
+              className="btn btn-secondary"
+            >
+              🎮 More Games
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 

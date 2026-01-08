@@ -1,279 +1,268 @@
-import { useState, useEffect } from 'react';
-import { ChevronRight, Flame, Star, Sparkles, Gift, X, Zap } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronRight, Search, Filter, X } from 'lucide-react';
+import Layout from '../components/Layout';
+import { GameGrid } from '../components/GameCard';
 import SpinWheel from '../components/SpinWheel';
 import ScratchCard from '../components/ScratchCard';
 import Confetti from '../components/Confetti';
 
 const Home = ({ user, navigate }) => {
-  const tg = window.Telegram?.WebApp;
   const [showWheel, setShowWheel] = useState(false);
   const [showScratch, setShowScratch] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [activeTab, setActiveTab] = useState('pg');
-
-  useEffect(() => {
-    if (tg) {
-      tg.setHeaderColor('#000000');
-      tg.setBackgroundColor('#000000');
-    }
-  }, [tg]);
+  const [activeCategory, setActiveCategory] = useState('featured');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const featuredGames = [
     { 
-      id: 'premium-slots', 
-      name: 'Premium Collection', 
-      subtitle: 'Elite Gaming Experience', 
-      gradient: 'from-black via-emerald-900 to-emerald-800',
-      icon: '💎'
+      id: 'golden-slots', 
+      name: 'Golden Age Slots', 
+      subtitle: 'Premium Vegas Experience', 
+      icon: '🎰',
+      isHot: true,
+      stats: { players: '1.2k', lastWin: '15,000' }
     },
     { 
-      id: 'vip-games', 
-      name: 'VIP Exclusives', 
-      subtitle: 'Members Only Access', 
-      gradient: 'from-emerald-900 via-emerald-800 to-emerald-700',
-      icon: '👑'
+      id: 'emerald-roulette', 
+      name: 'Emerald Roulette', 
+      subtitle: 'European Casino Style', 
+      icon: '🎯',
+      isLive: true,
+      stats: { players: '856', avgTime: '3m' }
     },
+    { 
+      id: 'royal-blackjack', 
+      name: 'Royal Blackjack', 
+      subtitle: 'Classic Card Game', 
+      icon: '🃏',
+      isNew: true,
+      stats: { players: '432', lastWin: '8,500' }
+    },
+    { 
+      id: 'diamond-poker', 
+      name: 'Diamond Poker', 
+      subtitle: 'High Stakes Poker', 
+      icon: '💎',
+      stats: { players: '234', lastWin: '25,000' }
+    }
   ];
 
-  const providers = [
-    { id: 'premium', name: 'Premium Games', icon: '💎', desc: 'Elite Selection' },
-    { id: 'classic', name: 'Classic Games', icon: '🎰', desc: 'Timeless Favorites' },
+  const gameCategories = [
+    { id: 'featured', name: 'Featured', icon: '⭐', count: featuredGames.length },
+    { id: 'slots', name: 'Slots', icon: '🎰', count: 12 },
+    { id: 'table', name: 'Table Games', icon: '🎯', count: 8 },
+    { id: 'live', name: 'Live Casino', icon: '📹', count: 6 },
+    { id: 'new', name: 'New Games', icon: '✨', count: 4 }
   ];
 
-  const todaysPicks = [
-    { id: 1, gradient: 'from-emerald-800 to-emerald-700' },
-    { id: 2, gradient: 'from-emerald-700 to-emerald-600' },
-    { id: 3, gradient: 'from-emerald-600 to-emerald-500' },
-    { id: 4, gradient: 'from-emerald-500 to-emerald-400' },
-    { id: 5, gradient: 'from-emerald-400 to-emerald-300' },
+  const quickActions = [
+    { 
+      id: 'daily-bonus', 
+      title: 'Daily Bonus', 
+      subtitle: 'Spin the wheel', 
+      icon: '🎁',
+      action: () => setShowWheel(true),
+      gradient: 'from-emerald-600 to-emerald-500'
+    },
+    { 
+      id: 'scratch-card', 
+      title: 'Scratch Card', 
+      subtitle: 'Win instantly', 
+      icon: '🎫',
+      action: () => setShowScratch(true),
+      gradient: 'from-purple-600 to-purple-500'
+    },
+    { 
+      id: 'tournaments', 
+      title: 'Tournaments', 
+      subtitle: 'Compete now', 
+      icon: '🏆',
+      action: () => navigate('tournaments'),
+      gradient: 'from-amber-600 to-amber-500'
+    }
   ];
 
-  const games = [
-    { id: 'golden-fortune', name: 'Golden Fortune', provider: 'Premium', hot: true, thumb: 'from-yellow-600 to-yellow-700' },
-    { id: 'emerald-riches', name: 'Emerald Riches', provider: 'Premium', hot: true, thumb: 'from-emerald-600 to-emerald-700' },
-    { id: 'diamond-dynasty', name: 'Diamond Dynasty', provider: 'Elite', hot: false, thumb: 'from-blue-600 to-blue-700' },
-    { id: 'royal-treasures', name: 'Royal Treasures', provider: 'VIP', hot: false, thumb: 'from-purple-600 to-purple-700' },
-  ];
-
-  const handleWheelComplete = () => {
-    setShowConfetti(true);
-    tg?.HapticFeedback?.notificationOccurred('success');
-    setTimeout(() => setShowWheel(false), 2500);
+  const handleGameClick = (game) => {
+    navigate('game', { selectedGame: game.id });
   };
 
-  const handleScratchComplete = () => {
+  const handleWheelWin = (prize) => {
+    setShowWheel(false);
     setShowConfetti(true);
-    tg?.HapticFeedback?.notificationOccurred('success');
-    setTimeout(() => setShowScratch(false), 2500);
+    setTimeout(() => setShowConfetti(false), 3000);
   };
+
+  const filteredGames = featuredGames.filter(game =>
+    game.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    game.subtitle.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <div className="page">
-      <Confetti active={showConfetti} onComplete={() => setShowConfetti(false)} />
-
-      {/* Header */}
-      <div className="header-bar">
-        <div className="app-title">
-          <div className="telegram-icon">
-            <span className="text-white text-sm font-bold">✈</span>
+    <Layout title="Casino" user={user}>
+      <div className="page p-4 space-y-6">
+        <div className="card">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gradient-gold">
+                Welcome to Golden Age Cash
+              </h1>
+              <p className="text-gray-400 mt-1">
+                Premium casino experience awaits
+              </p>
+            </div>
+            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gold/30">
+              <img 
+                src="/casinologo.jpg" 
+                alt="Golden Age Cash"
+                className="w-full h-full object-cover"
+              />
+            </div>
           </div>
-          <span className="font-semibold text-white">Golden Age Cash</span>
-        </div>
-        <div className="balance-chip">
-          <div className="coin-icon">$</div>
-          <span className="text-[var(--gold)]">{user?.balance?.toLocaleString() || '2,368.5'}</span>
-          <ChevronRight className="w-4 h-4 text-[var(--text-muted)]" />
-        </div>
-      </div>
-
-      {/* Featured Games */}
-      <div className="p-5">
-        <div className="grid grid-cols-2 gap-4">
-          {featuredGames.map((game) => (
-            <button
-              key={game.id}
-              onClick={() => {
-                tg?.HapticFeedback?.impactOccurred('medium');
-                navigate('game', { game: game.name });
-              }}
-              className={`featured-card bg-gradient-to-br ${game.gradient}`}
-            >
-              <div className="featured-card-icon animate-float">
-                {game.icon}
-              </div>
-              <div className="featured-card-content">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-[var(--gold)] rounded-full animate-pulse"></span>
+          
+          {user?.balance !== undefined && (
+            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-emerald-900/30 to-emerald-800/30 rounded-lg border border-emerald-500/20">
+              <div>
+                <div className="text-sm text-gray-400">Your Balance</div>
+                <div className="text-2xl font-bold text-gradient-emerald">
+                  ${user.balance.toLocaleString()}
                 </div>
+              </div>
+              <button className="btn btn-success btn-sm">
+                <span>💰</span>
+                Deposit
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-white">Quick Actions</h2>
+          <div className="grid-3">
+            {quickActions.map((action) => (
+              <button
+                key={action.id}
+                onClick={action.action}
+                className={`card hover:scale-105 transition-transform bg-gradient-to-br ${action.gradient}`}
+              >
+                <div className="text-center">
+                  <div className="text-2xl mb-2">{action.icon}</div>
+                  <div className="font-semibold text-white">{action.title}</div>
+                  <div className="text-xs text-white/80">{action.subtitle}</div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="flex-1 relative">
+              <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search games..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="form-input pl-10"
+              />
+            </div>
+            <button className="btn btn-secondary">
+              <Filter size={18} />
+            </button>
+          </div>
+
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {gameCategories.map((category) => (
+              <button
+                key={category.id}
+                onClick={() => setActiveCategory(category.id)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg whitespace-nowrap transition-all ${
+                  activeCategory === category.id
+                    ? 'bg-gradient-to-r from-amber-600 to-amber-500 text-white'
+                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                }`}
+              >
+                <span>{category.icon}</span>
+                <span className="font-medium">{category.name}</span>
+                <span className="text-xs bg-white/20 px-2 py-1 rounded-full">
+                  {category.count}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-white">Featured Games</h2>
+            <button className="text-amber-400 text-sm hover:text-amber-300 transition-colors">
+              View All <ChevronRight size={16} className="inline" />
+            </button>
+          </div>
+          
+          <GameGrid
+            games={filteredGames}
+            onGameClick={handleGameClick}
+            variant="default"
+          />
+        </div>
+
+        <div className="card">
+          <h3 className="text-lg font-semibold text-white mb-4">Recent Big Wins</h3>
+          <div className="space-y-3">
+            {[
+              { player: 'Player***123', game: 'Golden Age Slots', amount: 15000 },
+              { player: 'Lucky***789', game: 'Emerald Roulette', amount: 8500 },
+              { player: 'Winner***456', game: 'Diamond Poker', amount: 25000 }
+            ].map((win, index) => (
+              <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                 <div>
-                  <div className="featured-card-title">{game.name}</div>
-                  <div className="featured-card-subtitle">{game.subtitle}</div>
+                  <div className="font-medium text-white">{win.player}</div>
+                  <div className="text-sm text-gray-400">{win.game}</div>
+                </div>
+                <div className="text-emerald-400 font-bold">
+                  +${win.amount.toLocaleString()}
                 </div>
               </div>
-            </button>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Provider Tabs */}
-      <div className="px-5 pb-5">
-        <div className="grid grid-cols-2 gap-4">
-          {providers.map((provider) => (
-            <button
-              key={provider.id}
-              onClick={() => setActiveTab(provider.id)}
-              className={`provider-card ${activeTab === provider.id ? 'active' : ''}`}
-            >
-              <div className="flex items-center gap-3">
-                <div className="provider-icon">
-                  <span>{provider.icon}</span>
-                </div>
-                <div className="text-left">
-                  <p className="font-bold text-white text-sm">{provider.name}</p>
-                  <p className="text-xs text-[var(--text-muted)]">{provider.desc}</p>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Section Divider */}
-      <div className="px-5 pb-3">
-        <div className="flex items-center gap-3">
-          <div className="h-px bg-gradient-to-r from-transparent via-[var(--border-light)] to-transparent flex-1"></div>
-          <span className="text-sm font-bold text-[var(--text-secondary)] uppercase tracking-wider">Today's Picks</span>
-          <div className="h-px bg-gradient-to-r from-transparent via-[var(--border-light)] to-transparent flex-1"></div>
-        </div>
-      </div>
-
-      {/* Today's Picks */}
-      <div className="picks-container">
-        {todaysPicks.map((pick) => (
-          <button
-            key={pick.id}
-            onClick={() => {
-              tg?.HapticFeedback?.impactOccurred('light');
-              navigate('game');
-            }}
-            className={`pick-item bg-gradient-to-br ${pick.gradient}`}
-          >
-            <span>🎰</span>
-          </button>
-        ))}
-      </div>
-
-      {/* Daily Bonus */}
-      <div className="px-5 pb-4">
-        <div className="grid grid-cols-2 gap-4">
-          <button 
-            onClick={() => setShowWheel(true)}
-            className="bonus-card"
-          >
-            <div className="bonus-icon bg-gradient-to-br from-emerald-600 to-emerald-700">
-              <Gift className="w-6 h-6 text-white" />
-            </div>
-            <div className="bonus-content">
-              <h3>Daily Bonus</h3>
-              <p>Premium rewards</p>
-            </div>
-          </button>
-          <button 
-            onClick={() => setShowScratch(true)}
-            className="bonus-card"
-          >
-            <div className="bonus-icon bg-gradient-to-br from-yellow-600 to-yellow-700">
-              <Sparkles className="w-6 h-6 text-white" />
-            </div>
-            <div className="bonus-content">
-              <h3>VIP Scratch</h3>
-              <p>Exclusive prizes</p>
-            </div>
-          </button>
-        </div>
-      </div>
-
-      {/* Filter Pills */}
-      <div className="filter-container">
-        <span className="filter-pill hot active">
-          <span className="w-2 h-2 bg-[var(--gold)] rounded-full"></span> Premium
-        </span>
-        <span className="filter-pill new">
-          <span className="w-2 h-2 bg-emerald-400 rounded-full"></span> New Arrivals
-        </span>
-        <span className="filter-pill free">
-          <span className="text-[var(--gold)] font-bold">💎</span> VIP Only
-        </span>
-        <span className="filter-pill favorites">
-          <Star className="w-3 h-3" /> Favorites
-        </span>
-      </div>
-
-      {/* Game List */}
-      <div className="game-list">
-        {games.map((game) => (
-          <button
-            key={game.id}
-            onClick={() => {
-              tg?.HapticFeedback?.impactOccurred('medium');
-              navigate('game', { game: game.name });
-            }}
-            className="game-list-item w-full"
-          >
-            <div className={`game-thumb bg-gradient-to-br ${game.thumb}`}>
-              <span>🎰</span>
-            </div>
-            <div className="game-info">
-              <div className="game-title">
-                <h3>{game.name}</h3>
-                {game.hot && (
-                  <span className="hot-badge">
-                    <Flame className="w-3 h-3" />
-                    HOT
-                  </span>
-                )}
-              </div>
-              <p className="game-provider">{game.provider}</p>
-            </div>
-            <button className="btn-play">Play Now</button>
-          </button>
-        ))}
-      </div>
-
-      {/* Spin Wheel Modal */}
       {showWheel && (
-        <div className="modal-overlay" onClick={() => setShowWheel(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <button 
-              onClick={() => setShowWheel(false)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center"
-            >
-              <X className="w-4 h-4 text-white" />
-            </button>
-            <h2 className="text-xl font-bold text-center mb-2 text-white">🎡 Lucky Spin</h2>
-            <p className="text-sm text-[var(--text-muted)] text-center mb-4">Spin to win prizes!</p>
-            <SpinWheel onComplete={handleWheelComplete} />
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3 className="modal-title">Daily Bonus Wheel</h3>
+              <button onClick={() => setShowWheel(false)} className="modal-close">
+                <X size={20} />
+              </button>
+            </div>
+            <SpinWheel onWin={handleWheelWin} />
           </div>
         </div>
       )}
 
-      {/* Scratch Card Modal */}
       {showScratch && (
-        <div className="modal-overlay" onClick={() => setShowScratch(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <button 
-              onClick={() => setShowScratch(false)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center"
-            >
-              <X className="w-4 h-4 text-white" />
-            </button>
-            <h2 className="text-xl font-bold text-center mb-2 text-white">🎫 Scratch & Win</h2>
-            <p className="text-sm text-[var(--text-muted)] text-center mb-4">Reveal your prize!</p>
-            <ScratchCard onComplete={handleScratchComplete} />
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3 className="modal-title">Scratch Card</h3>
+              <button onClick={() => setShowScratch(false)} className="modal-close">
+                <X size={20} />
+              </button>
+            </div>
+            <ScratchCard onWin={(prize) => {
+              setShowScratch(false);
+              setShowConfetti(true);
+              setTimeout(() => setShowConfetti(false), 3000);
+            }} />
           </div>
         </div>
       )}
-    </div>
+
+      {showConfetti && <Confetti />}
+    </Layout>
   );
 };
 
