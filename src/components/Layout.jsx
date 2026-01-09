@@ -30,19 +30,19 @@ const Layout = ({ children, title, showBack = false, onBack, user, navigate, cur
     <div className="app">
       {/* Mobile Header */}
       <header className="header-bar">
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+        <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
           {showBack && (
             <button
               onClick={onBack}
-              className="p-2 rounded-lg hover:bg-white/10 transition-colors touch-manipulation"
+              className="p-2 rounded-lg hover:bg-white/10 transition-colors touch-manipulation flex-shrink-0"
               style={{ minWidth: '44px', minHeight: '44px' }}
             >
               <ChevronLeft size={20} className="text-white" />
             </button>
           )}
           
-          <div className="app-title">
-            <div className="telegram-icon overflow-hidden relative">
+          <div className="app-title min-w-0">
+            <div className="telegram-icon overflow-hidden relative flex-shrink-0">
               <img 
                 src="/casinologo.jpg" 
                 alt="Golden Age Cash"
@@ -50,8 +50,8 @@ const Layout = ({ children, title, showBack = false, onBack, user, navigate, cur
               />
               <div className="absolute inset-0 rounded-full border-2 border-emerald-500/30 pointer-events-none"></div>
             </div>
-            <div className="min-w-0 flex-1">
-              <div className="font-bold text-gradient-gold tracking-tight text-base truncate">
+            <div className="min-w-0 flex-1 overflow-hidden">
+              <div className="font-bold text-gradient-gold tracking-tight text-sm sm:text-base truncate">
                 Golden Age Cash
               </div>
               {title && (
@@ -63,17 +63,17 @@ const Layout = ({ children, title, showBack = false, onBack, user, navigate, cur
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
           {user?.balance !== undefined && (
             <div className="balance-chip">
-              <span className="text-xs">💰</span>
+              <span className="text-xs flex-shrink-0">💰</span>
               <span className="truncate">${user.balance.toLocaleString()}</span>
             </div>
           )}
           
           <button
             onClick={() => setShowMobileMenu(true)}
-            className="p-2 rounded-lg hover:bg-white/10 transition-colors touch-manipulation"
+            className="p-2 rounded-lg hover:bg-white/10 transition-colors touch-manipulation flex-shrink-0"
             style={{ minWidth: '44px', minHeight: '44px' }}
           >
             <Menu size={20} className="text-white" />
@@ -113,7 +113,7 @@ const Layout = ({ children, title, showBack = false, onBack, user, navigate, cur
       )}
 
       {/* Main Content */}
-      <main className="flex-1 overflow-hidden">
+      <main className="flex-1 overflow-hidden w-full max-w-full">
         {children}
       </main>
 

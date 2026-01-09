@@ -83,6 +83,10 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
   position: relative;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .page {
@@ -98,7 +102,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-md);
   background: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
@@ -106,19 +110,36 @@ body {
   top: 0;
   z-index: 40;
   min-height: 60px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .header-bar {
+    padding: var(--spacing-md) var(--spacing-lg);
+  }
 }
 
 .app-title {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
   flex: 1;
   min-width: 0; /* Allow text truncation */
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .app-title {
+    gap: var(--spacing-md);
+  }
 }
 
 .telegram-icon {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   background: linear-gradient(135deg, #0088cc, #005fa3);
   border-radius: 50%;
   display: flex;
@@ -128,20 +149,39 @@ body {
   flex-shrink: 0;
 }
 
+@media (min-width: 640px) {
+  .telegram-icon {
+    width: 32px;
+    height: 32px;
+  }
+}
+
 .balance-chip {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs);
   background: rgba(15, 26, 15, 0.8);
   backdrop-filter: blur(10px);
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: 20px;
   font-weight: 600;
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   border: 1px solid var(--border-light);
   box-shadow: 0 2px 8px var(--gold-glow-soft);
   flex-shrink: 0;
-  min-width: 80px;
+  min-width: 60px;
+  max-width: 120px;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .balance-chip {
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--text-sm);
+    min-width: 80px;
+    max-width: none;
+  }
 }
 
 .coin-icon {
@@ -168,6 +208,9 @@ body {
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   margin-bottom: var(--spacing-md);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* Featured Game Card - Mobile Optimized */
@@ -434,12 +477,16 @@ body {
   right: 0;
   z-index: 50;
   padding-bottom: env(safe-area-inset-bottom, 0px);
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .bottom-nav-item {
   position: relative;
   transition: all 0.3s ease;
-  padding: var(--spacing-md) var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-xs);
   touch-action: manipulation;
   min-height: 64px;
   display: flex;
@@ -447,6 +494,15 @@ body {
   align-items: center;
   justify-content: center;
   gap: var(--spacing-xs);
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .bottom-nav-item {
+    padding: var(--spacing-md) var(--spacing-sm);
+  }
 }
 
 .bottom-nav-item.active::before {
@@ -1156,11 +1212,20 @@ button, .btn, .card, .bottom-nav-item {
 .casino-game-container {
   max-width: 400px;
   margin: 0 auto;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
   background: rgba(15, 26, 15, 0.6);
   backdrop-filter: blur(10px);
   border-radius: 20px;
   border: 1px solid var(--border);
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .casino-game-container {
+    padding: var(--spacing-lg);
+  }
 }
 
 .chip-stack {
@@ -1372,10 +1437,19 @@ button, .btn, .card, .bottom-nav-item {
   backdrop-filter: blur(20px);
   border-radius: 20px;
   border: 2px solid var(--gold);
-  padding: var(--spacing-xl);
+  padding: var(--spacing-lg) var(--spacing-md);
   position: relative;
   overflow: hidden;
   box-shadow: 0 8px 32px var(--gold-glow-soft);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+  .wallet-card {
+    padding: var(--spacing-xl);
+  }
 }
 
 .wallet-balance-label {

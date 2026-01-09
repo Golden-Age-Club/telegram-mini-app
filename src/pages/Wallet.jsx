@@ -172,14 +172,14 @@ const Wallet = ({ user, updateBalance, navigate }) => {
       <div className="header-bar">
         <button 
           onClick={() => navigate('home')}
-          className="w-8 h-8 rounded-full bg-[#0088cc] flex items-center justify-center"
+          className="w-8 h-8 rounded-full bg-[#0088cc] flex items-center justify-center flex-shrink-0"
         >
           <span className="text-white text-sm">✈</span>
         </button>
-        <span className="font-bold text-white">My Wallet</span>
-        <div className="balance-chip">
+        <span className="font-bold text-white truncate flex-1 min-w-0 text-center">My Wallet</span>
+        <div className="balance-chip flex-shrink-0">
           <div className="coin-icon">$</div>
-          <span className="text-[var(--gold)]">{user?.balance?.toLocaleString() || '2,368.50'}</span>
+          <span className="text-[var(--gold)] truncate">{user?.balance?.toLocaleString() || '2,368.50'}</span>
         </div>
       </div>
 
@@ -190,17 +190,17 @@ const Wallet = ({ user, updateBalance, navigate }) => {
           <p className="wallet-balance-label">USDT Balance</p>
           <p className="wallet-balance">{user?.balance?.toLocaleString() || '2,368.50'}</p>
           
-          <div className="flex gap-4 mt-8">
+          <div className="flex gap-2 sm:gap-4 mt-8">
             <button 
               onClick={() => {
                 tg?.HapticFeedback?.impactOccurred('light');
                 setView('deposit');
               }}
-              className="btn btn-success flex-1 btn-lg font-bold relative overflow-hidden group"
+              className="btn btn-success flex-1 btn-lg font-bold relative overflow-hidden group min-w-0"
             >
-              <span className="relative z-10 flex items-center justify-center gap-2">
-                <span>💰</span>
-                Deposit
+              <span className="relative z-10 flex items-center justify-center gap-1 sm:gap-2 truncate">
+                <span className="flex-shrink-0">💰</span>
+                <span className="truncate">Deposit</span>
               </span>
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
             </button>
@@ -209,11 +209,11 @@ const Wallet = ({ user, updateBalance, navigate }) => {
                 tg?.HapticFeedback?.impactOccurred('light');
                 setView('withdraw');
               }}
-              className="btn btn-secondary flex-1 btn-lg font-bold border-2 border-orange-500/30 hover:border-orange-500/60 hover:bg-orange-500/10"
+              className="btn btn-secondary flex-1 btn-lg font-bold border-2 border-orange-500/30 hover:border-orange-500/60 hover:bg-orange-500/10 min-w-0"
             >
-              <span className="flex items-center justify-center gap-2">
-                <span>💸</span>
-                Withdraw
+              <span className="flex items-center justify-center gap-1 sm:gap-2 truncate">
+                <span className="flex-shrink-0">💸</span>
+                <span className="truncate">Withdraw</span>
               </span>
             </button>
           </div>

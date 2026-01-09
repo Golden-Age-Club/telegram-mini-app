@@ -169,7 +169,7 @@ const Game = ({ user, updateBalance, navigate, gameData }) => {
 
         {/* Main Game Area - Premium Casino Style */}
         <div className="px-4">
-          <div className="card p-6 bg-gradient-to-br from-black via-gray-900 to-black border-2 border-amber-500/30 relative overflow-hidden">
+          <div className="card p-4 sm:p-6 bg-gradient-to-br from-black via-gray-900 to-black border-2 border-amber-500/30 relative overflow-hidden w-full max-w-full box-border">
             <div className="absolute inset-0 bg-gradient-to-br from-gold/5 via-transparent to-emerald/5 opacity-50"></div>
             <div className="casino-ornament mb-4"></div>
             <div className="relative z-10 mb-6 text-center">
