@@ -28,13 +28,14 @@ const Layout = ({ children, title, showBack = false, onBack, user, navigate, cur
 
   return (
     <div className="app">
-      {/* Header */}
+      {/* Mobile Header */}
       <header className="header-bar">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
           {showBack && (
             <button
               onClick={onBack}
-              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+              className="p-2 rounded-lg hover:bg-white/10 transition-colors touch-manipulation"
+              style={{ minWidth: '44px', minHeight: '44px' }}
             >
               <ChevronLeft size={20} className="text-white" />
             </button>
@@ -49,24 +50,31 @@ const Layout = ({ children, title, showBack = false, onBack, user, navigate, cur
               />
               <div className="absolute inset-0 rounded-full border-2 border-emerald-500/30 pointer-events-none"></div>
             </div>
-            <div>
-              <div className="font-bold text-gradient-gold tracking-tight text-base">Golden Age Cash</div>
-              {title && <div className="text-xs text-gray-400 mt-0.5 font-medium">{title}</div>}
+            <div className="min-w-0 flex-1">
+              <div className="font-bold text-gradient-gold tracking-tight text-base truncate">
+                Golden Age Cash
+              </div>
+              {title && (
+                <div className="text-xs text-gray-400 mt-0.5 font-medium truncate">
+                  {title}
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {user?.balance !== undefined && (
             <div className="balance-chip">
               <span className="text-xs">💰</span>
-              <span>${user.balance.toLocaleString()}</span>
+              <span className="truncate">${user.balance.toLocaleString()}</span>
             </div>
           )}
           
           <button
             onClick={() => setShowMobileMenu(true)}
-            className="p-2 rounded-lg hover:bg-white/10 transition-colors md:hidden"
+            className="p-2 rounded-lg hover:bg-white/10 transition-colors touch-manipulation"
+            style={{ minWidth: '44px', minHeight: '44px' }}
           >
             <Menu size={20} className="text-white" />
           </button>
@@ -92,10 +100,11 @@ const Layout = ({ children, title, showBack = false, onBack, user, navigate, cur
                 <button
                   key={item.id}
                   onClick={() => handleNavigation(item.screen)}
-                  className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors text-left"
+                  className="w-full flex items-center gap-3 p-4 rounded-lg hover:bg-white/5 transition-colors text-left touch-manipulation"
+                  style={{ minHeight: '56px' }}
                 >
                   <item.icon size={20} className="text-gray-400" />
-                  <span className="text-white">{item.label}</span>
+                  <span className="text-white font-medium">{item.label}</span>
                 </button>
               ))}
             </nav>
@@ -108,8 +117,8 @@ const Layout = ({ children, title, showBack = false, onBack, user, navigate, cur
         {children}
       </main>
 
-      {/* Bottom Navigation for Mobile - Premium Casino Style */}
-      <nav className="md:hidden bottom-nav">
+      {/* Bottom Navigation - Mobile Optimized */}
+      <nav className="bottom-nav">
         <div className="flex">
           {navigation.map((item) => {
             const isActive = currentScreen === item.screen;
@@ -117,12 +126,10 @@ const Layout = ({ children, title, showBack = false, onBack, user, navigate, cur
               <button
                 key={item.id}
                 onClick={() => handleNavigation(item.screen)}
-                className={`bottom-nav-item flex-1 flex flex-col items-center gap-1 py-3 transition-all ${
-                  isActive ? 'active' : ''
-                }`}
+                className={`bottom-nav-item flex-1 ${isActive ? 'active' : ''}`}
               >
                 <item.icon 
-                  size={22} 
+                  size={20} 
                   className={isActive ? 'text-gold' : 'text-gray-400'} 
                   strokeWidth={isActive ? 2.5 : 2}
                 />
