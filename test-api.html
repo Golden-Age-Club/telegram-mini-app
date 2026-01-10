@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Endpoint Tester - Golden Age Club</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #fbbf24;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #9ca3af;
+            margin-bottom: 30px;
+        }
+        
+        .info-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-box h2 {
+            color: #fbbf24;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .info-item {
+            display: flex;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #10b981;
+            min-width: 150px;
+        }
+        
+        .info-value {
+            color: #d1d5db;
+            word-break: break-all;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button.secondary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #fff;
+        }
+        
+        .results {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .result-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        .result-item.success {
+            border-left-color: #10b981;
+        }
+        
+        .result-item.error {
+            border-left-color: #ef4444;
+        }
+        
+        .result-url {
+            color: #60a5fa;
+            font-weight: 600;
+            margin-bottom: 8px;
+            word-break: break-all;
+        }
+        
+        .result-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .result-status.success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+        
+        .result-status.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        
+        .result-data {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 8px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #9ca3af;
+        }
+        
+        .highlight {
+            background: rgba(251, 191, 36, 0.2);
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 API Endpoint Tester</h1>
+        <p class="subtitle">Testing backend endpoints to find demo credentials</p>
+        
+        <div class="info-box">
+            <h2>📋 Product Information</h2>
+            <div class="info-item">
+                <span class="info-label">Product Name:</span>
+                <span class="info-value">Golden Age Club</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">API Domain:</span>
+                <span class="info-value">https://server-kl7c.onrender.com</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Demo Site:</span>
+                <span class="info-value">https://pghome.co</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Currency:</span>
+                <span class="info-value">USDT</span>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button onclick="testAllEndpoints()">🚀 Test All Endpoints</button>
+            <button class="secondary" onclick="testConfigEndpoints()">⚙️ Test Config Endpoints</button>
+            <button onclick="clearResults()">🗑️ Clear Results</button>
+        </div>
+        
+        <div class="results" id="results">
+            <div class="loading">Click "Test All Endpoints" to start...</div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = 'https://server-kl7c.onrender.com';
+        const DEMO_SITE = 'https://pghome.co';
+        
+        const endpoints = [
+            '/api/demo',
+            '/api/demo-credentials',
+            '/api/demo-account',
+            '/api/config',
+            '/api/product/config',
+            '/api/product/info',
+            '/api/auth/demo',
+            '/api/test/demo',
+            '/demo',
+            '/config',
+            '/product',
+            '/api/product',
+            '/api',
+            '/',
+        ];
+        
+        async function testEndpoint(url) {
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                });
+                
+                const contentType = response.headers.get('content-type');
+                let data;
+                
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    const text = await response.text();
+                    try {
+                        data = JSON.parse(text);
+                    } catch {
+                        data = text;
+                    }
+                }
+                
+                return {
+                    status: response.status,
+                    ok: response.ok,
+                    data,
+                    url,
+                };
+            } catch (error) {
+                return {
+                    status: 'ERROR',
+                    ok: false,
+                    error: error.message,
+                    url,
+                };
+            }
+        }
+        
+        async function testAllEndpoints() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="loading">🔄 Testing endpoints...</div>';
+            
+            const results = [];
+            
+            for (const endpoint of endpoints) {
+                const url = `${API_BASE}${endpoint}`;
+                const result = await testEndpoint(url);
+                results.push(result);
+                displayResult(result);
+                
+                // Small delay
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+            
+            // Summary
+            const successful = results.filter(r => r.ok).length;
+            const failed = results.filter(r => !r.ok).length;
+            
+            const summary = document.createElement('div');
+            summary.className = 'result-item success';
+            summary.innerHTML = `
+                <div style="font-weight: 600; margin-bottom: 8px;">✅ Testing Complete</div>
+                <div>Successful: ${successful} | Failed: ${failed}</div>
+                <div style="margin-top: 8px; font-size: 12px; color: #9ca3af;">
+                    Look for responses containing "demo", "username", "password", or "config" keywords
+                </div>
+            `;
+            resultsDiv.appendChild(summary);
+        }
+        
+        async function testConfigEndpoints() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="loading">🔄 Testing config endpoints...</div>';
+            
+            const postEndpoints = [
+                { url: `${API_BASE}/api/product/config`, body: { product: 'Golden Age Club', domain: DEMO_SITE } },
+                { url: `${API_BASE}/api/config`, body: { product: 'Golden Age Club' } },
+                { url: `${API_BASE}/api/product/info`, body: { name: 'Golden Age Club' } },
+            ];
+            
+            for (const { url, body } of postEndpoints) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify(body),
+                    });
+                    
+                    const contentType = response.headers.get('content-type');
+                    let data;
+                    
+                    if (contentType && contentType.includes('application/json')) {
+                        data = await response.json();
+                    } else {
+                        data = await response.text();
+                    }
+                    
+                    displayResult({
+                        status: response.status,
+                        ok: response.ok,
+                        data,
+                        url: `POST ${url}`,
+                    });
+                } catch (error) {
+                    displayResult({
+                        status: 'ERROR',
+                        ok: false,
+                        error: error.message,
+                        url: `POST ${url}`,
+                    });
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+        }
+        
+        function displayResult(result) {
+            const resultsDiv = document.getElementById('results');
+            
+            if (resultsDiv.querySelector('.loading')) {
+                resultsDiv.innerHTML = '';
+            }
+            
+            const item = document.createElement('div');
+            item.className = `result-item ${result.ok ? 'success' : 'error'}`;
+            
+            const statusClass = result.ok ? 'success' : 'error';
+            const statusText = result.ok ? `✅ ${result.status}` : `❌ ${result.status}`;
+            
+            let dataDisplay = '';
+            if (result.error) {
+                dataDisplay = `<div class="result-data">Error: ${result.error}</div>`;
+            } else if (result.data) {
+                const dataStr = typeof result.data === 'string' 
+                    ? result.data 
+                    : JSON.stringify(result.data, null, 2);
+                    
+                // Highlight keywords
+                const highlighted = dataStr
+                    .replace(/(demo|username|password|config|product)/gi, 
+                        match => `<span class="highlight">${match}</span>`);
+                
+                dataDisplay = `<div class="result-data">${highlighted.substring(0, 1000)}${dataStr.length > 1000 ? '...' : ''}</div>`;
+            }
+            
+            item.innerHTML = `
+                <div class="result-url">${result.url}</div>
+                <div class="result-status ${statusClass}">${statusText}</div>
+                ${dataDisplay}
+            `;
+            
+            resultsDiv.appendChild(item);
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '<div class="loading">Click "Test All Endpoints" to start...</div>';
+        }
+    </script>
+</body>
+</html>

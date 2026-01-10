@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { ApiProvider, useApi } from './contexts/ApiContext';
 import { ToastContainer, useToast } from './components/Toast';
 import LandingPage from './pages/Landing';
 import Home from './pages/Home';
@@ -8,13 +9,23 @@ import Wallet from './pages/Wallet';
 import Profile from './pages/Profile';
 import './App.css';
 
-function App() {
+function AppContent() {
   const [screen, setScreen] = useState('landing');
   const [screenData, setScreenData] = useState(null);
-  const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const toast = useToast();
   const tg = window.Telegram?.WebApp;
+  
+  // Use API context
+  const { 
+    user, 
+    isConnected, 
+    demoCredentials, 
+    config,
+    loginWithDemo,
+    deposit,
+    withdraw
+  } = useApi();
 
   // Initialize Telegram WebApp
   useEffect(() => {
@@ -27,51 +38,40 @@ function App() {
         tg.setHeaderColor('#000000');
         tg.setBackgroundColor('#000000');
         
-        // Get user from Telegram
-        if (tg.initDataUnsafe?.user) {
+        // Get user from Telegram or use API user
+        if (tg.initDataUnsafe?.user && !user) {
           const tgUser = tg.initDataUnsafe.user;
-          setUser({
-            id: tgUser.id,
-            name: `${tgUser.first_name} ${tgUser.last_name || ''}`.trim(),
-            username: tgUser.username || `user${tgUser.id}`,
-            avatar: tgUser.photo_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${tgUser.id}`,
-            balance: 2368.50,
-            level: 'Gold',
-            joinDate: new Date().toISOString().split('T')[0],
-          });
           
-          // Welcome message
-          setTimeout(() => {
-            toast.success(`Welcome to Golden Age Cash, ${tgUser.first_name}!`);
-          }, 1000);
+          // Try to login with demo credentials if available
+          if (demoCredentials) {
+            const loginResult = await loginWithDemo();
+            if (loginResult.success) {
+              toast.success(`Welcome to ${config.PRODUCT_NAME}, ${tgUser.first_name}!`);
+            } else {
+              toast.warning('Demo login failed, using offline mode');
+            }
+          }
           
           // Auto-navigate to home if user is logged in via Telegram
           setScreen('home');
         }
       }
       
-      // Mock user for development outside Telegram
-      if (!tg?.initDataUnsafe?.user) {
-        setUser({
-          id: 123456789,
-          name: 'Golden Player',
-          username: 'player',
-          avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=player',
-          balance: 2368.50,
-          level: 'Gold',
-          joinDate: '2024-01-01',
-        });
-        
-        setTimeout(() => {
-          toast.info('Welcome to Golden Age Cash! Demo mode active.');
-        }, 1000);
+      // Show connection status
+      if (isConnected) {
+        toast.success(`Connected to ${config.PRODUCT_NAME} API`);
+      } else {
+        toast.warning('API offline - using demo mode');
       }
       
       setIsLoading(false);
     };
 
-    initializeApp();
-  }, []);
+    // Only initialize when API context is ready
+    if (config) {
+      initializeApp();
+    }
+  }, [tg, user, demoCredentials, isConnected, config, loginWithDemo, toast]);
 
   // Handle Telegram back button
   useEffect(() => {
@@ -105,15 +105,25 @@ function App() {
     setScreenData(data);
   };
 
-  const updateBalance = (amount) => {
-    const newBalance = user.balance + amount;
-    setUser(prev => prev ? { ...prev, balance: newBalance } : prev);
+  const updateBalance = async (amount) => {
+    if (user && isConnected) {
+      // Try to update balance via API
+      try {
+        if (amount > 0) {
+          await deposit(amount);
+        } else if (amount < 0) {
+          await withdraw(Math.abs(amount));
+        }
+      } catch (error) {
+        console.warn('Balance update via API failed, using local update');
+      }
+    }
     
     // Show toast notifications for balance changes
     if (amount > 0) {
-      toast.success(`+$${amount.toLocaleString()} added to your balance!`);
+      toast.success(`+${amount.toLocaleString()} ${config?.CURRENCY || 'USDT'} added to your balance!`);
     } else if (amount < 0) {
-      toast.warning(`-$${Math.abs(amount).toLocaleString()} deducted from balance`);
+      toast.warning(`-${Math.abs(amount).toLocaleString()} ${config?.CURRENCY || 'USDT'} deducted from balance`);
     }
   };
 
@@ -133,44 +143,52 @@ function App() {
             <div className="loading-dot"></div>
             <div className="loading-dot"></div>
           </div>
-          <p className="text-gray-400">Initializing Golden Age Cash...</p>
+          <p className="text-gray-400">Initializing {config?.PRODUCT_NAME || 'Golden Age Cash'}...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <LanguageProvider>
-      <div className="app">
-        {screen === 'landing' && (
-          <LandingPage navigate={navigate} />
-        )}
-        {screen === 'home' && (
-          <Home user={user} navigate={navigate} />
-        )}
-        {screen === 'game' && (
-          <Game 
-            user={user} 
-            gameData={screenData}
-            updateBalance={updateBalance}
-            navigate={navigate}
-          />
-        )}
-        {screen === 'wallet' && (
-          <Wallet 
-            user={user} 
-            updateBalance={updateBalance}
-            navigate={navigate}
-          />
-        )}
-        {screen === 'profile' && (
-          <Profile user={user} navigate={navigate} />
-        )}
-        
-        {/* Toast Notifications */}
-        <ToastContainer toasts={toast.toasts} removeToast={toast.removeToast} />
-      </div>
-    </LanguageProvider>
+    <div className="app">
+      {screen === 'landing' && (
+        <LandingPage navigate={navigate} />
+      )}
+      {screen === 'home' && (
+        <Home user={user} navigate={navigate} />
+      )}
+      {screen === 'game' && (
+        <Game 
+          user={user} 
+          gameData={screenData}
+          updateBalance={updateBalance}
+          navigate={navigate}
+        />
+      )}
+      {screen === 'wallet' && (
+        <Wallet 
+          user={user} 
+          updateBalance={updateBalance}
+          navigate={navigate}
+        />
+      )}
+      {screen === 'profile' && (
+        <Profile user={user} navigate={navigate} />
+      )}
+      
+      {/* Toast Notifications */}
+      <ToastContainer toasts={toast.toasts} removeToast={toast.removeToast} />
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <ApiProvider>
+      <LanguageProvider>
+        <AppContent />
+      </LanguageProvider>
+    </ApiProvider>
   );
 }
 

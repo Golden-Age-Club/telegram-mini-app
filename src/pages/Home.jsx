@@ -1,17 +1,23 @@
 import { useState } from 'react';
-import { ChevronRight, Search, Filter, X } from 'lucide-react';
+import { ChevronRight, Search, Filter, X, Wifi, WifiOff } from 'lucide-react';
 import Layout from '../components/Layout';
 import { GameGrid } from '../components/GameCard';
 import SpinWheel from '../components/SpinWheel';
 import ScratchCard from '../components/ScratchCard';
 import Confetti from '../components/Confetti';
+import ApiStatus from '../components/ApiStatus';
+import { useApi } from '../contexts/ApiContext';
 
 const Home = ({ user, navigate }) => {
   const [showWheel, setShowWheel] = useState(false);
   const [showScratch, setShowScratch] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [showApiStatus, setShowApiStatus] = useState(false);
   const [activeCategory, setActiveCategory] = useState('featured');
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // API context
+  const { isConnected, config } = useApi();
 
   const featuredGames = [
     { 
@@ -106,18 +112,34 @@ const Home = ({ user, navigate }) => {
             <div className="flex items-center justify-between mb-4">
               <div className="flex-1 min-w-0">
                 <h1 className="text-xl font-bold text-gradient-gold tracking-tight truncate">
-                  Welcome to Golden Age Cash
+                  Welcome to {config?.PRODUCT_NAME || 'Golden Age Cash'}
                 </h1>
                 <p className="text-gray-400 mt-1 text-sm">
                   Premium casino experience awaits
                 </p>
               </div>
-              <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gold/30 glow-gold flex-shrink-0">
-                <img 
-                  src="/casinologo.jpg" 
-                  alt="Golden Age Cash"
-                  className="w-full h-full object-cover"
-                />
+              <div className="flex items-center space-x-2 flex-shrink-0">
+                {/* API Status Indicator */}
+                <button
+                  onClick={() => setShowApiStatus(true)}
+                  className={`p-2 rounded-lg transition-colors ${
+                    isConnected 
+                      ? 'bg-green-900/30 text-green-400 hover:bg-green-900/50' 
+                      : 'bg-red-900/30 text-red-400 hover:bg-red-900/50'
+                  }`}
+                  title={`API Status: ${isConnected ? 'Connected' : 'Disconnected'}`}
+                >
+                  {isConnected ? <Wifi size={16} /> : <WifiOff size={16} />}
+                </button>
+                
+                {/* Logo */}
+                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gold/30 glow-gold">
+                  <img 
+                    src="/casinologo.jpg" 
+                    alt="Golden Age Cash"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </div>
             </div>
             
@@ -316,6 +338,11 @@ const Home = ({ user, navigate }) => {
         )}
 
         {showConfetti && <Confetti />}
+        
+        {/* API Status Modal */}
+        {showApiStatus && (
+          <ApiStatus onClose={() => setShowApiStatus(false)} />
+        )}
       </div>
     </Layout>
   );
