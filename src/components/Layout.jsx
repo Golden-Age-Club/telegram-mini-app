@@ -7,8 +7,13 @@ const Layout = ({ children, title, showBack = false, onBack, user, navigate, cur
 
   useEffect(() => {
     if (tg) {
-      tg.setHeaderColor('#000000');
-      tg.setBackgroundColor('#000000');
+      // Only set colors if supported
+      if (tg.setHeaderColor) {
+        tg.setHeaderColor('#000000');
+      }
+      if (tg.setBackgroundColor) {
+        tg.setBackgroundColor('#000000');
+      }
     }
   }, [tg]);
 

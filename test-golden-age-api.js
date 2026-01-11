@@ -171,8 +171,6 @@ async function testGoldenAgeApi() {
 }
 
 // Run the test
-if (typeof module !== 'undefined' && require.main === module) {
-  testGoldenAgeApi().catch(console.error);
-}
+testGoldenAgeApi().catch(console.error);
 
-module.exports = { testGoldenAgeApi, API_CONFIG };
+export { testGoldenAgeApi, API_CONFIG };

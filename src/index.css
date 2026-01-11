@@ -1571,3 +1571,94 @@ button, .btn, .card, .bottom-nav-item {
     height: 36px;
   }
 }
+/* Toast Notifications */
+.toast {
+  @apply bg-gray-900/95 backdrop-blur-sm border border-gray-700 rounded-lg p-4 shadow-xl;
+  min-width: 300px;
+  max-width: 400px;
+  pointer-events: auto;
+  position: relative;
+  z-index: 9999;
+}
+
+.toast-success {
+  @apply border-emerald-500/30 bg-emerald-900/20;
+}
+
+.toast-error {
+  @apply border-red-500/30 bg-red-900/20;
+}
+
+.toast-warning {
+  @apply border-amber-500/30 bg-amber-900/20;
+}
+
+.toast-info {
+  @apply border-blue-500/30 bg-blue-900/20;
+}
+
+/* Toast Animations */
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+}
+
+.animate-slideDown {
+  animation: slideDown 0.3s ease-out;
+}
+
+.animate-fadeOut {
+  animation: fadeOut 0.3s ease-in;
+}
+
+/* Mobile toast adjustments */
+@media (max-width: 640px) {
+  .toast {
+    min-width: 280px;
+    max-width: calc(100vw - 2rem);
+    margin: 0 1rem;
+  }
+}
+/* Fix for game list items (converted from button to div) */
+.game-list-item {
+  transition: all 0.2s ease;
+  border: none;
+  background: none;
+  text-align: left;
+}
+
+.game-list-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+}
+
+.game-list-item:active {
+  transform: translateY(0);
+}
+
+.btn-play {
+  @apply bg-gradient-to-r from-amber-500 to-amber-600 text-black px-3 py-1 rounded-lg text-sm font-semibold;
+  transition: all 0.2s ease;
+}
+
+.btn-play:hover {
+  @apply from-amber-400 to-amber-500;
+  transform: scale(1.05);
+}

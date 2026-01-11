@@ -4,9 +4,8 @@ import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
 const Toast = ({ 
   message, 
   type = 'info', 
-  duration = 4000, 
-  onClose,
-  position = 'top-right'
+  duration = 3000, 
+  onClose
 }) => {
   const [isVisible, setIsVisible] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
@@ -40,32 +39,13 @@ const Toast = ({
     }
   };
 
-  const getPositionClasses = () => {
-    switch (position) {
-      case 'top-left':
-        return 'top-4 left-4';
-      case 'top-center':
-        return 'top-4 left-1/2 transform -translate-x-1/2';
-      case 'top-right':
-        return 'top-4 right-4';
-      case 'bottom-left':
-        return 'bottom-4 left-4';
-      case 'bottom-center':
-        return 'bottom-4 left-1/2 transform -translate-x-1/2';
-      case 'bottom-right':
-        return 'bottom-4 right-4';
-      default:
-        return 'top-4 right-4';
-    }
-  };
-
   if (!isVisible) return null;
 
   return (
     <div 
-      className={`toast toast-${type} ${getPositionClasses()} ${
+      className={`toast toast-${type} ${
         isExiting ? 'animate-fadeOut' : 'animate-slideDown'
-      }`}
+      } pointer-events-auto relative`}
     >
       <div className="flex items-start gap-3">
         {getIcon()}
@@ -74,9 +54,10 @@ const Toast = ({
         </div>
         <button
           onClick={handleClose}
-          className="modal-close flex-shrink-0"
+          className="flex-shrink-0 p-1 hover:bg-white/10 rounded transition-colors cursor-pointer z-10 relative"
+          style={{ pointerEvents: 'auto' }}
         >
-          <X size={16} />
+          <X size={16} className="text-white/70 hover:text-white" />
         </button>
       </div>
     </div>
@@ -86,14 +67,24 @@ const Toast = ({
 // Toast Container Component
 export const ToastContainer = ({ toasts, removeToast }) => {
   return (
-    <div className="fixed inset-0 pointer-events-none z-200">
-      {toasts.map((toast) => (
-        <Toast
-          key={toast.id}
-          {...toast}
-          onClose={() => removeToast(toast.id)}
-        />
-      ))}
+    <div className="fixed inset-0 pointer-events-none z-[9999]">
+      <div className="absolute top-4 right-4 space-y-2 pointer-events-none">
+        {toasts.map((toast, index) => (
+          <div 
+            key={toast.id}
+            className="pointer-events-auto"
+            style={{ 
+              transform: `translateY(${index * 4}px)`,
+              zIndex: 9999 - index 
+            }}
+          >
+            <Toast
+              {...toast}
+              onClose={() => removeToast(toast.id)}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
@@ -103,21 +94,39 @@ export const useToast = () => {
   const [toasts, setToasts] = useState([]);
 
   const addToast = (message, type = 'info', options = {}) => {
+    // Check for duplicate messages to prevent spam
+    const isDuplicate = toasts.some(toast => 
+      toast.message === message && toast.type === type
+    );
+    
+    if (isDuplicate) {
+      return null; // Don't add duplicate toasts
+    }
+
     const id = Date.now() + Math.random();
     const toast = {
       id,
       message,
       type,
-      duration: options.duration || 4000,
+      duration: options.duration || 3000, // Reduced to 3 seconds
       position: options.position || 'top-right',
     };
 
-    setToasts(prev => [...prev, toast]);
+    setToasts(prev => {
+      // Limit to maximum 3 toasts at once
+      const newToasts = [...prev, toast];
+      return newToasts.slice(-3);
+    });
+    
     return id;
   };
 
   const removeToast = (id) => {
     setToasts(prev => prev.filter(toast => toast.id !== id));
+  };
+
+  const clearAll = () => {
+    setToasts([]);
   };
 
   const success = (message, options) => addToast(message, 'success', options);
@@ -129,6 +138,7 @@ export const useToast = () => {
     toasts,
     addToast,
     removeToast,
+    clearAll,
     success,
     error,
     warning,

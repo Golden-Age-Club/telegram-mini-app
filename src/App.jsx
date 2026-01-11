@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { ApiProvider, useApi } from './contexts/ApiContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ToastContainer, useToast } from './components/Toast';
 import LandingPage from './pages/Landing';
 import Home from './pages/Home';
@@ -16,40 +17,50 @@ function AppContent() {
   const toast = useToast();
   const tg = window.Telegram?.WebApp;
   
-  // Use API context
+  // Use API and Auth contexts
   const { 
-    user, 
     isConnected, 
-    demoCredentials, 
-    config,
-    loginWithDemo,
     deposit,
     withdraw
   } = useApi();
+  
+  const {
+    user,
+    isAuthenticated,
+    loginWithDemo
+  } = useAuth();
 
   // Initialize Telegram WebApp
   useEffect(() => {
+    let initializationDone = false;
+    
     const initializeApp = async () => {
+      if (initializationDone) return;
+      initializationDone = true;
+      
+      // Clear any existing toasts first
+      toast.clearAll();
+      
       if (tg) {
         tg.ready();
         tg.expand();
         
-        // Set Golden Age Cash theme colors
-        tg.setHeaderColor('#000000');
-        tg.setBackgroundColor('#000000');
+        // Set Golden Age Cash theme colors (only if supported)
+        if (tg.setHeaderColor) {
+          tg.setHeaderColor('#000000');
+        }
+        if (tg.setBackgroundColor) {
+          tg.setBackgroundColor('#000000');
+        }
         
         // Get user from Telegram or use API user
         if (tg.initDataUnsafe?.user && !user) {
           const tgUser = tg.initDataUnsafe.user;
           
-          // Try to login with demo credentials if available
-          if (demoCredentials) {
-            const loginResult = await loginWithDemo();
-            if (loginResult.success) {
-              toast.success(`Welcome to ${config.PRODUCT_NAME}, ${tgUser.first_name}!`);
-            } else {
-              toast.warning('Demo login failed, using offline mode');
-            }
+          // Try to login with demo credentials
+          const loginResult = await loginWithDemo();
+          if (loginResult.success) {
+            toast.success(`Welcome to Golden Age Club, ${tgUser.first_name}!`);
           }
           
           // Auto-navigate to home if user is logged in via Telegram
@@ -57,28 +68,24 @@ function AppContent() {
         }
       }
       
-      // Show connection status
-      if (isConnected) {
-        toast.success(`Connected to ${config.PRODUCT_NAME} API`);
-      } else {
-        toast.warning('API offline - using demo mode');
-      }
-      
       setIsLoading(false);
     };
 
-    // Only initialize when API context is ready
-    if (config) {
+    // Only initialize when contexts are ready
+    if (isLoading) {
       initializeApp();
     }
-  }, [tg, user, demoCredentials, isConnected, config, loginWithDemo, toast]);
+  }, [isLoading, isConnected, user, loginWithDemo, toast, tg]);
 
   // Handle Telegram back button
   useEffect(() => {
-    if (!tg) return;
+    if (!tg?.BackButton) return;
 
     const handleBack = () => {
-      tg.HapticFeedback?.impactOccurred('light');
+      // Only use haptic feedback if supported
+      if (tg?.HapticFeedback?.impactOccurred) {
+        tg.HapticFeedback.impactOccurred('light');
+      }
       if (screen === 'game' || screen === 'wallet' || screen === 'profile') {
         navigate('home');
       } else if (screen === 'home') {
@@ -87,20 +94,25 @@ function AppContent() {
       setScreenData(null);
     };
 
-    if (screen !== 'landing') {
+    if (screen !== 'landing' && tg.BackButton.show) {
       tg.BackButton.show();
       tg.BackButton.onClick(handleBack);
-    } else {
+    } else if (tg.BackButton.hide) {
       tg.BackButton.hide();
     }
 
     return () => {
-      tg.BackButton.offClick(handleBack);
+      if (tg.BackButton.offClick) {
+        tg.BackButton.offClick(handleBack);
+      }
     };
   }, [screen, tg]);
 
   const navigate = (newScreen, data = null) => {
-    tg?.HapticFeedback?.impactOccurred('light');
+    // Only use haptic feedback if supported
+    if (tg?.HapticFeedback?.impactOccurred) {
+      tg.HapticFeedback.impactOccurred('light');
+    }
     setScreen(newScreen);
     setScreenData(data);
   };
@@ -121,9 +133,9 @@ function AppContent() {
     
     // Show toast notifications for balance changes
     if (amount > 0) {
-      toast.success(`+${amount.toLocaleString()} ${config?.CURRENCY || 'USDT'} added to your balance!`);
+      toast.success(`+${amount.toLocaleString()} USDT added to your balance!`);
     } else if (amount < 0) {
-      toast.warning(`-${Math.abs(amount).toLocaleString()} ${config?.CURRENCY || 'USDT'} deducted from balance`);
+      toast.warning(`-${Math.abs(amount).toLocaleString()} USDT deducted from balance`);
     }
   };
 
@@ -143,7 +155,7 @@ function AppContent() {
             <div className="loading-dot"></div>
             <div className="loading-dot"></div>
           </div>
-          <p className="text-gray-400">Initializing {config?.PRODUCT_NAME || 'Golden Age Cash'}...</p>
+          <p className="text-gray-400">Initializing Golden Age Club...</p>
         </div>
       </div>
     );
@@ -167,8 +179,6 @@ function AppContent() {
       )}
       {screen === 'wallet' && (
         <Wallet 
-          user={user} 
-          updateBalance={updateBalance}
           navigate={navigate}
         />
       )}
@@ -185,9 +195,11 @@ function AppContent() {
 function App() {
   return (
     <ApiProvider>
-      <LanguageProvider>
-        <AppContent />
-      </LanguageProvider>
+      <AuthProvider>
+        <LanguageProvider>
+          <AppContent />
+        </LanguageProvider>
+      </AuthProvider>
     </ApiProvider>
   );
 }

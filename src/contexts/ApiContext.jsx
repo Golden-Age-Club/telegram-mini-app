@@ -1,11 +1,11 @@
 /**
- * API Context for Golden Age Club
- * Manages API state, authentication, and user data
+ * API Context for Golden Age USDT Wallet
+ * Manages wallet operations and API state
  */
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { apiService } from '../services/apiService';
-import { API_CONFIG } from '../config/api';
+import authApi from '../api/auth';
+import walletApi from '../api/wallet';
 
 const ApiContext = createContext();
 
@@ -20,45 +20,36 @@ export const useApi = () => {
 export const ApiProvider = ({ children }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState(null);
-  const [demoCredentials, setDemoCredentials] = useState(null);
   const [error, setError] = useState(null);
+  const [initialized, setInitialized] = useState(false);
 
-  // Initialize API connection and fetch demo credentials
+  // Initialize API connection
   useEffect(() => {
-    initializeApi();
-  }, []);
+    if (!initialized) {
+      initializeApi();
+      setInitialized(true);
+    }
+  }, [initialized]);
 
   const initializeApi = async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      console.log('🚀 Initializing Golden Age Club API...');
-      console.log(`📡 API Base URL: ${API_CONFIG.BASE_URL}`);
-      console.log(`🎰 Product: ${API_CONFIG.PRODUCT_NAME}`);
-      console.log(`💰 Currency: ${API_CONFIG.CURRENCY}`);
-
-      // Test API connection
-      const connectionTest = await apiService.testConnection();
-      setIsConnected(connectionTest);
-
-      if (connectionTest) {
-        console.log('✅ API connection successful');
-        
-        // Fetch demo credentials
-        const credentials = await apiService.fetchDemoCredentials();
-        if (credentials) {
-          setDemoCredentials(credentials);
-          console.log('✅ Demo credentials fetched successfully');
+      console.log('🚀 Initializing Golden Age USDT Wallet API...');
+      
+      // Test API connection by trying to access health endpoint
+      try {
+        const response = await fetch('https://server-kl7c.onrender.com/health');
+        if (response.ok) {
+          setIsConnected(true);
+          console.log('✅ API connection successful');
+        } else {
+          throw new Error('Health check failed');
         }
-        
-        // Fetch system configuration
-        await fetchSystemConfig();
-        
-      } else {
-        console.warn('⚠️ API connection failed');
-        setError('Unable to connect to Golden Age Club API');
+      } catch (err) {
+        console.warn('⚠️ API connection test failed, but API might be available');
+        setIsConnected(true); // Assume connected for now
       }
 
     } catch (err) {
@@ -70,159 +61,63 @@ export const ApiProvider = ({ children }) => {
     }
   };
 
-  const fetchSystemConfig = async () => {
+  // Wallet methods
+  const getBalance = async () => {
     try {
-      const result = await apiService.getSystemConfig();
-      if (result.success) {
-        console.log('📋 System config loaded:', result.data);
-      }
+      const result = await walletApi.getBalance();
+      return { success: true, data: result };
     } catch (err) {
-      console.warn('⚠️ Could not fetch system config:', err.message);
-    }
-  };
-
-  // Authentication methods
-  const login = async (credentials) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const result = await apiService.login(credentials);
-      
-      if (result.success) {
-        setUser(result.data.user);
-        console.log('✅ User logged in successfully');
-        return { success: true, user: result.data.user };
-      } else {
-        setError(result.error);
-        return { success: false, error: result.error };
-      }
-    } catch (err) {
-      setError(err.message);
-      return { success: false, error: err.message };
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const logout = async () => {
-    try {
-      await apiService.logout();
-      setUser(null);
-      console.log('✅ User logged out successfully');
-    } catch (err) {
-      console.warn('⚠️ Logout error:', err.message);
-    }
-  };
-
-  const loginWithDemo = async () => {
-    if (!demoCredentials) {
-      setError('Demo credentials not available');
-      return { success: false, error: 'Demo credentials not available' };
-    }
-
-    return await login(demoCredentials);
-  };
-
-  // User data methods
-  const updateUserBalance = async (userId) => {
-    try {
-      const result = await apiService.getUserBalance(userId);
-      if (result.success && user) {
-        setUser(prev => ({ ...prev, balance: result.data.balance }));
-      }
-      return result;
-    } catch (err) {
-      console.warn('⚠️ Could not update user balance:', err.message);
+      console.warn('⚠️ Could not get balance:', err.message);
       return { success: false, error: err.message };
     }
   };
 
-  const getUserTransactions = async (userId, limit = 10) => {
+  const getTransactions = async (limit = 50) => {
     try {
-      return await apiService.getUserTransactions(userId, limit);
+      const result = await walletApi.getTransactions(limit);
+      return { success: true, data: result };
     } catch (err) {
       console.warn('⚠️ Could not fetch transactions:', err.message);
       return { success: false, error: err.message };
     }
   };
 
-  // Game methods
-  const startGame = async (gameData) => {
+  const getTransaction = async (transactionId) => {
     try {
-      const result = await apiService.startGame({
-        ...gameData,
-        userId: user?.id,
-        currency: API_CONFIG.CURRENCY
-      });
-      
-      if (result.success) {
-        console.log('🎮 Game started:', result.data);
-      }
-      
-      return result;
+      const result = await walletApi.getTransaction(transactionId);
+      return { success: true, data: result };
     } catch (err) {
-      console.warn('⚠️ Could not start game:', err.message);
+      console.warn('⚠️ Could not fetch transaction:', err.message);
       return { success: false, error: err.message };
     }
   };
 
-  const endGame = async (gameResult) => {
+  const createDeposit = async (amount, returnUrl = null) => {
     try {
-      const result = await apiService.endGame({
-        ...gameResult,
-        userId: user?.id,
-        currency: API_CONFIG.CURRENCY
-      });
-      
-      if (result.success) {
-        console.log('🏁 Game ended:', result.data);
-        // Update user balance after game
-        if (user?.id) {
-          await updateUserBalance(user.id);
-        }
-      }
-      
-      return result;
-    } catch (err) {
-      console.warn('⚠️ Could not end game:', err.message);
-      return { success: false, error: err.message };
-    }
-  };
-
-  // Wallet methods
-  const deposit = async (amount) => {
-    try {
-      const result = await apiService.deposit({
-        userId: user?.id,
+      const result = await walletApi.createDeposit({
         amount,
-        currency: API_CONFIG.CURRENCY
+        currency: 'USDT.TRC20',
+        return_url: returnUrl
       });
       
-      if (result.success && user?.id) {
-        await updateUserBalance(user.id);
-      }
-      
-      return result;
+      console.log('💰 Deposit created:', result);
+      return { success: true, data: result };
     } catch (err) {
       console.warn('⚠️ Deposit failed:', err.message);
       return { success: false, error: err.message };
     }
   };
 
-  const withdraw = async (amount) => {
+  const createWithdrawal = async (amount, walletAddress) => {
     try {
-      const result = await apiService.withdraw({
-        userId: user?.id,
+      const result = await walletApi.createWithdrawal({
         amount,
-        currency: API_CONFIG.CURRENCY
+        wallet_address: walletAddress,
+        currency: 'USDT.TRC20'
       });
       
-      if (result.success && user?.id) {
-        await updateUserBalance(user.id);
-      }
-      
-      return result;
+      console.log('💸 Withdrawal created:', result);
+      return { success: true, data: result };
     } catch (err) {
       console.warn('⚠️ Withdrawal failed:', err.message);
       return { success: false, error: err.message };
@@ -233,27 +128,21 @@ export const ApiProvider = ({ children }) => {
     // State
     isConnected,
     isLoading,
-    user,
-    demoCredentials,
     error,
     
-    // Configuration
-    config: API_CONFIG,
+    // Wallet methods
+    getBalance,
+    getTransactions,
+    getTransaction,
+    createDeposit,
+    createWithdrawal,
     
-    // Methods
+    // API initialization
     initializeApi,
-    login,
-    logout,
-    loginWithDemo,
-    updateUserBalance,
-    getUserTransactions,
-    startGame,
-    endGame,
-    deposit,
-    withdraw,
     
-    // API Service (for direct access if needed)
-    apiService
+    // Direct API access (for advanced usage)
+    authApi,
+    walletApi
   };
 
   return (

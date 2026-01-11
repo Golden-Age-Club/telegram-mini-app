@@ -1,23 +1,19 @@
 import { useState } from 'react';
-import { ChevronRight, Search, Filter, X, Wifi, WifiOff } from 'lucide-react';
+import { X } from 'lucide-react';
 import Layout from '../components/Layout';
-import { GameGrid } from '../components/GameCard';
 import SpinWheel from '../components/SpinWheel';
 import ScratchCard from '../components/ScratchCard';
 import Confetti from '../components/Confetti';
-import ApiStatus from '../components/ApiStatus';
 import { useApi } from '../contexts/ApiContext';
 
 const Home = ({ user, navigate }) => {
   const [showWheel, setShowWheel] = useState(false);
   const [showScratch, setShowScratch] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [showApiStatus, setShowApiStatus] = useState(false);
   const [activeCategory, setActiveCategory] = useState('featured');
-  const [searchQuery, setSearchQuery] = useState('');
   
   // API context
-  const { isConnected, config } = useApi();
+  const { config } = useApi();
 
   const featuredGames = [
     { 
@@ -92,16 +88,13 @@ const Home = ({ user, navigate }) => {
     navigate('game', { selectedGame: game.id });
   };
 
-  const handleWheelWin = (prize) => {
+  const handleWheelWin = () => {
     setShowWheel(false);
     setShowConfetti(true);
     setTimeout(() => setShowConfetti(false), 3000);
   };
 
-  const filteredGames = featuredGames.filter(game =>
-    game.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    game.subtitle.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredGames = featuredGames;
 
   return (
     <Layout title="Casino" user={user} navigate={navigate} currentScreen="home">
@@ -119,19 +112,6 @@ const Home = ({ user, navigate }) => {
                 </p>
               </div>
               <div className="flex items-center space-x-2 flex-shrink-0">
-                {/* API Status Indicator */}
-                <button
-                  onClick={() => setShowApiStatus(true)}
-                  className={`p-2 rounded-lg transition-colors ${
-                    isConnected 
-                      ? 'bg-green-900/30 text-green-400 hover:bg-green-900/50' 
-                      : 'bg-red-900/30 text-red-400 hover:bg-red-900/50'
-                  }`}
-                  title={`API Status: ${isConnected ? 'Connected' : 'Disconnected'}`}
-                >
-                  {isConnected ? <Wifi size={16} /> : <WifiOff size={16} />}
-                </button>
-                
                 {/* Logo */}
                 <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gold/30 glow-gold">
                   <img 
@@ -243,10 +223,10 @@ const Home = ({ user, navigate }) => {
         {/* Games List - Mobile Optimized */}
         <div className="game-list">
           {filteredGames.map((game) => (
-            <button
+            <div
               key={game.id}
               onClick={() => handleGameClick(game)}
-              className="game-list-item w-full"
+              className="game-list-item w-full cursor-pointer"
             >
               <div className={`game-thumb bg-gradient-to-br ${game.gradient}`}>
                 <span>{game.icon}</span>
@@ -267,8 +247,8 @@ const Home = ({ user, navigate }) => {
                 </div>
                 <p className="game-provider">{game.subtitle}</p>
               </div>
-              <button className="btn-play">Play Now</button>
-            </button>
+              <div className="btn-play">Play Now</div>
+            </div>
           ))}
         </div>
 
@@ -328,7 +308,7 @@ const Home = ({ user, navigate }) => {
                   <X size={20} />
                 </button>
               </div>
-              <ScratchCard onWin={(prize) => {
+              <ScratchCard onWin={() => {
                 setShowScratch(false);
                 setShowConfetti(true);
                 setTimeout(() => setShowConfetti(false), 3000);
@@ -338,11 +318,6 @@ const Home = ({ user, navigate }) => {
         )}
 
         {showConfetti && <Confetti />}
-        
-        {/* API Status Modal */}
-        {showApiStatus && (
-          <ApiStatus onClose={() => setShowApiStatus(false)} />
-        )}
       </div>
     </Layout>
   );
