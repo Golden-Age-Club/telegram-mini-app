@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { ChevronLeft, Menu, X, Home, Gamepad2, Wallet, User } from 'lucide-react';
 
 const Layout = ({ children, title, showBack = false, onBack, user, navigate, currentScreen = 'home' }) => {
-const Layout = ({ children, title, showBack = false, onBack, user, navigate, currentScreen = 'home' }) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const tg = window.Telegram?.WebApp;
 
@@ -23,18 +22,10 @@ const Layout = ({ children, title, showBack = false, onBack, user, navigate, cur
     { id: 'games', label: 'Games', icon: Gamepad2, screen: 'game' },
     { id: 'wallet', label: 'Wallet', icon: Wallet, screen: 'wallet' },
     { id: 'profile', label: 'Profile', icon: User, screen: 'profile' },
-    { id: 'home', label: 'Home', icon: Home, screen: 'home' },
-    { id: 'games', label: 'Games', icon: Gamepad2, screen: 'game' },
-    { id: 'wallet', label: 'Wallet', icon: Wallet, screen: 'wallet' },
-    { id: 'profile', label: 'Profile', icon: User, screen: 'profile' },
   ];
 
   const handleNavigation = (screen) => {
-  const handleNavigation = (screen) => {
     setShowMobileMenu(false);
-    if (navigate) {
-      navigate(screen);
-    }
     if (navigate) {
       navigate(screen);
     }
@@ -109,7 +100,7 @@ const Layout = ({ children, title, showBack = false, onBack, user, navigate, cur
               </button>
             </div>
             
-            <nav className="space-y-2">
+            <nav className="p-4 space-y-2">
               {navigation.map((item) => (
                 <button
                   key={item.id}

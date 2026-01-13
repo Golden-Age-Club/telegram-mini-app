@@ -11,9 +11,7 @@ const Home = ({ user, navigate }) => {
   const [showScratch, setShowScratch] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [activeCategory, setActiveCategory] = useState('featured');
-  
-  // API context
-  const { config } = useApi();
+  const [searchQuery, setSearchQuery] = useState('');
 
   const featuredGames = [
     { 
@@ -216,36 +214,30 @@ const Home = ({ user, navigate }) => {
           </div>
         </div>
 
-        {/* Games List - Mobile Optimized */}
-        <div className="game-list">
-          {filteredGames.map((game) => (
-            <div
-              key={game.id}
-              onClick={() => handleGameClick(game)}
-              className="game-list-item w-full cursor-pointer"
-            >
-              <div className={`game-thumb bg-gradient-to-br ${game.gradient}`}>
-                <span>{game.icon}</span>
-              </div>
-              <div className="game-info">
-                <div className="game-title">
-                  <h3>{game.name}</h3>
-                  {game.isHot && (
-                    <span className="hot-badge">
-                      🔥 HOT
-                    </span>
-                  )}
-                  {game.isNew && (
-                    <span className="hot-badge" style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}>
-                      ✨ NEW
-                    </span>
-                  )}
+        {/* Games List - Simple Clickable Images */}
+        <div className="px-4 pb-6">
+          <div className="grid grid-cols-4 gap-3">
+            {featuredGames.map((game) => (
+              <button
+                key={game.id}
+                onClick={() => handleGameClick(game)}
+                className="aspect-square rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300 focus:outline-none focus:ring-2 focus:ring-gold/50"
+              >
+                <img
+                  src={game.image}
+                  alt={game.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
+                  }}
+                />
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 text-2xl">
+                  {game.icon}
                 </div>
-                <p className="game-provider">{game.subtitle}</p>
-              </div>
-              <div className="btn-play">Play Now</div>
-            </div>
-          ))}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Recent Big Wins - Mobile Card */}

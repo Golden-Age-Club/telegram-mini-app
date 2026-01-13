@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { LanguageProvider } from './contexts/LanguageContext';
-import { ApiProvider, useApi } from './contexts/ApiContext';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ToastContainer, useToast } from './components/Toast';
 import { useAuth } from './hooks/useAuth';
 import { useWallet } from './hooks/useWallet';
@@ -12,7 +10,7 @@ import Wallet from './pages/Wallet';
 import Profile from './pages/Profile';
 import './App.css';
 
-function AppContent() {
+function App() {
   const [screen, setScreen] = useState('landing');
   const [screenData, setScreenData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
