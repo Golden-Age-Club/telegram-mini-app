@@ -50,24 +50,38 @@ export async function login(initData) {
 function createMockTelegramUser(tg) {
   const tgUser = tg?.initDataUnsafe?.user;
   
-  const fullName = tgUser?.first_name ? `${tgUser.first_name} ${tgUser.last_name || ''}`.trim() : 'Player';
+  console.log('📱 Raw Telegram user data:', tgUser);
+  console.log('📱 Telegram WebApp object:', tg);
+  
+  // Extract user data with better fallbacks
+  const firstName = tgUser?.first_name || 'Player';
+  const lastName = tgUser?.last_name || '';
+  const fullName = `${firstName} ${lastName}`.trim();
+  const username = tgUser?.username || `user${tgUser?.id || Date.now()}`;
+  
+  // Handle profile photo - Telegram provides photo_url in initDataUnsafe.user
+  let profilePhoto = null;
+  if (tgUser?.photo_url) {
+    profilePhoto = tgUser.photo_url;
+  }
   
   const mockUser = {
     id: tgUser?.id || 123456789,
-    first_name: tgUser?.first_name || 'Player',
-    last_name: tgUser?.last_name || '',
-    name: fullName, // For profile display
-    username: tgUser?.username || 'player',
-    photo_url: tgUser?.photo_url,
-    avatar: tgUser?.photo_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${tgUser?.username || tgUser?.id || 'telegram'}`,
+    first_name: firstName,
+    last_name: lastName,
+    name: fullName, // This should be used in Profile component
+    username: username,
+    photo_url: profilePhoto,
+    avatar: profilePhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`,
     balance: 2500,
     isTelegramUser: true,
     level: 'Gold',
     joinDate: new Date().toISOString().split('T')[0]
   };
   
-  console.log('📱 Created Telegram user:', mockUser);
-  console.log('📱 Telegram user data available:', tgUser);
+  console.log('📱 Final created Telegram user:', mockUser);
+  console.log('📱 User name will be displayed as:', mockUser.name);
+  console.log('📱 User avatar will be:', mockUser.avatar);
   
   const mockToken = 'telegram_token_' + Date.now();
   

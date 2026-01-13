@@ -58,9 +58,12 @@ function App() {
         if (hasRealTelegramData) {
           try {
             console.log('🔐 Authenticating with real Telegram data...');
+            console.log('📱 Telegram initData:', tg.initData);
+            console.log('📱 Telegram initDataUnsafe:', tg.initDataUnsafe);
             const response = await login(tg.initData);
             
             if (response.user) {
+              console.log('✅ Real Telegram auth successful, user:', response.user);
               // Welcome message with real Telegram user
               setTimeout(() => {
                 toast.success(`Welcome back, ${response.user.first_name || 'Player'}!`);
@@ -86,6 +89,7 @@ function App() {
             const response = await login('telegram_mock');
             
             if (response.user) {
+              console.log('📱 Mock Telegram auth successful, user:', response.user);
               console.log('📱 Final user object:', response.user);
               setTimeout(() => {
                 toast.success(`Welcome to Golden Age Cash, ${response.user.first_name || 'Player'}!`);
@@ -258,7 +262,11 @@ function App() {
         )}
         {screen === 'profile' && isAuthenticated && (
           <Profile 
-            user={{ ...user, balance: user?.balance || balance }} 
+            user={(() => {
+              const profileUser = { ...user, balance: user?.balance || balance };
+              console.log('📱 Passing user to Profile component:', profileUser);
+              return profileUser;
+            })()} 
             navigate={navigate}
             onLogout={logout}
           />

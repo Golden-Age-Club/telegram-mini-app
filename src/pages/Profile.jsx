@@ -63,12 +63,30 @@ const Profile = ({ user, navigate, onLogout }) => {
               alt="Profile"
               className="w-16 h-16 rounded-2xl bg-[var(--bg-elevated)] object-cover"
               onError={(e) => {
+                console.log('❌ Avatar failed to load, using fallback');
                 e.target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.username || 'player'}`;
               }}
             />
             <div>
               <h2 className="text-xl font-bold text-white">
-                {user?.name || `${user?.first_name || 'Player'} ${user?.last_name || ''}`.trim()}
+                {(() => {
+                  // Debug logging for name display
+                  console.log('👤 Profile name debug:', {
+                    'user?.name': user?.name,
+                    'user?.first_name': user?.first_name,
+                    'user?.last_name': user?.last_name,
+                    'full user object': user
+                  });
+                  
+                  // Priority: name field, then constructed from first/last, then fallback
+                  if (user?.name && user.name !== 'Player') {
+                    return user.name;
+                  } else if (user?.first_name) {
+                    return `${user.first_name} ${user.last_name || ''}`.trim();
+                  } else {
+                    return 'Player';
+                  }
+                })()}
               </h2>
               <p className="text-sm text-[var(--text-muted)]">@{user?.username || 'player'}</p>
             </div>
