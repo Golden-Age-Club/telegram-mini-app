@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { Canvas, Circle, Text as FabricText, Group, Line } from 'fabric';
+import { Canvas, Circle, FabricText as Text, Group, Line } from 'fabric';
 
-// European Roulette Numbers (more authentic)
+// European Roulette Numbers (more professional than American)
 const NUMBERS = [
   { num: 0, color: 'green' },
   { num: 32, color: 'red' }, { num: 15, color: 'black' }, { num: 19, color: 'red' }, { num: 4, color: 'black' },
@@ -15,13 +15,13 @@ const NUMBERS = [
   { num: 12, color: 'red' }, { num: 35, color: 'black' }, { num: 3, color: 'red' }, { num: 26, color: 'black' }
 ];
 
-// Professional casino betting options
+// Professional Casino Betting Options
 const BETS = [
   { id: 'red', label: 'Red', payout: 2, color: '#dc2626', icon: '🔴' },
   { id: 'black', label: 'Black', payout: 2, color: '#1f2937', icon: '⚫' },
   { id: 'even', label: 'Even', payout: 2, color: '#3b82f6', icon: '2️⃣' },
   { id: 'odd', label: 'Odd', payout: 2, color: '#8b5cf6', icon: '1️⃣' },
-  { id: 'low', label: '1-18', payout: 2, color: '#22c55e', icon: '📉' },
+  { id: 'low', label: '1-18', payout: 2, color: '#16a34a', icon: '📉' },
   { id: 'high', label: '19-36', payout: 2, color: '#f59e0b', icon: '📈' },
 ];
 
@@ -35,8 +35,6 @@ const Roulette = ({ onWin, onLose, disabled = false }) => {
   const [bets, setBets] = useState({});
   const [totalBet, setTotalBet] = useState(0);
   const [lastWin, setLastWin] = useState(null);
-  const [showHistory, setShowHistory] = useState(false);
-  const [history, setHistory] = useState([]);
 
   const SIZE = 320;
   const CENTER = SIZE / 2;
@@ -48,7 +46,7 @@ const Roulette = ({ onWin, onLose, disabled = false }) => {
     const canvas = new Canvas(canvasRef.current, {
       width: SIZE,
       height: SIZE,
-      backgroundColor: '#0f172a',
+      backgroundColor: '#0a0a0a',
       selection: false,
     });
 
@@ -70,18 +68,25 @@ const Roulette = ({ onWin, onLose, disabled = false }) => {
       const startAngle = (i * segmentAngle - 90) * (Math.PI / 180);
       const endAngle = ((i + 1) * segmentAngle - 90) * (Math.PI / 180);
       
-      // Create segment with proper casino colors
+      // Create segment with casino-quality appearance
+      const segmentPath = `M ${CENTER} ${CENTER} L ${CENTER + RADIUS * Math.cos(startAngle)} ${CENTER + RADIUS * Math.sin(startAngle)} A ${RADIUS} ${RADIUS} 0 0 1 ${CENTER + RADIUS * Math.cos(endAngle)} ${CENTER + RADIUS * Math.sin(endAngle)} Z`;
+      
+      // Segment colors with professional casino styling
       const segmentColor = number.color === 'red' ? '#dc2626' : 
                           number.color === 'black' ? '#1f2937' : '#16a34a';
       
-      // Create multiple arcs for smooth segments
-      for (let r = 40; r < RADIUS; r += 2) {
+      // Create multiple arcs for depth effect
+      for (let r = RADIUS; r > RADIUS - 30; r -= 3) {
+        const opacity = (RADIUS - r) / 30;
+        const arcRadius = r;
+        
         for (let a = startAngle; a < endAngle; a += 0.02) {
           const dot = new Circle({
-            left: CENTER + r * Math.cos(a),
-            top: CENTER + r * Math.sin(a),
+            left: CENTER + arcRadius * Math.cos(a),
+            top: CENTER + arcRadius * Math.sin(a),
             radius: 1.5,
             fill: segmentColor,
+            opacity: 1 - opacity * 0.3,
             originX: 'center',
             originY: 'center',
             selectable: false,
@@ -93,28 +98,31 @@ const Roulette = ({ onWin, onLose, disabled = false }) => {
 
       // Number text with casino styling
       const midAngle = (startAngle + endAngle) / 2;
-      const textRadius = RADIUS - 25;
-      const numberText = new FabricText(number.num.toString(), {
+      const textRadius = RADIUS - 20;
+      const numberText = new Text(number.num.toString(), {
         left: CENTER + textRadius * Math.cos(midAngle),
         top: CENTER + textRadius * Math.sin(midAngle),
         fontSize: 14,
         fontWeight: 'bold',
         fontFamily: 'Inter, sans-serif',
         fill: '#ffffff',
-        stroke: '#000000',
-        strokeWidth: 0.5,
         originX: 'center',
         originY: 'center',
         selectable: false,
         evented: false,
-        shadow: '1px 1px 2px rgba(0,0,0,0.8)',
+        shadow: {
+          color: 'rgba(0, 0, 0, 0.8)',
+          blur: 4,
+          offsetX: 1,
+          offsetY: 1,
+        },
       });
       wheelParts.push(numberText);
 
       // Separator lines
       const separatorLine = new Line([
-        CENTER + 40 * Math.cos(startAngle),
-        CENTER + 40 * Math.sin(startAngle),
+        CENTER + (RADIUS - 35) * Math.cos(startAngle),
+        CENTER + (RADIUS - 35) * Math.sin(startAngle),
         CENTER + RADIUS * Math.cos(startAngle),
         CENTER + RADIUS * Math.sin(startAngle)
       ], {
@@ -126,7 +134,7 @@ const Roulette = ({ onWin, onLose, disabled = false }) => {
       wheelParts.push(separatorLine);
     });
 
-    // Outer casino rim with gold
+    // Outer rim with casino gold
     const outerRim = new Circle({
       left: CENTER,
       top: CENTER,
@@ -138,34 +146,69 @@ const Roulette = ({ onWin, onLose, disabled = false }) => {
       originY: 'center',
       selectable: false,
       evented: false,
+      shadow: {
+        color: 'rgba(251, 191, 36, 0.6)',
+        blur: 15,
+        offsetX: 0,
+        offsetY: 0,
+      },
     });
 
-    // Inner circle (casino green)
+    // Middle rim
+    const middleRim = new Circle({
+      left: CENTER,
+      top: CENTER,
+      radius: RADIUS - 35,
+      fill: 'transparent',
+      stroke: '#d97706',
+      strokeWidth: 2,
+      originX: 'center',
+      originY: 'center',
+      selectable: false,
+      evented: false,
+    });
+
+    // Inner circle with professional finish
     const innerCircle = new Circle({
       left: CENTER,
       top: CENTER,
-      radius: 35,
-      fill: '#16a34a',
-      stroke: '#fbbf24',
+      radius: RADIUS - 50,
+      fill: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+      stroke: '#475569',
       strokeWidth: 3,
       originX: 'center',
       originY: 'center',
       selectable: false,
       evented: false,
+      shadow: {
+        color: 'rgba(0, 0, 0, 0.8)',
+        blur: 20,
+        offsetX: 0,
+        offsetY: 0,
+      },
     });
 
-    // Casino logo in center
-    const centerLogo = new FabricText('🎰', {
+    // Center hub
+    const centerHub = new Circle({
       left: CENTER,
       top: CENTER,
-      fontSize: 24,
+      radius: 15,
+      fill: 'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)',
+      stroke: '#92400e',
+      strokeWidth: 2,
       originX: 'center',
       originY: 'center',
       selectable: false,
       evented: false,
+      shadow: {
+        color: 'rgba(251, 191, 36, 0.8)',
+        blur: 10,
+        offsetX: 0,
+        offsetY: 0,
+      },
     });
 
-    const wheelGroup = new Group([innerCircle, ...wheelParts, outerRim, centerLogo], {
+    const wheelGroup = new Group([innerCircle, ...wheelParts, middleRim, outerRim, centerHub], {
       left: CENTER,
       top: CENTER,
       originX: 'center',
@@ -179,17 +222,22 @@ const Roulette = ({ onWin, onLose, disabled = false }) => {
 
     // Professional casino ball
     const ball = new Circle({
-      left: CENTER + RADIUS - 20,
+      left: CENTER + RADIUS - 25,
       top: CENTER,
       radius: 6,
-      fill: '#ffffff',
-      stroke: '#fbbf24',
-      strokeWidth: 2,
+      fill: 'linear-gradient(135deg, #ffffff 0%, #e5e7eb 100%)',
+      stroke: '#9ca3af',
+      strokeWidth: 1,
       originX: 'center',
       originY: 'center',
       selectable: false,
       evented: false,
-      shadow: '0 3px 6px rgba(0,0,0,0.8)',
+      shadow: {
+        color: 'rgba(0, 0, 0, 0.8)',
+        blur: 8,
+        offsetX: 2,
+        offsetY: 2,
+      },
     });
 
     canvas.add(ball);
@@ -211,6 +259,7 @@ const Roulette = ({ onWin, onLose, disabled = false }) => {
   const clearBets = () => {
     setBets({});
     setTotalBet(0);
+    setLastWin(null);
   };
 
   const spin = useCallback(async () => {
@@ -229,16 +278,16 @@ const Roulette = ({ onWin, onLose, disabled = false }) => {
     
     if (!canvas || !wheel || !ball) return;
 
-    // Random winning number with proper casino physics
+    // Random winning number with casino-style selection
     const winningIndex = Math.floor(Math.random() * NUMBERS.length);
     const winningNumber = NUMBERS[winningIndex];
     
-    // Calculate realistic spin physics
+    // Professional casino spin physics
     const segmentAngle = 360 / NUMBERS.length;
     const baseRotations = 8 + Math.random() * 6; // 8-14 rotations
     const targetAngle = baseRotations * 360 + winningIndex * segmentAngle;
     
-    const duration = 4500 + Math.random() * 1000; // 4.5-5.5 seconds
+    const duration = 4500; // Longer, more dramatic spin
     const startTime = Date.now();
     const startAngle = wheel.angle || 0;
 
@@ -248,18 +297,19 @@ const Roulette = ({ onWin, onLose, disabled = false }) => {
       
       // Professional casino easing (slow start, fast middle, slow end)
       const eased = progress < 0.1 
-        ? progress * 5 * progress
-        : progress < 0.9
-        ? 0.05 + 0.85 * (progress - 0.1) / 0.8
-        : 0.9 + 0.1 * (1 - Math.pow(1 - (progress - 0.9) / 0.1, 3));
+        ? progress * 5 // Slow start
+        : progress < 0.8 
+        ? 0.5 + (progress - 0.1) * 0.714 // Fast middle
+        : 1 - Math.pow((1 - progress) / 0.2, 3) * 0.2; // Dramatic slow end
       
       const currentAngle = startAngle + targetAngle * eased;
       
       wheel.set('angle', currentAngle);
       
-      // Animate ball with realistic physics
+      // Ball physics - opposite direction with realistic bounce
+      const ballProgress = Math.min(progress * 1.2, 1);
       const ballAngle = -currentAngle * 1.3 * (Math.PI / 180);
-      const ballRadius = RADIUS - 20 - Math.sin(progress * Math.PI * 2) * 15;
+      const ballRadius = RADIUS - 25 - Math.sin(ballProgress * Math.PI * 2) * 15;
       const ballBounce = progress > 0.8 ? Math.sin((progress - 0.8) * 50) * 3 : 0;
       
       ball.set({
@@ -272,7 +322,7 @@ const Roulette = ({ onWin, onLose, disabled = false }) => {
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
-        // Final ball position
+        // Final ball position with precision
         const finalAngle = (winningIndex * segmentAngle - 90) * (Math.PI / 180);
         ball.set({
           left: CENTER + (RADIUS - 30) * Math.cos(finalAngle),
@@ -281,7 +331,6 @@ const Roulette = ({ onWin, onLose, disabled = false }) => {
         canvas.renderAll();
         
         setResult(winningNumber);
-        setHistory(prev => [winningNumber, ...prev.slice(0, 9)]); // Keep last 10
         setIsSpinning(false);
         calculateWinnings(winningNumber);
       }
@@ -320,9 +369,9 @@ const Roulette = ({ onWin, onLose, disabled = false }) => {
 
       if (won) {
         const bet = BETS.find(b => b.id === betType);
-        const payout = amount * bet.payout;
-        totalWin += payout;
-        winningBets.push({ bet: bet.label, amount: payout });
+        const winAmount = amount * bet.payout;
+        totalWin += winAmount;
+        winningBets.push({ type: betType, amount: winAmount });
       }
     });
 
@@ -331,52 +380,96 @@ const Roulette = ({ onWin, onLose, disabled = false }) => {
       onWin?.(totalWin, 'roulette');
     }
 
-    // Clear bets after spin
+    // Clear bets after showing results
     setTimeout(() => {
       clearBets();
-    }, 3000);
+    }, 4000);
   };
 
   return (
-    <div className="flex flex-col items-center">
-      {/* Roulette Wheel */}
-      <div className="relative mb-6">
-        <div className="absolute inset-0 bg-amber-500/20 rounded-full blur-xl" />
-        <div className="relative bg-slate-800 rounded-full p-2 border-4 border-amber-500/50 shadow-2xl">
-          <canvas ref={canvasRef} />
+    <div className="casino-game-container">
+      {/* Casino Header */}
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-gold mb-2" style={{ textShadow: '0 0 20px rgba(251, 191, 36, 0.5)' }}>
+          🎯 EUROPEAN ROULETTE 🎯
+        </h2>
+        <div className="text-sm text-zinc-400 uppercase tracking-wider">
+          Professional Casino Table
+        </div>
+      </div>
+
+      {/* Roulette Wheel - Professional Casino Design */}
+      <div className="relative mb-8 flex justify-center">
+        <div className="relative">
+          {/* Outer Casino Frame */}
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-600 via-amber-700 to-amber-900 rounded-full shadow-2xl transform scale-110"></div>
+          <div className="absolute inset-2 bg-gradient-to-br from-zinc-900 to-black rounded-full transform scale-105"></div>
+          
+          {/* Wheel Container */}
+          <div className="relative p-4 bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-full border-4 border-amber-500/50 shadow-2xl">
+            <canvas ref={canvasRef} className="rounded-full" />
+          </div>
+
+          {/* Casino Pointer */}
+          <div className="absolute top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-8 border-l-transparent border-r-transparent border-b-amber-400 shadow-lg z-10"></div>
         </div>
       </div>
 
       {/* Result Display */}
       {result && !isSpinning && (
-        <div className="mb-4 text-center animate-scale-in">
-          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${
-            result.color === 'red' ? 'bg-red-600' : 
-            result.color === 'black' ? 'bg-gray-800' : 'bg-green-600'
-          }`}>
-            <span className="text-2xl font-bold text-white">{result.num}</span>
-            <span className="text-sm text-white uppercase">{result.color}</span>
+        <div className="mb-6 text-center animate-bounce">
+          <div className={`inline-flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl ${
+            result.color === 'red' ? 'bg-gradient-to-r from-red-600 to-red-700' : 
+            result.color === 'black' ? 'bg-gradient-to-r from-gray-800 to-gray-900' : 
+            'bg-gradient-to-r from-green-600 to-green-700'
+          } border-2 border-amber-400/50`}>
+            <span className="text-4xl font-black">{result.num}</span>
+            <div className="text-left">
+              <div className="text-sm text-white/80 uppercase tracking-wider">Winner</div>
+              <div className="text-lg font-bold text-white capitalize">{result.color}</div>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Betting Grid */}
-      <div className="w-full max-w-sm mb-4">
-        <div className="grid grid-cols-2 gap-2 mb-3">
+      {/* Win Display */}
+      {lastWin && (
+        <div className="mb-6 text-center">
+          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-2xl animate-pulse">
+            <span className="text-2xl">🎉</span>
+            <div>
+              <div className="font-bold text-lg">WINNER!</div>
+              <div className="text-xl font-black">${lastWin.amount}</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Professional Betting Grid */}
+      <div className="w-full max-w-md mx-auto mb-6">
+        <div className="grid grid-cols-2 gap-3 mb-4">
           {BETS.map((bet) => (
             <button
               key={bet.id}
               onClick={() => placeBet(bet.id)}
               disabled={isSpinning}
-              className={`relative p-3 rounded-lg font-bold text-white transition-all ${
-                isSpinning ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'
-              }`}
-              style={{ backgroundColor: bet.color }}
+              className={`relative p-4 rounded-xl font-bold text-white transition-all duration-300 ${
+                isSpinning ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 active:scale-95'
+              } shadow-lg border-2 border-transparent hover:border-amber-400/50`}
+              style={{ 
+                background: `linear-gradient(135deg, ${bet.color} 0%, ${bet.color}dd 100%)`,
+                boxShadow: isSpinning ? 'none' : `0 6px 20px ${bet.color}40`
+              }}
             >
-              <div className="text-sm">{bet.label}</div>
-              <div className="text-xs opacity-80">{bet.payout}:1</div>
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-lg">{bet.icon}</span>
+                <div className="text-center">
+                  <div className="text-sm font-bold">{bet.label}</div>
+                  <div className="text-xs opacity-90">{bet.payout}:1</div>
+                </div>
+              </div>
               {bets[bet.id] && (
-                <div className="absolute -top-2 -right-2 bg-amber-500 text-black text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                <div className="absolute -top-2 -right-2 bg-amber-500 text-black text-xs font-bold rounded-full w-7 h-7 flex items-center justify-center border-2 border-white shadow-lg">
                   ${bets[bet.id]}
                 </div>
               )}
@@ -385,30 +478,44 @@ const Roulette = ({ onWin, onLose, disabled = false }) => {
         </div>
 
         {/* Bet Controls */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="text-sm text-zinc-400">
-            Total Bet: <span className="text-amber-500 font-bold">${totalBet}</span>
+        <div className="flex items-center justify-between mb-6 bg-black/40 rounded-xl p-4 border border-amber-500/30">
+          <div className="text-sm">
+            <div className="text-zinc-400 uppercase tracking-wider text-xs">Total Bet</div>
+            <div className="text-amber-400 font-bold text-lg">${totalBet}</div>
           </div>
           <button
             onClick={clearBets}
             disabled={isSpinning || totalBet === 0}
-            className="text-xs text-red-400 hover:text-red-300 disabled:opacity-50"
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
             Clear Bets
           </button>
         </div>
 
-        {/* Spin Button */}
+        {/* Spin Button - Professional Casino Style */}
         <button
           onClick={spin}
           disabled={isSpinning || disabled || totalBet === 0}
-          className={`w-full py-4 rounded-2xl font-bold text-lg transition-all ${
+          className={`w-full py-6 rounded-2xl font-black text-xl transition-all duration-300 ${
             isSpinning || disabled || totalBet === 0
-              ? 'bg-zinc-700 text-zinc-400 cursor-not-allowed'
-              : 'bg-gradient-to-r from-amber-500 to-orange-500 text-black shadow-[0_0_20px_rgba(245,158,11,0.4)] hover:shadow-[0_0_30px_rgba(245,158,11,0.6)] active:scale-95'
-          }`}
+              ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed border-2 border-zinc-700'
+              : 'bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 text-black shadow-[0_0_30px_rgba(251,191,36,0.6)] hover:shadow-[0_0_40px_rgba(251,191,36,0.8)] active:scale-98 hover:from-amber-300 hover:to-amber-500 border-2 border-amber-300'
+          } uppercase tracking-wider`}
+          style={{
+            textShadow: isSpinning || disabled || totalBet === 0 ? 'none' : '0 2px 4px rgba(0,0,0,0.5)',
+            boxShadow: isSpinning || disabled || totalBet === 0 ? 'none' : '0 8px 25px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
+          }}
         >
-          {isSpinning ? 'SPINNING...' : totalBet === 0 ? 'PLACE BETS' : `SPIN - $${totalBet}`}
+          {isSpinning ? (
+            <span className="flex items-center justify-center gap-3">
+              <span className="animate-spin">🎯</span>
+              SPINNING...
+            </span>
+          ) : totalBet === 0 ? (
+            '🎲 PLACE BETS 🎲'
+          ) : (
+            `🎯 SPIN - $${totalBet} 🎯`
+          )}
         </button>
       </div>
     </div>

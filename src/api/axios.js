@@ -1,4 +1,5 @@
 import axios from 'axios';
+<<<<<<< HEAD
 import { API_BASE_URL, REQUEST_TIMEOUT, STORAGE_KEYS } from './config';
 
 /**
@@ -7,19 +8,38 @@ import { API_BASE_URL, REQUEST_TIMEOUT, STORAGE_KEYS } from './config';
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: REQUEST_TIMEOUT,
+=======
+
+export const backendUrl = () => {
+  // Golden Age USDT Wallet API - always use the provided server
+  return "https://server-kl7c.onrender.com";
+};
+
+const api = axios.create({
+  baseURL: backendUrl(),
+  timeout: 50000,
+>>>>>>> 191eb8047438f5763ef34c456631ad09c1d9e03b
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
+<<<<<<< HEAD
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+=======
+api.interceptors.request.use(
+  (config) => {
+    // Get JWT token from localStorage (not cookies for this API)
+    const token = localStorage.getItem('access_token');
+>>>>>>> 191eb8047438f5763ef34c456631ad09c1d9e03b
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     
+<<<<<<< HEAD
     // Add request ID for tracking
     config.headers['X-Request-ID'] = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
@@ -101,6 +121,41 @@ api.interceptors.response.use(
       type: 'API_ERROR'
     });
   }
+=======
+    // Add Telegram initData as fallback authentication
+    if (window.Telegram?.WebApp?.initData) {
+      config.headers['X-Telegram-Init-Data'] = window.Telegram.WebApp.initData;
+    }
+    
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
+
+api.interceptors.response.use(
+  (response) => {
+    try {
+      console.log('[api] response', {
+        url: response.config?.url,
+        status: response.status,
+        data: response.data,
+      });
+    } catch (e) {}
+    return response.data;
+  },
+  (error) => {
+    try {
+      console.error('[api] response error', {
+        message: error.message,
+        url: error.config?.url,
+        status: error.response?.status,
+        responseData: error.response?.data,
+        request: error.request,
+      });
+    } catch (e) {}
+    return Promise.reject(error?.response?.data || error);
+  },
+>>>>>>> 191eb8047438f5763ef34c456631ad09c1d9e03b
 );
 
 export default api;

@@ -97,6 +97,8 @@ const Game = ({ user, updateBalance, navigate, gameData }) => {
     <Layout 
       title={currentGameData?.name} 
       user={user} 
+      navigate={navigate}
+      currentScreen="game"
       showBack={true} 
       onBack={() => navigate('home')}
       navigate={navigate}
@@ -105,87 +107,99 @@ const Game = ({ user, updateBalance, navigate, gameData }) => {
       <div className="page space-y-6">
         {showConfetti && <Confetti onComplete={() => setShowConfetti(false)} />}
 
-        {/* Mega Win Display */}
+        {/* Mega Win Display - Premium Casino Style */}
         {lastWin && lastWin >= 100 && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-            <div className="card text-center max-w-sm mx-4 glow-gold">
-              <div className="text-6xl mb-4">🎉</div>
-              <h2 className="text-2xl font-bold text-gradient-gold mb-2">MEGA WIN!</h2>
-              <div className="text-4xl font-bold text-gradient-emerald mb-4">
-                ${lastWin.toLocaleString()}
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md">
+            <div className="card text-center max-w-sm mx-4 glow-gold border-2 border-gold/50 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-gold/10 via-transparent to-emerald/10 animate-pulse"></div>
+              <div className="relative z-10">
+                <div className="text-7xl mb-4 animate-bounce">🎉</div>
+                <h2 className="text-3xl font-bold text-gradient-gold mb-3 tracking-tight">MEGA WIN!</h2>
+                <div className="text-5xl font-bold text-gradient-emerald mb-6 tracking-tight">
+                  ${lastWin.toLocaleString()}
+                </div>
+                <div className="casino-divider my-4"></div>
+                <button 
+                  onClick={() => setLastWin(null)}
+                  className="btn btn-primary btn-lg font-bold w-full"
+                >
+                  Continue Playing
+                </button>
               </div>
-              <button 
-                onClick={() => setLastWin(null)}
-                className="btn btn-primary"
-              >
-                Continue Playing
-              </button>
             </div>
           </div>
         )}
 
-        {/* Game Selection Tabs */}
+        {/* Game Selection Tabs - Premium Casino Style */}
         <div className="px-4">
-          <div className="flex gap-2 overflow-x-auto pb-2">
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {gameOptions.map((game) => (
               <button
                 key={game.id}
                 onClick={() => handleGameSwitch(game.id)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg whitespace-nowrap transition-all ${
-                  activeGame === game.id
-                    ? 'bg-gradient-to-r from-amber-600 to-amber-500 text-white'
-                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                className={`casino-tab flex items-center gap-3 whitespace-nowrap ${
+                  activeGame === game.id ? 'active' : ''
                 }`}
               >
-                <span className="text-xl">{game.icon}</span>
+                <span className="text-2xl">{game.icon}</span>
                 <div className="text-left">
-                  <div className="font-medium text-sm">{game.name}</div>
-                  <div className="text-xs opacity-80">{game.subtitle}</div>
+                  <div className="font-semibold text-sm tracking-tight">{game.name}</div>
+                  <div className="text-xs opacity-80 mt-0.5">{game.subtitle}</div>
                 </div>
-                {game.isHot && <span className="text-xs bg-red-500 px-2 py-1 rounded-full">HOT</span>}
-                {game.isLive && <span className="text-xs bg-emerald-500 px-2 py-1 rounded-full">LIVE</span>}
-                {game.isNew && <span className="text-xs bg-blue-500 px-2 py-1 rounded-full">NEW</span>}
+                {game.isHot && <span className="status-badge-hot text-xs">HOT</span>}
+                {game.isLive && <span className="live-indicator text-xs">LIVE</span>}
+                {game.isNew && <span className="status-badge-new text-xs">NEW</span>}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Game Stats */}
+        {/* Game Stats - Premium Casino Style */}
         <div className="px-4">
           <div className="grid-2 gap-4">
-            <div className="card text-center">
-              <div className="text-2xl mb-2">💰</div>
-              <div className="text-sm text-gray-400">Total Wins</div>
-              <div className="text-lg font-bold text-gradient-emerald">
-                ${gameStats.totalWins.toLocaleString()}
+            <div className="card text-center relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative z-10">
+                <div className="text-3xl mb-2 transform group-hover:scale-110 transition-transform duration-300">💰</div>
+                <div className="text-xs text-gray-400 uppercase tracking-wider mb-1 font-medium">Total Wins</div>
+                <div className="text-xl font-bold text-gradient-emerald tracking-tight">
+                  ${gameStats.totalWins.toLocaleString()}
+                </div>
               </div>
             </div>
-            <div className="card text-center">
-              <div className="text-2xl mb-2">🔥</div>
-              <div className="text-sm text-gray-400">Win Streak</div>
-              <div className="text-lg font-bold text-gradient-gold">
-                {gameStats.winStreak}
+            <div className="card text-center relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-br from-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative z-10">
+                <div className="text-3xl mb-2 transform group-hover:scale-110 transition-transform duration-300">🔥</div>
+                <div className="text-xs text-gray-400 uppercase tracking-wider mb-1 font-medium">Win Streak</div>
+                <div className="text-xl font-bold text-gradient-gold tracking-tight">
+                  {gameStats.winStreak}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Main Game Area */}
+        {/* Main Game Area - Premium Casino Style */}
         <div className="px-4">
-          <div className="card p-6 bg-gradient-to-br from-black via-gray-900 to-black border-amber-500/20">
-            <div className="mb-4 text-center">
-              <h2 className="text-xl font-bold text-gradient-gold mb-2">
+          <div className="card p-4 sm:p-6 bg-gradient-to-br from-black via-gray-900 to-black border-2 border-amber-500/30 relative overflow-hidden w-full max-w-full box-border">
+            <div className="absolute inset-0 bg-gradient-to-br from-gold/5 via-transparent to-emerald/5 opacity-50"></div>
+            <div className="casino-ornament mb-4"></div>
+            <div className="relative z-10 mb-6 text-center">
+              <h2 className="text-2xl font-bold text-gradient-gold mb-2 tracking-tight">
                 {currentGameData?.name}
               </h2>
-              <p className="text-gray-400 text-sm">{currentGameData?.subtitle}</p>
+              <p className="text-gray-400 text-sm font-medium">{currentGameData?.subtitle}</p>
             </div>
             
             {GameComponent && (
-              <GameComponent 
-                onWin={handleWin} 
-                onLose={handleLose}
-                user={user}
-              />
+              <div className="relative z-10">
+                <GameComponent 
+                  onWin={handleWin} 
+                  onLose={handleLose}
+                  user={user}
+                />
+              </div>
             )}
           </div>
         </div>

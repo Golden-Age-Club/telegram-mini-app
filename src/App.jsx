@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { ApiProvider, useApi } from './contexts/ApiContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ToastContainer, useToast } from './components/Toast';
 import { useAuth } from './hooks/useAuth';
 import { useWallet } from './hooks/useWallet';
@@ -10,7 +12,7 @@ import Wallet from './pages/Wallet';
 import Profile from './pages/Profile';
 import './App.css';
 
-function App() {
+function AppContent() {
   const [screen, setScreen] = useState('landing');
   const [screenData, setScreenData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,6 +42,8 @@ function App() {
 
   // Initialize Telegram WebApp
   useEffect(() => {
+    let initializationDone = false;
+    
     const initializeApp = async () => {
       if (hasInitialized) return;
       setHasInitialized(true);
@@ -48,9 +52,13 @@ function App() {
         tg.ready();
         tg.expand();
         
-        // Set Golden Age Cash theme colors
-        tg.setHeaderColor('#000000');
-        tg.setBackgroundColor('#000000');
+        // Set Golden Age Cash theme colors (only if supported)
+        if (tg.setHeaderColor) {
+          tg.setHeaderColor('#000000');
+        }
+        if (tg.setBackgroundColor) {
+          tg.setBackgroundColor('#000000');
+        }
         
         // Check if we have real Telegram data
         const hasRealTelegramData = tg.initData && tg.initData.length > 0;
@@ -148,10 +156,13 @@ function App() {
 
   // Handle Telegram back button
   useEffect(() => {
-    if (!tg) return;
+    if (!tg?.BackButton) return;
 
     const handleBack = () => {
-      tg.HapticFeedback?.impactOccurred('light');
+      // Only use haptic feedback if supported
+      if (tg?.HapticFeedback?.impactOccurred) {
+        tg.HapticFeedback.impactOccurred('light');
+      }
       if (screen === 'game' || screen === 'wallet' || screen === 'profile') {
         navigate('home');
       } else if (screen === 'home') {
@@ -160,20 +171,25 @@ function App() {
       setScreenData(null);
     };
 
-    if (screen !== 'landing') {
+    if (screen !== 'landing' && tg.BackButton.show) {
       tg.BackButton.show();
       tg.BackButton.onClick(handleBack);
-    } else {
+    } else if (tg.BackButton.hide) {
       tg.BackButton.hide();
     }
 
     return () => {
-      tg.BackButton.offClick(handleBack);
+      if (tg.BackButton.offClick) {
+        tg.BackButton.offClick(handleBack);
+      }
     };
   }, [screen, tg]);
 
   const navigate = (newScreen, data = null) => {
-    tg?.HapticFeedback?.impactOccurred('light');
+    // Only use haptic feedback if supported
+    if (tg?.HapticFeedback?.impactOccurred) {
+      tg.HapticFeedback.impactOccurred('light');
+    }
     setScreen(newScreen);
     setScreenData(data);
   };
@@ -216,7 +232,7 @@ function App() {
             <div className="loading-dot"></div>
             <div className="loading-dot"></div>
           </div>
-          <p className="text-gray-400">Initializing Golden Age Cash...</p>
+          <p className="text-gray-400">Initializing Golden Age Club...</p>
         </div>
       </div>
     );

@@ -27,6 +27,15 @@ const SlotMachine = ({ onWin, onLose, bet = 10, disabled = false }) => {
   const SYMBOL_HEIGHT = 90;
   const CANVAS_WIDTH = 340;
   const CANVAS_HEIGHT = 300;
+  
+  // Calculate responsive canvas size
+  const getResponsiveCanvasSize = () => {
+    if (typeof window !== 'undefined') {
+      const maxWidth = Math.min(340, window.innerWidth - 80); // Account for padding
+      return { width: maxWidth, height: (maxWidth / 340) * 300 };
+    }
+    return { width: CANVAS_WIDTH, height: CANVAS_HEIGHT };
+  };
 
   // Initialize canvas with casino styling
   useEffect(() => {
@@ -339,28 +348,33 @@ const SlotMachine = ({ onWin, onLose, bet = 10, disabled = false }) => {
       </div>
 
       {/* Slot Machine Frame - Professional Casino Design */}
-      <div className="relative mx-auto mb-6" style={{ width: CANVAS_WIDTH + 40 }}>
+      <div className="relative mx-auto mb-6 w-full" style={{ maxWidth: 'min(380px, calc(100vw - 2rem))' }}>
         {/* Outer Casino Frame */}
         <div className="absolute inset-0 bg-gradient-to-b from-amber-600 via-amber-700 to-amber-900 rounded-3xl shadow-2xl"></div>
         <div className="absolute inset-2 bg-gradient-to-b from-zinc-900 to-black rounded-2xl"></div>
         
         {/* Top Casino Branding */}
-        <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 px-8 py-2 rounded-full text-black font-bold text-sm shadow-lg border-2 border-amber-300">
+        <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 px-3 sm:px-8 py-1.5 sm:py-2 rounded-full text-black font-bold text-[10px] sm:text-sm shadow-lg border-2 border-amber-300 whitespace-nowrap z-10">
           ⭐ VEGAS STYLE ⭐
         </div>
         
         {/* Canvas Container */}
-        <div className="relative p-5">
-          <canvas ref={canvasRef} className="rounded-xl" />
+        <div className="relative p-3 sm:p-5" style={{ paddingTop: '2rem', paddingBottom: '1.25rem' }}>
+          <div className="relative w-full overflow-hidden" style={{ aspectRatio: '340/300' }}>
+            <canvas 
+              ref={canvasRef} 
+              className="rounded-xl absolute inset-0 w-full h-full" 
+            />
           
-          {/* Gradient Masks for Professional Look */}
-          <div className="absolute inset-x-5 top-5 h-20 bg-gradient-to-b from-black/80 to-transparent pointer-events-none rounded-t-xl" />
-          <div className="absolute inset-x-5 bottom-5 h-20 bg-gradient-to-t from-black/80 to-transparent pointer-events-none rounded-b-xl" />
+            {/* Gradient Masks for Professional Look */}
+            <div className="absolute inset-x-3 sm:inset-x-5 top-3 sm:top-5 h-16 sm:h-20 bg-gradient-to-b from-black/80 to-transparent pointer-events-none rounded-t-xl" />
+            <div className="absolute inset-x-3 sm:inset-x-5 bottom-3 sm:bottom-5 h-16 sm:h-20 bg-gradient-to-t from-black/80 to-transparent pointer-events-none rounded-b-xl" />
+          </div>
         </div>
 
         {/* Side Decorations */}
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-3 h-16 bg-gradient-to-b from-amber-400 to-amber-600 rounded-r-full shadow-lg"></div>
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-16 bg-gradient-to-b from-amber-400 to-amber-600 rounded-l-full shadow-lg"></div>
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-2 sm:w-3 h-12 sm:h-16 bg-gradient-to-b from-amber-400 to-amber-600 rounded-r-full shadow-lg"></div>
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 sm:w-3 h-12 sm:h-16 bg-gradient-to-b from-amber-400 to-amber-600 rounded-l-full shadow-lg"></div>
       </div>
 
       {/* Win Display */}

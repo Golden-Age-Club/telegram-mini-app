@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Globe, Bell, Shield, MessageCircle, ChevronRight, Crown, Trophy, Target, X, Check } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import Layout from '../components/Layout';
+import Layout from '../components/Layout';
 
 const Profile = ({ user, navigate, onLogout }) => {
   const tg = window.Telegram?.WebApp;
@@ -192,6 +193,8 @@ const Profile = ({ user, navigate, onLogout }) => {
           </div>
         </div>
       )}
+      </div>
+    </Layout>
       </div>
     </Layout>
   );
