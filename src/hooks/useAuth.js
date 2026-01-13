@@ -6,7 +6,7 @@ import {
   logout, 
   isAuthenticated as checkIsAuthenticated, 
   getStoredUser 
-} from '../api/auth-simple';
+} from '../api/auth-real';
 
 /**
  * Custom hook for authentication management

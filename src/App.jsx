@@ -52,16 +52,18 @@ function App() {
         tg.setHeaderColor('#000000');
         tg.setBackgroundColor('#000000');
         
-        // Try to authenticate with Telegram
-        if (tg.initData && tg.initData.length > 0) {
+        // Check if we have real Telegram data
+        const hasRealTelegramData = tg.initData && tg.initData.length > 0;
+        
+        if (hasRealTelegramData) {
           try {
-            console.log('🔐 Authenticating with Telegram...');
+            console.log('🔐 Authenticating with real Telegram data...');
             const response = await login(tg.initData);
             
             if (response.user) {
-              // Welcome message
+              // Welcome message with real Telegram user
               setTimeout(() => {
-                toast.success(`Welcome to Golden Age Cash, ${response.user.first_name || 'Player'}!`);
+                toast.success(`Welcome back, ${response.user.first_name || 'Player'}!`);
               }, 1000);
               
               // Auto-navigate to home if user is logged in
@@ -76,9 +78,27 @@ function App() {
             // Fall back to web mode
             await initWebMode();
           }
+        } else if (tg.initDataUnsafe?.user) {
+          // Telegram environment but no initData - use initDataUnsafe for mock
+          console.log('📱 Telegram environment detected, using mock auth...');
+          try {
+            const response = await login('telegram_mock');
+            
+            if (response.user) {
+              setTimeout(() => {
+                toast.success(`Welcome to Golden Age Cash, ${response.user.first_name || 'Player'}!`);
+              }, 1000);
+              
+              setScreen('home');
+              await refreshWallet();
+            }
+          } catch (error) {
+            console.error('❌ Telegram mock authentication failed:', error);
+            await initWebMode();
+          }
         } else {
-          // No Telegram data, but still in Telegram environment - fall back to web mode
-          console.log('🌐 No Telegram initData, using web mode');
+          // In Telegram but no user data - fall back to web mode
+          console.log('🌐 No Telegram user data, using web mode');
           await initWebMode();
         }
       } else {
