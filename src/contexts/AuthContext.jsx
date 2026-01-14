@@ -146,6 +146,42 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const registerWithEmail = async ({ email, username, password, first_name, last_name }) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const result = await authApi.registerWithEmail({
+        email,
+        username,
+        password,
+        first_name,
+        last_name
+      });
+      console.log(result)
+
+      if (result && result.access_token && result.user) {
+        setUser(result.user);
+        setIsAuthenticated(true);
+        localStorage.setItem('access_token', result.access_token);
+        return { success: true, user: result.user };
+      }
+
+      if (result && result.user) {
+        setUser(result.user);
+        return { success: true, user: result.user };
+      }
+
+      return { success: true, user: result };
+    } catch (err) {
+      const errorMsg = err?.message || 'Email registration failed';
+      setError(errorMsg);
+      return { success: false, error: errorMsg };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const logout = async () => {
     setIsLoading(true);
     
@@ -186,6 +222,7 @@ export const AuthProvider = ({ children }) => {
     loginWithTestData,
     loginWithDemo, // Legacy method
     refreshToken,
+    registerWithEmail,
     logout,
     updateUser,
     clearError,

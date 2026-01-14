@@ -1,278 +1,332 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, History, Gift, CreditCard, Bitcoin, Building2 } from 'lucide-react';
-import Layout from '../components/Layout';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Copy, Check, Clock } from 'lucide-react';
+import { useApi } from '../contexts/ApiContext';
+import { useToast } from '../contexts/ToastContext';
 
-const Wallet = ({ user, updateBalance, navigate }) => {
+const Wallet = () => {
   const tg = window.Telegram?.WebApp;
-  const [view, setView] = useState('main');
-  const [selectedAmount, setSelectedAmount] = useState(null);
-  const [isInTelegram, setIsInTelegram] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { createWithdrawal } = useApi();
+  const toast = useToast();
 
-  const quickAmounts = [100, 500, 1000, 2000, 5000];
+  const isDepositRoute = location.pathname.endsWith('/wallet/deposit') || location.pathname.endsWith('/wallet');
+  const isWithdrawRoute = location.pathname.endsWith('/wallet/withdraw');
+
+  const [activeTab, setActiveTab] = useState(isWithdrawRoute ? 'withdraw' : 'deposit');
+  const [depositStep, setDepositStep] = useState('form');
+  const [amount, setAmount] = useState('');
+  const [selectedNetwork, setSelectedNetwork] = useState('trc20');
+  const [copied, setCopied] = useState(false);
+
+  const networks = [
+    { id: 'trc20', name: 'USDT.TRC20', label: 'TRC20' },
+    { id: 'erc20', name: 'USDT.ERC20', label: 'ERC20' },
+    { id: 'bep20', name: 'USDT.BEP20', label: 'BEP20' }
+  ];
+
+  const mockAddresses = {
+    trc20: 'T9yD14Nj9j7xAB4dbGeiX9h8zzCyrXYZ',
+    erc20: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+    bep20: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F'
+  };
+
+  const address = mockAddresses[selectedNetwork];
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${address}&bgcolor=000000&color=ffffff&margin=10`;
 
   useEffect(() => {
-    // Check if we're in Telegram environment
-    const inTelegram = tg && tg.initData && tg.initData.length > 0;
-    setIsInTelegram(inTelegram);
-    
-    if (inTelegram) {
-      tg.setHeaderColor('#000000');
-      tg.setBackgroundColor('#000000');
-    }
+    if (!tg) return;
+    tg.setHeaderColor('#000000');
+    tg.setBackgroundColor('#000000');
   }, [tg]);
 
   useEffect(() => {
-    if (!isInTelegram || !tg?.MainButton) return;
-
-    if (view === 'deposit' && selectedAmount) {
-      tg.MainButton.setText(`Deposit $${selectedAmount}`);
-      tg.MainButton.color = '#4caf50';
-      tg.MainButton.textColor = '#ffffff';
-      tg.MainButton.show();
-      tg.MainButton.onClick(() => {
-        tg.HapticFeedback?.notificationOccurred('success');
-        updateBalance(selectedAmount);
-        setView('main');
-        setSelectedAmount(null);
-      });
-    } else if (view === 'withdraw' && selectedAmount) {
-      tg.MainButton.setText(`Withdraw $${selectedAmount}`);
-      tg.MainButton.color = '#ff6b35';
-      tg.MainButton.textColor = '#ffffff';
-      tg.MainButton.show();
-      tg.MainButton.onClick(() => {
-        tg.HapticFeedback?.notificationOccurred('success');
-        updateBalance(-selectedAmount);
-        setView('main');
-        setSelectedAmount(null);
-      });
-    } else {
-      tg.MainButton.hide();
+    if (isWithdrawRoute) {
+      setActiveTab('withdraw');
+    } else if (isDepositRoute) {
+      setActiveTab('deposit');
     }
+  }, [isDepositRoute, isWithdrawRoute]);
 
-    return () => {
-      tg.MainButton.offClick();
-    };
-  }, [view, selectedAmount, tg, updateBalance, isInTelegram]);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(address);
+    setCopied(true);
+    tg?.HapticFeedback?.notificationOccurred('success');
+    setTimeout(() => setCopied(false), 2000);
+  };
 
-  const transactions = [
-    { type: 'deposit', amount: 500, date: 'Today, 2:30 PM' },
-    { type: 'win', amount: 150, date: 'Today, 11:45 AM' },
-    { type: 'withdraw', amount: -200, date: 'Yesterday' },
-  ];
+  const parsedAmount = Number(amount);
+  const isValidAmount = !Number.isNaN(parsedAmount) && parsedAmount > 0;
 
-  if (view === 'deposit' || view === 'withdraw') {
-    const isDeposit = view === 'deposit';
-    return (
-      <div className="page">
-        {/* Header */}
-        <div className="header-bar">
-          <button 
-            onClick={() => setView('main')}
-            className="flex items-center gap-1 text-white"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <span className="font-bold text-white">{isDeposit ? 'Deposit' : 'Withdraw'}</span>
-          <div className="w-5" />
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    if (tab === 'deposit') {
+      navigate('/wallet/deposit');
+      setDepositStep('form');
+    } else if (tab === 'withdraw') {
+      navigate('/wallet/withdraw');
+    }
+  };
+
+  const handleProceed = () => {
+    if (!isValidAmount) return;
+    setDepositStep('details');
+  };
+
+  const handleBackToForm = () => {
+    setDepositStep('form');
+  };
+
+  const renderDepositForm = () => (
+    <div className="space-y-6">
+      <div className="card p-0 space-y-4">
+        <p className="text-sm text-[var(--text-muted)] font-medium uppercase tracking-wide">
+          Network
+        </p>
+        <select
+          value={selectedNetwork}
+          onChange={(e) => setSelectedNetwork(e.target.value)}
+          className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50"
+        >
+          {networks.map((net) => (
+            <option key={net.id} value={net.id}>
+              {net.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="card p-0 space-y-4">
+        <p className="text-sm text-[var(--text-muted)] font-medium uppercase tracking-wide">
+          Amount (USDT)
+        </p>
+
+        <div className="relative">
+          <input
+            type="number"
+            value={amount}
+            placeholder="0.00"
+            className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-2 text-2xl font-bold text-white placeholder-white/20 focus:outline-none focus:border-emerald-500/50 transition-colors"
+            onChange={(e) => setAmount(e.target.value)}
+            min="0"
+            step="0.01"
+          />
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold text-[var(--text-muted)]">
+            USDT
+          </span>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={handleProceed}
+        disabled={!isValidAmount}
+        className={`w-full py-2 rounded-xl font-bold text-lg shadow-lg transform active:scale-95 transition-all ${
+          isValidAmount
+            ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-emerald-500/20'
+            : 'bg-white/5 text-gray-500 border border-white/10 cursor-not-allowed'
+        }`}
+      >
+        Proceed
+      </button>
+    </div>
+  );
+
+  const renderDepositDetails = () => (
+    <div className="space-y-6">
+      <button
+        type="button"
+        onClick={handleBackToForm}
+        className="text-sm text-[var(--text-muted)] hover:text-white transition-colors"
+      >
+        ← Edit amount or network
+      </button>
+
+      <div className="card p-6 flex flex-col items-center text-center space-y-6">
+        <div className="space-y-1">
+          <p className="text-gray-400 text-sm">Send exactly</p>
+          <p className="text-3xl font-black text-white tracking-tight">
+            {parsedAmount.toLocaleString()} <span className="text-emerald-500">USDT</span>
+          </p>
+          <p className="text-xs text-gray-400">
+            Network: {networks.find((n) => n.id === selectedNetwork)?.name}
+          </p>
         </div>
 
-        {/* Amount Selection */}
-        <div className="p-4">
-          <div className="card p-4">
-            <p className="text-sm text-[var(--text-muted)] mb-3">Select Amount</p>
-            <div className="grid grid-cols-3 gap-2 mb-4">
-              {(isDeposit ? quickAmounts : [50, 100, 250, 500, 1000]).map((amount) => (
-                <button
-                  key={amount}
-                  onClick={() => {
-                    tg?.HapticFeedback?.selectionChanged();
-                    setSelectedAmount(amount);
-                  }}
-                  disabled={!isDeposit && amount > (user?.balance || 0)}
-                  className={`py-3 rounded-xl font-bold text-sm transition-all ${
-                    selectedAmount === amount
-                      ? isDeposit 
-                        ? 'bg-[#4caf50] text-white' 
-                        : 'bg-[#ff6b35] text-white'
-                      : !isDeposit && amount > (user?.balance || 0)
-                      ? 'bg-[var(--bg-elevated)] opacity-30 text-white'
-                      : 'bg-[var(--bg-elevated)] text-white'
-                  }`}
-                >
-                  ${amount}
-                </button>
-              ))}
-            </div>
-
-            <input
-              type="number"
-              placeholder="Enter custom amount"
-              className="input"
-              onChange={(e) => {
-                const val = Number(e.target.value) || 0;
-                setSelectedAmount(isDeposit ? val : Math.min(val, user?.balance || 0));
-              }}
+        <div className="relative group">
+          <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity"></div>
+          <div className="relative bg-white p-3 rounded-xl">
+            <img
+              src={qrCodeUrl}
+              alt="Deposit QR Code"
+              className="w-48 h-48 object-contain"
             />
           </div>
         </div>
 
-        {/* Payment Methods (Deposit only) */}
-        {isDeposit && (
-          <div className="p-4 pt-0">
-            <p className="text-sm text-[var(--text-muted)] mb-3">Payment Method</p>
-            <div className="space-y-2">
-              {[
-                { icon: CreditCard, name: 'Credit Card', desc: 'Instant' },
-                { icon: Bitcoin, name: 'Crypto', desc: 'BTC, ETH, USDT' },
-                { icon: Building2, name: 'Bank Transfer', desc: '1-3 days' },
-              ].map((method, i) => (
-                <button key={i} className="menu-item w-full rounded-xl">
-                  <div className="menu-icon">
-                    <method.icon className="w-5 h-5 text-[var(--text-secondary)]" />
-                  </div>
-                  <div className="flex-1 text-left">
-                    <p className="font-semibold text-white text-sm">{method.name}</p>
-                    <p className="text-xs text-[var(--text-muted)]">{method.desc}</p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-[var(--text-muted)]" />
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Fallback button */}
-        {!isInTelegram && selectedAmount && (
-          <div className="p-4">
-            <button 
-              onClick={() => {
-                updateBalance(isDeposit ? selectedAmount : -selectedAmount);
-                setView('main');
-                setSelectedAmount(null);
-              }}
-              className={`w-full py-4 rounded-xl font-bold ${
-                isDeposit 
-                  ? 'bg-[#4caf50] text-white' 
-                  : 'bg-[#ff6b35] text-white'
+        <div className="w-full space-y-2">
+          <p className="text-xs text-gray-500 uppercase tracking-wider">
+            Deposit Address ({networks.find((n) => n.id === selectedNetwork)?.label})
+          </p>
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="w-full flex items-center justify-between bg-black/30 border border-white/10 p-3 rounded-xl group active:scale-95 transition-all"
+          >
+            <span className="text-xs font-mono text-gray-300 truncate mr-2">
+              {address}
+            </span>
+            <div
+              className={`p-2 rounded-lg ${
+                copied
+                  ? 'bg-emerald-500/20 text-emerald-500'
+                  : 'bg-white/5 text-gray-400 group-hover:text-white'
               }`}
             >
-              {isDeposit ? 'Deposit' : 'Withdraw'} ${selectedAmount}
-            </button>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <Layout title="Wallet" user={user} navigate={navigate} currentScreen="wallet">
-      <div className="page p-4 space-y-6">
-      {/* Header */}
-      <div className="header-bar">
-        <button 
-          onClick={() => navigate('home')}
-          className="w-8 h-8 rounded-full bg-[#0088cc] flex items-center justify-center flex-shrink-0"
-        >
-          <span className="text-white text-sm">✈</span>
-        </button>
-        <span className="font-bold text-white truncate flex-1 min-w-0 text-center">My Wallet</span>
-        <div className="balance-chip flex-shrink-0">
-          <div className="coin-icon">$</div>
-          <span className="text-[var(--gold)] truncate">{user?.balance?.toLocaleString() || '2,368.50'}</span>
-        </div>
-      </div>
-
-      {/* Balance Card - Premium Casino Style */}
-      <div className="p-4">
-        <div className="wallet-card">
-          <div className="casino-ornament mb-6"></div>
-          <p className="wallet-balance-label">USDT Balance</p>
-          <p className="wallet-balance">{user?.balance?.toLocaleString() || '2,368.50'}</p>
-          
-          <div className="flex gap-2 sm:gap-4 mt-8">
-            <button 
-              onClick={() => {
-                tg?.HapticFeedback?.impactOccurred('light');
-                setView('deposit');
-              }}
-              className="btn btn-success flex-1 btn-lg font-bold relative overflow-hidden group min-w-0"
-            >
-              <span className="relative z-10 flex items-center justify-center gap-1 sm:gap-2 truncate">
-                <span className="flex-shrink-0">💰</span>
-                <span className="truncate">Deposit</span>
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-            </button>
-            <button 
-              onClick={() => {
-                tg?.HapticFeedback?.impactOccurred('light');
-                setView('withdraw');
-              }}
-              className="btn btn-secondary flex-1 btn-lg font-bold border-2 border-orange-500/30 hover:border-orange-500/60 hover:bg-orange-500/10 min-w-0"
-            >
-              <span className="flex items-center justify-center gap-1 sm:gap-2 truncate">
-                <span className="flex-shrink-0">💸</span>
-                <span className="truncate">Withdraw</span>
-              </span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Menu Items - Premium Casino Style */}
-      <div className="px-4">
-        <button className="menu-item w-full rounded-t-2xl group">
-          <div className="menu-icon group-hover:scale-110 transition-transform duration-300">
-            <History className="w-5 h-5 text-[var(--text-secondary)] group-hover:text-emerald-400 transition-colors duration-300" />
-          </div>
-          <span className="flex-1 text-left font-semibold text-white group-hover:text-emerald-400 transition-colors duration-300">Transaction History</span>
-          <ChevronRight className="w-5 h-5 text-[var(--text-muted)] group-hover:text-emerald-400 group-hover:translate-x-1 transition-all duration-300" />
-        </button>
-        <button className="menu-item w-full rounded-b-2xl group">
-          <div className="menu-icon group-hover:scale-110 transition-transform duration-300">
-            <Gift className="w-5 h-5 text-[var(--gold)] group-hover:scale-110 transition-transform duration-300" />
-          </div>
-          <span className="flex-1 text-left font-semibold text-white group-hover:text-gold transition-colors duration-300">My Bonuses</span>
-          <ChevronRight className="w-5 h-5 text-[var(--text-muted)] group-hover:text-gold group-hover:translate-x-1 transition-all duration-300" />
-        </button>
-      </div>
-
-      {/* Recent Transactions - Premium Casino Style */}
-      <div className="p-4">
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-sm text-[var(--text-muted)] uppercase tracking-wider font-semibold">Recent Activity</p>
-          <button className="text-xs text-gold hover:text-gold-light transition-colors font-medium">
-            View All →
+              {copied ? <Check size={14} /> : <Copy size={14} />}
+            </div>
           </button>
         </div>
-        <div className="card">
-          <div className="space-y-3">
-            {transactions.map((tx, i) => (
-              <div key={i} className="flex items-center gap-4 p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-gold/20 transition-all duration-300 group">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center border-2 transition-all duration-300 ${
-                  tx.type === 'deposit' ? 'bg-green-500/20 border-green-500/30 group-hover:border-green-500/60' :
-                  tx.type === 'win' ? 'bg-amber-500/20 border-amber-500/30 group-hover:border-amber-500/60' : 
-                  'bg-red-500/20 border-red-500/30 group-hover:border-red-500/60'
-                }`}>
-                  <span className="text-xl group-hover:scale-110 transition-transform duration-300">
-                    {tx.type === 'deposit' ? '💵' : tx.type === 'win' ? '🏆' : '💸'}
-                  </span>
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-white text-sm capitalize tracking-tight">{tx.type}</p>
-                  <p className="text-xs text-[var(--text-muted)] mt-0.5">{tx.date}</p>
-                </div>
-                <p className={`font-bold text-lg tracking-tight ${tx.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  {tx.amount > 0 ? '+' : ''}${Math.abs(tx.amount).toLocaleString()}
-                </p>
-              </div>
-            ))}
-          </div>
+
+        <div className="text-xs text-yellow-500/80 bg-yellow-500/10 px-4 py-2 rounded-lg">
+          Only send USDT ({networks.find((n) => n.id === selectedNetwork)?.label}) to this address.
+          Sending other assets may result in permanent loss.
         </div>
       </div>
+    </div>
+  );
+
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [withdrawAddress, setWithdrawAddress] = useState('');
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
+
+  const withdrawParsedAmount = Number(withdrawAmount);
+  const isValidWithdrawAmount = !Number.isNaN(withdrawParsedAmount) && withdrawParsedAmount > 0;
+  const isValidWithdrawAddress = withdrawAddress.trim().length > 0;
+
+  const handleWithdraw = async () => {
+    if (!isValidWithdrawAmount || !isValidWithdrawAddress || isWithdrawing) return;
+
+    setIsWithdrawing(true);
+
+    try {
+      const result = await createWithdrawal(withdrawParsedAmount, withdrawAddress.trim());
+
+      if (result?.success) {
+        toast.success('Withdrawal request submitted successfully.');
+        setWithdrawAmount('');
+        setWithdrawAddress('');
+      } else {
+        toast.error(result?.error || 'Withdrawal failed. Please try again.');
+      }
+    } catch (err) {
+      toast.error('Withdrawal failed. Please try again.');
+    } finally {
+      setIsWithdrawing(false);
+    }
+  };
+
+  const renderWithdraw = () => (
+    <div className="space-y-6">
+      <div className="card p-0 space-y-4">
+        <p className="text-sm text-[var(--text-muted)] font-medium uppercase tracking-wide">
+          Amount (USDT)
+        </p>
+        <div className="relative">
+          <input
+            type="number"
+            value={withdrawAmount}
+            placeholder="0.00"
+            className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-2 text-2xl font-bold text-white placeholder-white/20 focus:outline-none focus:border-emerald-500/50 transition-colors"
+            onChange={(e) => setWithdrawAmount(e.target.value)}
+            min="0"
+            step="0.01"
+          />
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold text-[var(--text-muted)]">
+            USDT
+          </span>
+        </div>
       </div>
-    </Layout>
+
+      <div className="card p-0 space-y-4">
+        <p className="text-sm text-[var(--text-muted)] font-medium uppercase tracking-wide">
+          USDT Wallet Address (TRC20)
+        </p>
+        <input
+          type="text"
+          value={withdrawAddress}
+          placeholder="Enter your USDT wallet address"
+          className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-2 text-sm text-white placeholder-white/20 focus:outline-none focus:border-emerald-500/50 transition-colors"
+          onChange={(e) => setWithdrawAddress(e.target.value)}
+        />
+      </div>
+
+      <button
+        type="button"
+        onClick={handleWithdraw}
+        disabled={!isValidWithdrawAmount || !isValidWithdrawAddress || isWithdrawing}
+        className={`w-full py-2 rounded-xl font-bold text-lg shadow-lg transform active:scale-95 transition-all ${
+          isValidWithdrawAmount && isValidWithdrawAddress && !isWithdrawing
+            ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-emerald-500/20'
+            : 'bg-white/5 text-gray-500 border border-white/10 cursor-not-allowed'
+        }`}
+      >
+        {isWithdrawing ? 'Processing...' : 'Withdraw'}
+      </button>
+    </div>
+  );
+
+  const renderContent = () => {
+    if (activeTab === 'withdraw') {
+      return renderWithdraw();
+    }
+    if (depositStep === 'details' && isValidAmount) {
+      return renderDepositDetails();
+    }
+    return renderDepositForm();
+  };
+
+  return (
+    <div className="page pb-24 p-4 space-y-6">
+      <div className="header-bar">
+        <span className="font-bold text-white text-lg">Wallet</span>
+        <button
+          type="button"
+          className="ml-auto flex items-center gap-1 text-xs text-[var(--text-muted)] hover:text-white transition-colors"
+        >
+          <Clock className="w-4 h-4" />
+          <span>Transactions</span>
+        </button>
+      </div>
+
+      <div className="flex gap-2 bg-black/40 border border-white/10 rounded-2xl p-1">
+        <button
+          type="button"
+          onClick={() => handleTabChange('deposit')}
+          className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all ${
+            activeTab === 'deposit'
+              ? 'bg-white text-black'
+              : 'text-gray-400 hover:text-white hover:bg-white/5'
+          }`}
+        >
+          Deposit
+        </button>
+        <button
+          type="button"
+          onClick={() => handleTabChange('withdraw')}
+          className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all ${
+            activeTab === 'withdraw'
+              ? 'bg-white text-black'
+              : 'text-gray-400 hover:text-white hover:bg-white/5'
+          }`}
+        >
+          Withdraw
+        </button>
+      </div>
+
+      {renderContent()}
+    </div>
   );
 };
 

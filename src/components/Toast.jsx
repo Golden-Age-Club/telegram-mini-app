@@ -67,8 +67,8 @@ const Toast = ({
 // Toast Container Component
 export const ToastContainer = ({ toasts, removeToast }) => {
   return (
-    <div className="fixed inset-0 pointer-events-none z-[9999]">
-      <div className="absolute top-4 right-4 space-y-2 pointer-events-none">
+    <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] h-full pointer-events-none z-[9999]">
+      <div className="absolute top-20 right-4 space-y-2 pointer-events-none">
         {toasts.map((toast, index) => (
           <div 
             key={toast.id}
