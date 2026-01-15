@@ -5,6 +5,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import authApi from '../api/auth';
+import { setCookie, getCookie, removeCookie } from '../api/cookies';
 
 const AuthContext = createContext();
 
@@ -31,7 +32,7 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(true);
     
     try {
-      const token = localStorage.getItem('access_token');
+      const token = getCookie('access_token');
       
       if (token) {
         // Try to get current user with existing token
@@ -41,11 +42,12 @@ export const AuthProvider = ({ children }) => {
           setUser(currentUser);
           setIsAuthenticated(true);
           console.log('✅ User authenticated from existing token');
-        } else {
-          // Token is invalid, remove it
-          localStorage.removeItem('access_token');
-          setIsAuthenticated(false);
-        }
+      } else {
+        // Token is invalid, remove it
+        localStorage.removeItem('access_token');
+        removeCookie('access_token');
+        setIsAuthenticated(false);
+      }
       } else {
         setIsAuthenticated(false);
       }
@@ -53,6 +55,7 @@ export const AuthProvider = ({ children }) => {
       console.warn('⚠️ Auth check failed:', err.message);
       // Remove invalid token
       localStorage.removeItem('access_token');
+      removeCookie('access_token');
       setIsAuthenticated(false);
     } finally {
       setIsLoading(false);
@@ -75,9 +78,7 @@ export const AuthProvider = ({ children }) => {
       if (result && result.user && result.access_token) {
         setUser(result.user);
         setIsAuthenticated(true);
-        
-        // Store JWT token in localStorage
-        localStorage.setItem('access_token', result.access_token);
+        setCookie('access_token', result.access_token);
         
         console.log('✅ User logged in with Telegram successfully');
         return { success: true, user: result.user };
@@ -108,7 +109,7 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
         
         // Store JWT token in localStorage
-        localStorage.setItem('access_token', result.access_token);
+        setCookie('access_token', result.access_token);
         
         console.log('✅ User logged in with test data successfully');
         return { success: true, user: result.user };
@@ -126,12 +127,44 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginWithEmail = async ({ email, password }) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const result = await authApi.loginWithEmail({
+        email,
+        password
+      });
+
+      if (result && result.access_token && result.user) {
+        setUser(result.user);
+        setIsAuthenticated(true);
+        setCookie('access_token', result.access_token);
+        return { success: true, user: result.user };
+      }
+
+      if (result && result.user) {
+        setUser(result.user);
+        return { success: true, user: result.user };
+      }
+
+      return { success: false, error: 'Email login failed' };
+    } catch (err) {
+      const errorMsg = err?.message || 'Email login failed';
+      setError(errorMsg);
+      return { success: false, error: errorMsg };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const refreshToken = async () => {
     try {
       const result = await authApi.refreshToken();
       
       if (result && result.access_token) {
-        localStorage.setItem('access_token', result.access_token);
+        setCookie('access_token', result.access_token);
         if (result.user) {
           setUser(result.user);
         }
@@ -146,6 +179,42 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const registerWithEmail = async ({ email, username, password, first_name, last_name }) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const result = await authApi.registerWithEmail({
+        email,
+        username,
+        password,
+        first_name,
+        last_name
+      });
+
+
+     if (result && result.access_token && result.user) {
+        setUser(result.user);
+        setIsAuthenticated(true);
+        setCookie('access_token', result.access_token);
+        return { success: true, user: result.user };
+      }
+
+      if (result && result.user) {
+        setUser(result.user);
+        return { success: true, user: result.user };
+      }
+
+      return { success: true, user: result };
+    } catch (err) {
+      const errorMsg = err?.message || 'Email registration failed';
+      setError(errorMsg);
+      return { success: false, error: errorMsg };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const logout = async () => {
     setIsLoading(true);
     
@@ -154,6 +223,7 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       setIsAuthenticated(false);
       localStorage.removeItem('access_token');
+      removeCookie('access_token');
       console.log('✅ User logged out successfully');
     } finally {
       setIsLoading(false);
@@ -184,8 +254,10 @@ export const AuthProvider = ({ children }) => {
     // Methods
     loginWithTelegram,
     loginWithTestData,
+    loginWithEmail,
     loginWithDemo, // Legacy method
     refreshToken,
+    registerWithEmail,
     logout,
     updateUser,
     clearError,

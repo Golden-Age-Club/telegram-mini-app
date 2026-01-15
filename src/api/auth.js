@@ -1,16 +1,5 @@
 import api from './axios';
 
-/**
- * Authentication API Service Functions
- * Based on Golden Age USDT Wallet API
- */
-
-// ==================== POST ENDPOINTS ====================
-
-/**
- * Login with Telegram WebApp initData
- * @param {string} initData - Telegram WebApp initData string
- */
 export const login = async (initData) => {
   try {
     console.log('📡 Auth API: Telegram login');
@@ -23,9 +12,18 @@ export const login = async (initData) => {
   }
 };
 
-/**
- * Refresh access token
- */
+export const loginWithEmail = async (payload) => {
+  try {
+    console.log('📡 Auth API: Email login', payload.email);
+    const response = await api.post('/api/auth/login/email', payload);
+    console.log('✅ Auth API Response - Login Email:', response);
+    return response;
+  } catch (error) {
+    console.error('❌ Auth API Error - Login Email:', error);
+    throw error;
+  }
+};
+
 export const refreshToken = async () => {
   try {
     console.log('📡 Auth API: Refresh token');
@@ -38,11 +36,6 @@ export const refreshToken = async () => {
   }
 };
 
-// ==================== GET ENDPOINTS ====================
-
-/**
- * Get current user profile
- */
 export const getCurrentUser = async () => {
   try {
     console.log('📡 Auth API: Get current user');
@@ -55,9 +48,22 @@ export const getCurrentUser = async () => {
   }
 };
 
-// Export all functions as default object
+export const registerWithEmail = async (payload) => {
+  try {
+    console.log('📡 Auth API: Email register', payload);
+    const response = await api.post('/api/auth/register/email', payload);
+    console.log('✅ Auth API Response - Register Email:', response);
+    return response;
+  } catch (error) {
+    console.error('❌ Auth API Error - Register Email:', error);
+    throw error;
+  }
+};
+
 export default {
   login,
+  loginWithEmail,
   refreshToken,
-  getCurrentUser
+  getCurrentUser,
+  registerWithEmail
 };

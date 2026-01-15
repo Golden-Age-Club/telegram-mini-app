@@ -1,284 +1,115 @@
-import { useState, useEffect } from 'react';
-import { ChevronRight, Trophy, TrendingUp, Users } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Lock, Play } from 'lucide-react';
 import Layout from '../components/Layout';
-import GameCard from '../components/GameCard';
-import SlotMachine from '../components/SlotMachine';
-import Roulette from '../components/Roulette';
-import CardFlip from '../components/CardFlip';
-import Confetti from '../components/Confetti';
 
-const Game = ({ user, updateBalance, navigate, gameData }) => {
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [lastWin, setLastWin] = useState(null);
-  const [activeGame, setActiveGame] = useState(gameData?.game || 'slots');
-  const [gameStats, setGameStats] = useState({
-    totalWins: 0,
-    biggestWin: 0,
-    gamesPlayed: 0,
-    winStreak: 0
-  });
+const Game = () => {
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('pg');
 
-  const gameOptions = [
-    { 
-      id: 'slots', 
-      name: 'Golden Age Slots', 
-      icon: '🎰', 
-      subtitle: 'Premium Vegas Experience',
-      image: '/games/golden age slots.png',
-      isHot: true,
-      component: SlotMachine
-    },
-    { 
-      id: 'roulette', 
-      name: 'Emerald Roulette', 
-      icon: '🎯', 
-      subtitle: 'European Casino Style',
-      image: '/games/emerald roulette.png',
-      isLive: true,
-      component: Roulette
-    },
-    { 
-      id: 'cards', 
-      name: 'Royal Blackjack', 
-      icon: '🃏', 
-      subtitle: 'Classic Card Game',
-      image: '/games/royal blackjack.png',
-      isNew: true,
-      component: CardFlip
-    },
-    { 
-      id: 'poker', 
-      name: 'Diamond Poker', 
-      icon: '💎', 
-      subtitle: 'High Stakes Poker',
-      image: '/games/diamond poker.png',
-      component: CardFlip // Using CardFlip as placeholder for poker
-    },
+  const tabs = [
+    { id: 'pg', label: 'Pg soft', active: true },
+    { id: 'egt', label: 'EGT soft', active: true },
+    { id: 'pragmatic', label: 'Pragmatic', active: false },
+    { id: 'hacksaw', label: 'Hacksaw', active: false },
   ];
 
-  const currentGameData = gameOptions.find(g => g.id === activeGame);
-  const GameComponent = currentGameData?.component;
-
-  const handleWin = (amount) => {
-    setLastWin(amount);
-    setShowConfetti(true);
-    updateBalance(amount);
-    
-    setGameStats(prev => ({
-      ...prev,
-      totalWins: prev.totalWins + amount,
-      biggestWin: Math.max(prev.biggestWin, amount),
-      gamesPlayed: prev.gamesPlayed + 1,
-      winStreak: prev.winStreak + 1
-    }));
-
-    // Telegram haptic feedback
-    window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('success');
-  };
-
-  const handleLose = (amount) => {
-    updateBalance(-amount);
-    setGameStats(prev => ({
-      ...prev,
-      gamesPlayed: prev.gamesPlayed + 1,
-      winStreak: 0
-    }));
-    
-    window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('error');
-  };
-
-  const handleGameSwitch = (gameId) => {
-    setActiveGame(gameId);
-    setLastWin(null);
-    window.Telegram?.WebApp?.HapticFeedback?.impactOccurred('light');
-  };
+  // Mock data for games (20 items)
+  const games = Array.from({ length: 20 }).map((_, i) => ({
+    id: i + 1,
+    title: `${activeTab === 'pg' ? 'Fortune' : 'Burning'} Game ${i + 1}`,
+    provider: activeTab === 'pg' ? 'PG Soft' : 'EGT',
+  }));
 
   return (
-    <Layout 
-      title={currentGameData?.name} 
-      user={user} 
-      navigate={navigate}
-      currentScreen="game"
-      showBack={true} 
-      onBack={() => navigate('home')}
-      navigate={navigate}
-      currentScreen="game"
-    >
-      <div className="page space-y-6">
-        {showConfetti && <Confetti onComplete={() => setShowConfetti(false)} />}
 
-        {/* Mega Win Display - Premium Casino Style */}
-        {lastWin && lastWin >= 100 && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md">
-            <div className="card text-center max-w-sm mx-4 glow-gold border-2 border-gold/50 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-gold/10 via-transparent to-emerald/10 animate-pulse"></div>
-              <div className="relative z-10">
-                <div className="text-7xl mb-4 animate-bounce">🎉</div>
-                <h2 className="text-3xl font-bold text-gradient-gold mb-3 tracking-tight">MEGA WIN!</h2>
-                <div className="text-5xl font-bold text-gradient-emerald mb-6 tracking-tight">
-                  ${lastWin.toLocaleString()}
-                </div>
-                <div className="casino-divider my-4"></div>
-                <button 
-                  onClick={() => setLastWin(null)}
-                  className="btn btn-primary btn-lg font-bold w-full"
-                >
-                  Continue Playing
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Game Selection Tabs - Premium Casino Style */}
-        <div className="px-4">
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            {gameOptions.map((game) => (
+      <div className="flex flex-col h-full min-h-[calc(100vh-140px)]">
+        {/* Tabs Header */}
+        <div className="sticky top-0 z-30 bg-[var(--bg-elevated)]/95 backdrop-blur-md border-b border-white/5 px-4 py-4">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+            {tabs.map((tab) => (
               <button
-                key={game.id}
-                onClick={() => handleGameSwitch(game.id)}
-                className={`casino-tab flex items-center gap-3 whitespace-nowrap ${
-                  activeGame === game.id ? 'active' : ''
-                }`}
+                key={tab.id}
+                onClick={() => tab.active && setActiveTab(tab.id)}
+                disabled={!tab.active}
+                className={`
+                  flex-1 min-w-[100px] py-2.5 px-4 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap border
+                  ${activeTab === tab.id 
+                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg shadow-amber-500/20 border-amber-400/50' 
+                    : tab.active
+                      ? 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white border-white/5'
+                      : 'bg-black/20 text-gray-600 cursor-not-allowed border-transparent'
+                  }
+                `}
               >
-                <span className="text-2xl">{game.icon}</span>
-                <div className="text-left">
-                  <div className="font-semibold text-sm tracking-tight">{game.name}</div>
-                  <div className="text-xs opacity-80 mt-0.5">{game.subtitle}</div>
-                </div>
-                {game.isHot && <span className="status-badge-hot text-xs">HOT</span>}
-                {game.isLive && <span className="live-indicator text-xs">LIVE</span>}
-                {game.isNew && <span className="status-badge-new text-xs">NEW</span>}
+                <span className="flex items-center justify-center gap-2">
+                  {tab.label}
+                  {!tab.active && <Lock size={12} />}
+                </span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Game Stats - Premium Casino Style */}
-        <div className="px-4">
-          <div className="grid-2 gap-4">
-            <div className="card text-center relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <div className="relative z-10">
-                <div className="text-3xl mb-2 transform group-hover:scale-110 transition-transform duration-300">💰</div>
-                <div className="text-xs text-gray-400 uppercase tracking-wider mb-1 font-medium">Total Wins</div>
-                <div className="text-xl font-bold text-gradient-emerald tracking-tight">
-                  ${gameStats.totalWins.toLocaleString()}
+        {/* Game Grid */}
+        <div className="flex-1 p-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {games.map((game) => (
+              <div 
+                key={game.id}
+                className="aspect-[3/4] rounded-xl overflow-hidden relative group cursor-pointer border border-white/5 bg-white/5 shadow-lg shadow-black/20"
+              >
+                {/* Placeholder Image / Gradient */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                  style={{ 
+                    backgroundImage: `linear-gradient(135deg, ${activeTab === 'pg' ? '#059669, #064e3b' : '#d97706, #78350f'})`
+                  }}
+                >
+                  {/* Decorative Pattern */}
+                  <div className="absolute inset-0 opacity-20" 
+                       style={{ backgroundImage: 'radial-gradient(circle at 50% 50%, white 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
+                  </div>
+                  
+                  {/* Game Icon Placeholder */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                     <span className="text-4xl font-black text-white/20 select-none">
+                       {game.id}
+                     </span>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className="card text-center relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <div className="relative z-10">
-                <div className="text-3xl mb-2 transform group-hover:scale-110 transition-transform duration-300">🔥</div>
-                <div className="text-xs text-gray-400 uppercase tracking-wider mb-1 font-medium">Win Streak</div>
-                <div className="text-xl font-bold text-gradient-gold tracking-tight">
-                  {gameStats.winStreak}
+
+                {/* Overlay content */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-90">
+                  <div className="absolute bottom-0 left-0 right-0 p-3">
+                    <h3 className="text-white font-bold text-sm truncate leading-tight mb-0.5">
+                      {game.title}
+                    </h3>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wider font-medium">
+                      {game.provider}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Main Game Area - Premium Casino Style */}
-        <div className="px-4">
-          <div className="card p-4 sm:p-6 bg-gradient-to-br from-black via-gray-900 to-black border-2 border-amber-500/30 relative overflow-hidden w-full max-w-full box-border">
-            <div className="absolute inset-0 bg-gradient-to-br from-gold/5 via-transparent to-emerald/5 opacity-50"></div>
-            <div className="casino-ornament mb-4"></div>
-            <div className="relative z-10 mb-6 text-center">
-              <h2 className="text-2xl font-bold text-gradient-gold mb-2 tracking-tight">
-                {currentGameData?.name}
-              </h2>
-              <p className="text-gray-400 text-sm font-medium">{currentGameData?.subtitle}</p>
-            </div>
-            
-            {GameComponent && (
-              <div className="relative z-10">
-                <GameComponent 
-                  onWin={handleWin} 
-                  onLose={handleLose}
-                  user={user}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Game Statistics */}
-        <div className="px-4">
-          <div className="card">
-            <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-              <TrendingUp size={20} className="text-emerald-400" />
-              Your Statistics
-            </h3>
-            <div className="grid-2 gap-4">
-              <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <Trophy size={16} className="text-amber-400" />
-                  <span className="text-sm text-gray-400">Biggest Win</span>
+                {/* Active State Overlay */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black/40 backdrop-blur-[2px]">
+                  <div className="bg-emerald-500 text-white rounded-full p-3 shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
+                    <Play size={20} fill="currentColor" />
+                  </div>
                 </div>
-                <span className="font-bold text-amber-400">
-                  ${gameStats.biggestWin.toLocaleString()}
-                </span>
+                
+                {/* Hot/New Badge (Random) */}
+                {Math.random() > 0.7 && (
+                  <div className="absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] font-bold bg-red-500 text-white shadow-sm">
+                    HOT
+                  </div>
+                )}
               </div>
-              <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <Users size={16} className="text-blue-400" />
-                  <span className="text-sm text-gray-400">Games Played</span>
-                </div>
-                <span className="font-bold text-blue-400">
-                  {gameStats.gamesPlayed}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Other Games */}
-        <div className="px-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Other Games</h3>
-            <button 
-              onClick={() => navigate('home')}
-              className="text-amber-400 text-sm hover:text-amber-300 transition-colors flex items-center gap-1"
-            >
-              View All <ChevronRight size={16} />
-            </button>
-          </div>
-          
-          <div className="space-y-2">
-            {gameOptions
-              .filter(game => game.id !== activeGame)
-              .map((game) => (
-                <GameCard
-                  key={game.id}
-                  game={game}
-                  variant="compact"
-                  onClick={() => handleGameSwitch(game.id)}
-                />
-              ))}
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="px-4 pb-8">
-          <div className="grid-2 gap-4">
-            <button 
-              onClick={() => navigate('wallet')}
-              className="btn btn-success"
-            >
-              💰 Deposit
-            </button>
-            <button 
-              onClick={() => navigate('home')}
-              className="btn btn-secondary"
-            >
-              🎮 More Games
-            </button>
+            ))}
           </div>
         </div>
       </div>
-    </Layout>
+
   );
 };
 

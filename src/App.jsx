@@ -1,31 +1,27 @@
 import { useState, useEffect } from 'react';
+import { RouterProvider } from 'react-router-dom';
 import { LanguageProvider } from './contexts/LanguageContext';
-import { ToastContainer, useToast } from './components/Toast';
-import { useAuth } from './hooks/useAuth';
-import { useWallet } from './hooks/useWallet';
-import LandingPage from './pages/Landing';
-import Home from './pages/Home';
-import Game from './pages/Game';
-import Wallet from './pages/Wallet';
-import Profile from './pages/Profile';
-import './App.css';
+import { ApiProvider, useApi } from './contexts/ApiContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { WalletProvider } from './contexts/WalletContext';
+import { LayoutProvider } from './contexts/LayoutContext';
+import { ToastProvider, useToast } from './contexts/ToastContext';
+import router from './router';
 
-function App() {
-  const [screen, setScreen] = useState('landing');
-  const [screenData, setScreenData] = useState(null);
+function AppContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasInitialized, setHasInitialized] = useState(false);
   const toast = useToast();
   const tg = window.Telegram?.WebApp;
-
-  // Authentication hook
+  
+  // Use API and Auth contexts
   const { 
-    user, 
-    isAuthenticated, 
-    login, 
-    logout, 
-    updateUserBalance,
-    error: authError 
+    isConnected
+  } = useApi();
+  
+  const {
+    user,
+    loginWithDemo
   } = useAuth();
 
   // Wallet hook
@@ -58,65 +54,16 @@ function App() {
           tg.setBackgroundColor('#000000');
         }
         
-        // Check if we have real Telegram data
-        const hasRealTelegramData = tg.initData && tg.initData.length > 0;
-        
-        if (hasRealTelegramData) {
-          try {
-            console.log('🔐 Authenticating with real Telegram data...');
-            console.log('📱 Telegram initData:', tg.initData);
-            console.log('📱 Telegram initDataUnsafe:', tg.initDataUnsafe);
-            const response = await login(tg.initData);
-            
-            if (response.user) {
-              console.log('✅ Real Telegram auth successful, user:', response.user);
-              // Welcome message with real Telegram user
-              setTimeout(() => {
-                toast.success(`Welcome back, ${response.user.first_name || 'Player'}!`);
-              }, 1000);
-              
-              // Auto-navigate to home if user is logged in
-              setScreen('home');
-              
-              // Fetch wallet data
-              await refreshWallet();
-            }
-          } catch (error) {
-            console.error('❌ Telegram authentication failed:', error);
-            toast.error('Authentication failed. Please try again.');
-            // Fall back to web mode
-            await initWebMode();
+        // Get user from Telegram or use API user
+        if (tg.initDataUnsafe?.user && !user) {
+          const tgUser = tg.initDataUnsafe.user;
+          
+          // Try to login with demo credentials
+          const loginResult = await loginWithDemo();
+          if (loginResult?.success) {
+            toast.success(`Welcome to Golden Age Club, ${tgUser.first_name}!`);
           }
-        } else if (tg.initDataUnsafe?.user) {
-          // Telegram environment but no initData - use initDataUnsafe for mock
-          console.log('📱 Telegram environment detected, using mock auth...');
-          console.log('📱 Available Telegram user data:', tg.initDataUnsafe.user);
-          try {
-            const response = await login('telegram_mock');
-            
-            if (response.user) {
-              console.log('📱 Mock Telegram auth successful, user:', response.user);
-              console.log('📱 Final user object:', response.user);
-              setTimeout(() => {
-                toast.success(`Welcome to Golden Age Cash, ${response.user.first_name || 'Player'}!`);
-              }, 1000);
-              
-              setScreen('home');
-              await refreshWallet();
-            }
-          } catch (error) {
-            console.error('❌ Telegram mock authentication failed:', error);
-            await initWebMode();
-          }
-        } else {
-          // In Telegram but no user data - fall back to web mode
-          console.log('🌐 No Telegram user data, using web mode');
-          await initWebMode();
         }
-      } else {
-        // Not in Telegram environment - web mode
-        console.log('🌐 Web mode - not in Telegram environment');
-        await initWebMode();
       }
       
       setIsLoading(false);
@@ -150,69 +97,7 @@ function App() {
     if (authError) {
       toast.error(authError);
     }
-  }, [authError, toast]);
-
-  // Handle Telegram back button
-  useEffect(() => {
-    if (!tg?.BackButton) return;
-
-    const handleBack = () => {
-      // Only use haptic feedback if supported
-      if (tg?.HapticFeedback?.impactOccurred) {
-        tg.HapticFeedback.impactOccurred('light');
-      }
-      if (screen === 'game' || screen === 'wallet' || screen === 'profile') {
-        navigate('home');
-      } else if (screen === 'home') {
-        navigate('landing');
-      }
-      setScreenData(null);
-    };
-
-    if (screen !== 'landing' && tg.BackButton.show) {
-      tg.BackButton.show();
-      tg.BackButton.onClick(handleBack);
-    } else if (tg.BackButton.hide) {
-      tg.BackButton.hide();
-    }
-
-    return () => {
-      if (tg.BackButton.offClick) {
-        tg.BackButton.offClick(handleBack);
-      }
-    };
-  }, [screen, tg]);
-
-  const navigate = (newScreen, data = null) => {
-    // Only use haptic feedback if supported
-    if (tg?.HapticFeedback?.impactOccurred) {
-      tg.HapticFeedback.impactOccurred('light');
-    }
-    setScreen(newScreen);
-    setScreenData(data);
-  };
-
-  const updateBalance = async (amount) => {
-    try {
-      // For game wins/losses, we'll need to implement game API endpoints
-      // For now, just update locally and show toast
-      const newBalance = (user?.balance || balance) + amount;
-      updateUserBalance(newBalance);
-      
-      // Show toast notifications for balance changes
-      if (amount > 0) {
-        toast.success(`+${amount.toLocaleString()} USDT added to your balance!`);
-      } else if (amount < 0) {
-        toast.warning(`-${Math.abs(amount).toLocaleString()} USDT deducted from balance`);
-      }
-      
-      // In a real implementation, you'd call an API to update the balance on the server
-      // await gameApi.updateBalance(amount);
-    } catch (error) {
-      console.error('❌ Balance update error:', error);
-      toast.error('Failed to update balance');
-    }
-  };
+  }, [isLoading, isConnected, user, loginWithDemo, toast, tg]);
 
   if (isLoading) {
     return (
@@ -242,54 +127,28 @@ function App() {
   }
 
   return (
-    <LanguageProvider>
-      <div className="app">
-        {screen === 'landing' && (
-          <LandingPage navigate={navigate} />
-        )}
-        {screen === 'home' && isAuthenticated && (
-          <Home 
-            user={{ ...user, balance: user?.balance || balance }} 
-            navigate={navigate} 
-          />
-        )}
-        {screen === 'game' && isAuthenticated && (
-          <Game 
-            user={{ ...user, balance: user?.balance || balance }}
-            gameData={screenData}
-            updateBalance={updateBalance}
-            navigate={navigate}
-          />
-        )}
-        {screen === 'wallet' && isAuthenticated && (
-          <Wallet 
-            user={{ ...user, balance: user?.balance || balance }}
-            updateBalance={updateBalance}
-            navigate={navigate}
-            walletApi={{
-              createDeposit,
-              createWithdrawal,
-              fetchTransactions,
-              refreshWallet
-            }}
-          />
-        )}
-        {screen === 'profile' && isAuthenticated && (
-          <Profile 
-            user={(() => {
-              const profileUser = { ...user, balance: user?.balance || balance };
-              console.log('📱 Passing user to Profile component:', profileUser);
-              return profileUser;
-            })()} 
-            navigate={navigate}
-            onLogout={logout}
-          />
-        )}
-        
-        {/* Toast Notifications */}
-        <ToastContainer toasts={toast.toasts} removeToast={toast.removeToast} />
-      </div>
-    </LanguageProvider>
+    <div className="app min-h-screen bg-gradient-primary">
+      <LayoutProvider>
+        <RouterProvider router={router} />
+      </LayoutProvider>
+    </div>
+  );
+}
+
+function App() {
+  return (
+ 
+      <AuthProvider>
+           <ApiProvider>
+        <LanguageProvider>
+          <ToastProvider>
+            <WalletProvider>
+              <AppContent />
+            </WalletProvider>
+          </ToastProvider>
+        </LanguageProvider>
+         </ApiProvider>
+      </AuthProvider>
   );
 }
 

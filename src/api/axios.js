@@ -1,9 +1,16 @@
 import axios from 'axios';
-import { API_BASE_URL, REQUEST_TIMEOUT, STORAGE_KEYS } from './config';
+import { getCookie } from './cookies';
 
-/**
- * Axios instance configured for API requests
- */
+export const backendUrl = () => {
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:8000';
+    }
+  }
+  return 'https://server-kl7c.onrender.com';
+};
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: REQUEST_TIMEOUT,
@@ -15,7 +22,7 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    const token = getCookie('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
