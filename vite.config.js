@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: './', // Important for Telegram Mini Apps
+  base: '/', // Changed to absolute path for root domain deployment
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
