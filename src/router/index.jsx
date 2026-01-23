@@ -3,6 +3,7 @@ import Layout from '../components/Layout';
 import Landing from '../pages/Landing';
 import Home from '../pages/Home';
 import Game from '../pages/Game';
+import StartGame from '../pages/StartGame';
 import Wallet from '../pages/Wallet';
 import Profile from '../pages/Profile';
 
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
       {
         path: 'game',
         element: <Game />
+      },
+      {
+        path: 'start-game',
+        element: <StartGame />
       },
       {
         path: 'wallet',

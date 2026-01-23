@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Play, Star, Flame, Users, Clock } from 'lucide-react';
+import React from 'react';
+import { Play } from 'lucide-react';
 
 const GameCard = ({ 
   game, 
@@ -158,16 +158,31 @@ export const GameGrid = ({ games, variant = 'default', onGameClick, loading = fa
   }
 
   return (
-    <div className={variant === 'compact' ? 'space-y-2' : 'grid-auto'}>
-      {games.map((game) => (
-        <GameCard
-          key={game.id}
-          game={game}
-          variant={variant}
-          onClick={onGameClick}
-          showStats={variant === 'default'}
+    <div 
+      className="group rounded-2xl overflow-hidden border border-[var(--border)] bg-black/40 cursor-pointer"
+      onClick={onClick}
+    >
+      <div className="relative aspect-[4/5] w-full">
+        <img
+          src={image}
+          alt={alt || name}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
-      ))}
+        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-1">
+            <Play className="w-8 h-8 text-emerald-400" />
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-emerald-200">
+              Play now
+            </span>
+          </div>
+        </div>
+        <div className="pointer-events-none absolute inset-0 rounded-2xl  opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      </div>
+      <div className="px-2 py-1">
+        <span className="block text-[10px] font-semibold text-white truncate">
+          {name}
+        </span>
+      </div>
     </div>
   );
 };

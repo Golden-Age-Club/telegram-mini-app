@@ -4,10 +4,22 @@
  */
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import CryptoJS from 'crypto-js';
+import axios from 'axios';
 import authApi from '../api/auth';
 import walletApi from '../api/wallet';
+import api from '../api/axios';
+import { useAuth } from './AuthContext';
+import { getCookie } from '../api/cookies';
 
 const ApiContext = createContext();
+
+const PG_CONFIG = {
+  APP_NAME: "Golden Age Club",
+  APP_ID: "f6710138-8c7e-4200-9d3d-4cd1630e4813",
+  API_KEY: "3099a19b-647e-4350-8cf4-33a0e78d27df",
+  BASE_URL: "https://mgcbot.mgcapi.com"
+};
 
 export const useApi = () => {
   const context = useContext(ApiContext);
@@ -18,10 +30,13 @@ export const useApi = () => {
 };
 
 export const ApiProvider = ({ children }) => {
+  const { user } = useAuth();
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [initialized, setInitialized] = useState(false);
+  const [pgOptions, setPgOptions] = useState(null);
+  const [pgGames, setPgGames] = useState(null);
 
   // Initialize API connection
   useEffect(() => {
@@ -36,20 +51,27 @@ export const ApiProvider = ({ children }) => {
     setError(null);
 
     try {
-      console.log('🚀 Initializing Golden Age USDT Wallet API...');
-      
-      // Test API connection by trying to access health endpoint
+
       try {
-        const response = await fetch('https://server-kl7c.onrender.com/health');
-        if (response.ok) {
-          setIsConnected(true);
-          console.log('✅ API connection successful');
+        const options = await api.get('/api/casino/pg/options');
+        console.log(options)
+        setPgOptions(options);
+      } catch (err) {
+        console.warn('⚠️ Could not load PG options:', err.message);
+      }
+
+      try {
+        const games = await api.get('/api/casino/pg/games');
+        console.log(games)
+        if (games && Array.isArray(games.games)) {
+          setPgGames(games.games);
+        } else if (Array.isArray(games)) {
+          setPgGames(games);
         } else {
-          throw new Error('Health check failed');
+          setPgGames([]);
         }
       } catch (err) {
-        console.warn('⚠️ API connection test failed, but API might be available');
-        setIsConnected(true); // Assume connected for now
+        console.warn('⚠️ Could not load PG games:', err.message);
       }
 
     } catch (err) {
@@ -124,6 +146,77 @@ export const ApiProvider = ({ children }) => {
     }
   };
 
+  const launchGame = async (gameId) => {
+    try {
+      // Get auth token from cookie
+      const token = getCookie('access_token');
+      
+      if (!token || !user) {
+        throw new Error('User not authenticated');
+      }
+
+      // Sample uses Unix timestamp (seconds), not milliseconds
+      const requestTime = Math.floor(Date.now() / 1000);
+      
+      // Construct payload strictly following the required parameter order
+      // exit, game_id, player_id, player_token, app_id, language, currency, request_time, urls
+      const payload = {
+        exit: window.location.origin + '/',
+        game_id: parseInt(gameId, 10), // Ensure integer
+        player_id: String(user._id || user.id), // Ensure string
+        player_token: token,
+        app_id: PG_CONFIG.APP_ID,
+        language: user.language_code || 'en',
+        currency: 'USD',
+        request_time: requestTime,
+        urls: {
+          base_url: window.location.origin + '/start-game',
+          wallet_url: window.location.origin + '/wallet',
+          other_url: window.location.origin + '/support'
+        }
+      };
+
+      console.log('🔑 Payload:', payload);
+
+      // Signature generation function based on provided sample
+    const createSign = (params, apiKey) => {
+        // 1. Manually define the order to match exactly what the provider expects
+        const keys = ['exit', 'game_id', 'player_id', 'player_token', 'app_id', 'language', 'currency', 'request_time'];
+        
+        // 2. Concatenate values in that specific order
+        const signString = keys.map(key => params[key]).join('');
+        
+        // 3. Match the Python logic: encode the WHOLE string, not individual parts
+        const encoded = encodeURIComponent(signString);
+        
+        return CryptoJS.HmacMD5(encoded, apiKey).toString(CryptoJS.enc.Hex);
+      };
+      // Generate signature
+      payload.sign = createSign(payload, PG_CONFIG.API_KEY);
+
+      console.log('🚀 Launching game with payload:', payload);
+
+      // Use axios as requested
+      const response = await axios.post(`${PG_CONFIG.BASE_URL}/api/v1/playGame`, payload, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const data = response.data;
+      console.log('🎮 Game launch result:', data);
+      
+      if (data.result === false || data.err_code !== 0) {
+        throw new Error(data.err_desc || 'Game launch failed');
+      }
+
+      return { success: true, data: data };
+    } catch (err) {
+      console.warn('⚠️ Game launch failed:', err.message);
+      // Handle axios error structure if available
+      const errorMessage = err.response?.data?.err_desc || err.message;
+      return { success: false, error: errorMessage };
+    }
+  };
+
   const value = {
     // State
     isConnected,
@@ -136,6 +229,9 @@ export const ApiProvider = ({ children }) => {
     getTransaction,
     createDeposit,
     createWithdrawal,
+    launchGame,
+    pgOptions,
+    pgGames,
     
     // API initialization
     initializeApi,

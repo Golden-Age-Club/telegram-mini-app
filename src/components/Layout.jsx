@@ -52,7 +52,7 @@ const Layout = () => {
   };
 
   return (
-    <div className="app flex flex-col pt-16 pb-20 min-h-screen w-full max-w-[480px] mx-auto relative shadow-2xl">
+    <div className="app bg-gradient-primary flex flex-col pt-16 pb-20 min-h-screen w-full max-w-[480px] mx-auto relative shadow-[0_0_60px_rgba(0,0,0,0.9)] border-x border-[var(--border)]">
       <Navbar />
       <main className="flex-1 w-full">
         <Outlet />
@@ -62,7 +62,7 @@ const Layout = () => {
 
       {modalType === 'sign-up' && <SignUpModal onClose={closeModal} />}
 
-      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-40 border-t border-emerald-500/30 bg-[var(--bg-elevated)]/95 backdrop-blur-md">
+      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-40 border-t border-[var(--border)] bg-[var(--bg-elevated)]/95 backdrop-blur-md">
         <div className="flex max-w-md mx-auto px-2 py-1.5 gap-1">
           {navigation.map((item) => {
             const isActive = item.screen === '/' 
@@ -74,16 +74,16 @@ const Layout = () => {
                 onClick={() => handleNavigation(item.screen)}
                 className={`flex-1 flex flex-col items-center justify-center rounded-xl px-2 py-1.5 text-[11px] font-medium transition-all duration-200 ${
                   isActive
-                    ? 'bg-emerald-600/80 text-gold shadow-[0_0_18px_rgba(16,185,129,0.45)] border border-emerald-400/60'
+                    ? 'bg-[var(--bg-card)] text-[var(--gold)] border border-[var(--gold)]/45 shadow-[0_0_22px_rgba(212,175,55,0.45)]'
                     : 'text-gray-400 hover:bg-white/5'
                 }`}
               >
                 <item.icon 
                   size={20}
-                  className={isActive ? 'text-gold' : 'text-gray-400'}
+                  className={isActive ? 'text-[var(--gold)]' : 'text-gray-400'}
                   strokeWidth={isActive ? 2.5 : 2}
                 />
-                <span className={isActive ? 'text-gold mt-0.5' : 'text-gray-400 mt-0.5'}>
+                <span className={isActive ? 'text-[var(--gold)] mt-0.5' : 'text-gray-400 mt-0.5'}>
                   {item.label}
                 </span>
               </button>
