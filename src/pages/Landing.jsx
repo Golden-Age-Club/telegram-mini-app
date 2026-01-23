@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
   Zap,
   Crown,
@@ -26,11 +26,69 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { useNavigate } from 'react-router-dom';
+import { useApi } from '../contexts/ApiContext';
+import { useToast } from '../contexts/ToastContext';
+import GameCard from '../components/GameCard';
+
+const providerPriority = (provider) => {
+  const code = provider?.code || '';
+  const title = (provider?.title || '').toLowerCase();
+  const uniq = (provider?.uniq_name || '').toLowerCase();
+  if (
+    code === 'FERHUB_PGSOFT' ||
+    title.includes('pgsoft') ||
+    uniq.includes('pgsoft')
+  ) {
+    return 0;
+  }
+  if (
+    code === 'FERHUB_EGT' ||
+    title.includes('egt') ||
+    uniq.includes('egt')
+  ) {
+    return 1;
+  }
+  return 2;
+};
+
+const GAME_TYPES = {
+  1: 'Slot',
+  2: 'Live Casino',
+  3: 'Sport Book',
+  4: 'Virtual Sport',
+  5: 'Lottery',
+  6: 'Qipai',
+  7: 'P2P',
+  8: 'Fishing',
+  9: 'Cock Fighting',
+  10: 'Bonus',
+  11: 'Esport',
+  12: 'Poker',
+  13: 'Other'
+};
 
 const Landing = () => {
   const tg = window.Telegram?.WebApp;
   const [showFallbackButton, setShowFallbackButton] = useState(false);
+  const [launchingGameId, setLaunchingGameId] = useState(null);
   const navigate = useNavigate();
+  const { pgOptions, pgGames, isLoading, launchGame } = useApi();
+  const { addToast } = useToast();
+  const providerSwipersRef = useRef({});
+
+  const handleGameClick = async (game) => {
+    if (launchingGameId) return; // Prevent multiple clicks
+    
+    setLaunchingGameId(game.id);
+    const result = await launchGame(game.id);
+    setLaunchingGameId(null);
+
+    if (result.success && result.data.url) {
+      navigate('/start-game', { state: { url: result.data.url } });
+    } else {
+      addToast('Failed to launch game. Please try again.', 'error');
+    }
+  };
 
   const banners = [
     '/assets/banner-actThroughtDZ.webp',
@@ -68,7 +126,7 @@ const Landing = () => {
 
 
   return (
-    <div className="min-h-screen flex flex-col items-center p-6 bg-gradient-primary relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center p-2 bg-gradient-primary relative overflow-hidden">
       {/* Background Elements - Subtle */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-emerald-500 blur-3xl"></div>
@@ -124,87 +182,138 @@ const Landing = () => {
         </div>
       </div>
 
-      <div className="w-full max-w-4xl px-2 sm:px-4 mb-6 relative z-10">
-        <div className="flex items-center justify-between mb-3">
-          <button
-            onClick={() => navigate('/game?provider=pg')}
-            className="flex items-center gap-2 text-sm font-semibold text-white cursor-pointer"
-          >
-            <span>PG soft</span>
-            <ChevronRight className="w-4 h-4 text-emerald-400" />
-          </button>
-          <div className="flex items-center gap-2">
-            <button className="w-8 h-8 rounded-full border border-[var(--border)] flex items-center justify-center text-gray-300 hover:border-[var(--gold)] hover:text-[var(--gold)] cursor-pointer pg-soft-prev">
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button className="w-8 h-8 rounded-full border border-[var(--border)] flex items-center justify-center text-gray-300 hover:border-[var(--gold)] hover:text-[var(--gold)] cursor-pointer pg-soft-next">
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-        <Swiper
-          modules={[Navigation]}
-          navigation={{
-            prevEl: '.pg-soft-prev',
-            nextEl: '.pg-soft-next'
-          }}
-          slidesPerView={3.2}
-          spaceBetween={8}
-        >
-          {Array.from({ length: 30 }).map((_, idx) => (
-            <SwiperSlide key={`pg-${idx}`}>
-              <div className="rounded-2xl overflow-hidden border border-[var(--border)] bg-black/40">
-                <img
-                  src="/assets/ztb-pg4.webp"
-                  alt={`PG soft slot ${idx + 1}`}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </div>
+      {(() => {
+        const gamesArray =
+          pgGames && Array.isArray(pgGames)
+            ? pgGames
+            : pgGames && Array.isArray(pgGames.games)
+            ? pgGames.games
+            : [];
 
-      <div className="w-full max-w-4xl px-2 sm:px-4 mb-8 relative z-10">
-        <div className="flex items-center justify-between mb-3">
-          <button
-            onClick={() => navigate('/game?provider=egt')}
-            className="flex items-center gap-2 text-sm font-semibold text-white cursor-pointer"
-          >
-            <span>EGT soft</span>
-            <ChevronRight className="w-4 h-4 text-emerald-400" />
-          </button>
-          <div className="flex items-center gap-2">
-            <button className="w-8 h-8 rounded-full border border-[var(--border)] flex items-center justify-center text-gray-300 hover:border-[var(--gold)] hover:text-[var(--gold)] cursor-pointer egt-soft-prev">
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button className="w-8 h-8 rounded-full border border-[var(--border)] flex items-center justify-center text-gray-300 hover:border-[var(--gold)] hover:text-[var(--gold)] cursor-pointer egt-soft-next">
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-        <Swiper
-          modules={[Navigation]}
-          navigation={{
-            prevEl: '.egt-soft-prev',
-            nextEl: '.egt-soft-next'
-          }}
-          slidesPerView={3.2}
-          spaceBetween={8}
-        >
-          {Array.from({ length: 30 }).map((_, idx) => (
-            <SwiperSlide key={`egt-${idx}`}>
-              <div className="rounded-2xl overflow-hidden border border-[var(--border)] bg-black/40">
-                <img
-                  src="/assets/ztb-pg4.webp"
-                  alt={`EGT soft slot ${idx + 1}`}
-                  className="w-full h-full object-cover"
-                />
+        if (isLoading) {
+          return Array.from({ length: 3 }).map((_, i) => (
+            <div
+              key={`loading-type-${i}`}
+              className="w-full max-w-4xl px-2 sm:px-4 mb-6 relative z-10"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="h-6 w-32 bg-white/10 rounded animate-pulse" />
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full border border-[var(--border)] bg-white/5 animate-pulse" />
+                  <div className="w-8 h-8 rounded-full border border-[var(--border)] bg-white/5 animate-pulse" />
+                </div>
               </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </div>
+              <div className="grid grid-cols-3 gap-3">
+                {Array.from({ length: 3 }).map((_, j) => (
+                  <GameCard key={j} isLoading={true} />
+                ))}
+              </div>
+            </div>
+          ));
+        }
+
+        if (!gamesArray.length) {
+          return null;
+        }
+
+        // Group games by type
+        const gamesByType = {};
+        gamesArray.forEach((game) => {
+          const type = game.game_type;
+          if (type && GAME_TYPES[type]) {
+            if (!gamesByType[type]) {
+              gamesByType[type] = [];
+            }
+            gamesByType[type].push(game);
+          }
+        });
+
+        return Object.entries(GAME_TYPES).map(([typeId, typeName]) => {
+          const typeGames = gamesByType[typeId] || [];
+          if (typeGames.length === 0) return null;
+
+          const displayGames = typeGames.slice(0, 20);
+          const pages = [];
+          for (let i = 0; i < displayGames.length; i += 9) {
+            pages.push(displayGames.slice(i, i + 9));
+          }
+          const hasPages = pages.length > 0;
+
+          return (
+            <div
+              key={typeId}
+              className="w-full max-w-4xl px-2 sm:px-4 mb-6 relative z-10"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2 text-sm font-semibold text-white">
+                  <span>{typeName}</span>
+                  <ChevronRight className="w-4 h-4 text-emerald-400" />
+                </div>
+                {hasPages && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      className="w-8 h-8 rounded-full border border-[var(--border)] flex items-center justify-center text-gray-300 hover:border-[var(--gold)] hover:text-[var(--gold)] cursor-pointer"
+                      onClick={() =>
+                        providerSwipersRef.current[typeId]?.slidePrev()
+                      }
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button
+                      className="w-8 h-8 rounded-full border border-[var(--border)] flex items-center justify-center text-gray-300 hover:border-[var(--gold)] hover:text-[var(--gold)] cursor-pointer"
+                      onClick={() =>
+                        providerSwipersRef.current[typeId]?.slideNext()
+                      }
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
+              <Swiper
+                modules={[Navigation]}
+                slidesPerView={1}
+                spaceBetween={12}
+                onSwiper={(swiperInstance) => {
+                  providerSwipersRef.current[typeId] = swiperInstance;
+                }}
+              >
+                {hasPages ? (
+                  pages.map((pageGames, pageIndex) => (
+                    <SwiperSlide key={`type-${typeId}-page-${pageIndex}`}>
+                      <div className="grid grid-cols-3 gap-3">
+                        {pageGames.map((game) => (
+                          <GameCard
+                            key={game.id}
+                            image={game.image}
+                            name={game.name}
+                            alt={game.name}
+                            onClick={() => handleGameClick(game)}
+                            isLoading={launchingGameId === game.id}
+                          />
+                        ))}
+                      </div>
+                    </SwiperSlide>
+                  ))
+                ) : (
+                  <SwiperSlide>
+                    <div className="grid grid-cols-3 gap-3">
+                      {Array.from({ length: 9 }).map((_, idx) => (
+                        <GameCard
+                          key={idx}
+                          isLoading={true}
+                        />
+                      ))}
+                    </div>
+                  </SwiperSlide>
+                )}
+              </Swiper>
+            </div>
+          );
+        });
+      })()}
+
+
 
       {/* Live Winners Section */}
       <div className="w-full max-w-4xl px-2 sm:px-4 mb-8 relative z-10">
@@ -240,6 +349,71 @@ const Landing = () => {
             ))}
           </Swiper>
         </div>
+        {pgOptions &&
+          pgOptions.providers &&
+          pgOptions.providers.length > 0 && (
+          <div className="mt-4 rounded-2xl border border-[var(--border)] bg-black/40 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Globe className="w-5 h-5 text-gold" />
+                <h3 className="text-sm font-bold text-white">PG Providers</h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <button className="w-8 h-8 rounded-full border border-[var(--border)] flex items-center justify-center text-gray-300 hover:border-[var(--gold)] hover:text-[var(--gold)] cursor-pointer pg-providers-prev">
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button className="w-8 h-8 rounded-full border border-[var(--border)] flex items-center justify-center text-gray-300 hover:border-[var(--gold)] hover:text-[var(--gold)] cursor-pointer pg-providers-next">
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            {(() => {
+              const providers =
+                pgOptions && Array.isArray(pgOptions.providers)
+                  ? [...pgOptions.providers]
+                      .filter(
+                        (p) => p.is_active === 1 || p.is_active === '1'
+                      )
+                      .sort((a, b) => {
+                        const pa = providerPriority(a);
+                        const pb = providerPriority(b);
+                        if (pa !== pb) return pa - pb;
+                        const sa = Number(a.sorder ?? 0);
+                        const sb = Number(b.sorder ?? 0);
+                        return sa - sb;
+                      })
+                  : [];
+              return (
+                <Swiper
+                  modules={[Navigation]}
+                  navigation={{
+                    prevEl: '.pg-providers-prev',
+                    nextEl: '.pg-providers-next'
+                  }}
+                  slidesPerView={4.5}
+                  spaceBetween={3}
+                >
+                  {providers.map((provider) => (
+                    <SwiperSlide key={provider.id}>
+                      <div className="w-full rounded-xl p-0 flex flex-col items-center gap-2 border border-transparent">
+                        {provider.logo_b && (
+                          <img
+                            src={provider.logo_b}
+                            alt={provider.title || provider.code}
+                            className="w-full h-12 object-contain"
+                          />
+                        )}
+                        <div className="text-xs text-center text-gray-200 font-medium truncate w-full">
+                          {provider.title || provider.code}
+                        </div>
+                      </div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              );
+            })()}
+          </div>
+        )}
       </div>
 
       {/* Jackpot Section */}
