@@ -90,6 +90,7 @@ const Landing = () => {
     }
   };
 
+  
   const banners = [
     '/assets/banner-actThroughtDZ.webp',
     '/assets/banner-yessc2.webp',
