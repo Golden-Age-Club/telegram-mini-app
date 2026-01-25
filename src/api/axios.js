@@ -2,18 +2,18 @@ import axios from 'axios';
 import { getCookie } from './cookies';
 
 export const backendUrl = () => {
-  // if (typeof window !== 'undefined') {
-  //   const hostname = window.location.hostname;
-  //   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-  //     return 'http://localhost:8000';
-  //   }
-  // }
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:8000';
+    }
+  }
   return 'https://golden-age-club-f8a5bb71b60a.herokuapp.com';
 };
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: REQUEST_TIMEOUT,
+  baseURL: backendUrl(),
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },

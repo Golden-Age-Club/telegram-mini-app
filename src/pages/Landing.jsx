@@ -232,7 +232,7 @@ const Landing = () => {
           const typeGames = gamesByType[typeId] || [];
           if (typeGames.length === 0) return null;
 
-          const displayGames = typeGames.slice(0, 20);
+          const displayGames = typeGames.slice(0, 27);
           const pages = [];
           for (let i = 0; i < displayGames.length; i += 9) {
             pages.push(displayGames.slice(i, i + 9));
@@ -285,11 +285,9 @@ const Landing = () => {
                         {pageGames.map((game) => (
                           <GameCard
                             key={game.id}
-                            image={game.image}
-                            name={game.name}
-                            alt={game.name}
-                            onClick={() => handleGameClick(game)}
-                            isLoading={launchingGameId === game.id}
+                            game={game}
+                            onClick={handleGameClick}
+                            disabled={launchingGameId === game.id}
                           />
                         ))}
                       </div>

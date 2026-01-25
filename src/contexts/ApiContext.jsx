@@ -169,11 +169,8 @@ export const ApiProvider = ({ children }) => {
         language: user.language_code || 'en',
         currency: 'USD',
         request_time: requestTime,
-        urls: {
-          base_url: window.location.origin + '/start-game',
-          wallet_url: window.location.origin + '/wallet',
-          other_url: window.location.origin + '/support'
-        }
+        shop_id:1,
+        callback_url: "https://golden-age-club-f8a5bb71b60a.herokuapp.com/api/callback",
       };
 
       console.log('🔑 Payload:', payload);
@@ -197,7 +194,9 @@ export const ApiProvider = ({ children }) => {
       console.log('🚀 Launching game with payload:', payload);
 
       // Use axios as requested
-      const response = await axios.post(`${PG_CONFIG.BASE_URL}/api/v1/playGame`, payload, {
+      // The user requested to use URL search params (query string) instead of body
+      const response = await axios.get(`${PG_CONFIG.BASE_URL}/api/v1/playGame`, {
+        params: payload,
         headers: { 'Content-Type': 'application/json' }
       });
 

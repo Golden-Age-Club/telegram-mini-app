@@ -3,101 +3,18 @@ import { RouterProvider } from 'react-router-dom';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { ApiProvider, useApi } from './contexts/ApiContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { WalletProvider } from './contexts/WalletContext';
 import { LayoutProvider } from './contexts/LayoutContext';
 import { ToastProvider, useToast } from './contexts/ToastContext';
 import router from './router';
 
 function AppContent() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasInitialized, setHasInitialized] = useState(false);
-  const toast = useToast();
-  const tg = window.Telegram?.WebApp;
+  const { isLoading: authLoading } = useAuth();
+  const { isLoading: apiLoading } = useApi();
   
-  // Use API and Auth contexts
-  const { 
-    isConnected
-  } = useApi();
-  
-  const {
-    user,
-    loginWithDemo
-  } = useAuth();
-
-  // Wallet hook
-  const { 
-    balance, 
-    fetchBalance, 
-    createDeposit, 
-    createWithdrawal, 
-    fetchTransactions,
-    refreshWallet 
-  } = useWallet(updateUserBalance);
-
-  // Initialize Telegram WebApp
-  useEffect(() => {
-    let initializationDone = false;
-    
-    const initializeApp = async () => {
-      if (hasInitialized) return;
-      setHasInitialized(true);
-      
-      if (tg) {
-        tg.ready();
-        tg.expand();
-        
-        // Set Golden Age Cash theme colors (only if supported)
-        if (tg.setHeaderColor) {
-          tg.setHeaderColor('#000000');
-        }
-        if (tg.setBackgroundColor) {
-          tg.setBackgroundColor('#000000');
-        }
-        
-        // Get user from Telegram or use API user
-        if (tg.initDataUnsafe?.user && !user) {
-          const tgUser = tg.initDataUnsafe.user;
-          
-          // Try to login with demo credentials
-          const loginResult = await loginWithDemo();
-          if (loginResult?.success) {
-            toast.success(`Welcome to Golden Age Club, ${tgUser.first_name}!`);
-          }
-        }
-      }
-      
-      setIsLoading(false);
-    };
-
-    const initWebMode = async () => {
-      try {
-        // Try to authenticate with mock data for web mode
-        const response = await login('web_mode_user');
-        
-        if (response.user) {
-          setTimeout(() => {
-            toast.success(`Welcome to Golden Age Cash, ${response.user.first_name || 'Player'}!`);
-          }, 1000);
-          
-          setScreen('home');
-          await refreshWallet();
-        }
-      } catch (error) {
-        console.error('❌ Web mode authentication failed:', error);
-        toast.info('Welcome to Golden Age Cash! Click to get started.');
-        // Stay on landing page for manual login
-      }
-    };
-
-    initializeApp();
-  }, []); // Empty dependency array to run only once
-
-  // Handle authentication errors
-  useEffect(() => {
-    if (authError) {
-      toast.error(authError);
-    }
-  }, [isLoading, isConnected, user, loginWithDemo, toast, tg]);
+  // Combine loading states
+  // We can decide to only block on authLoading if we want the app to be interactive faster
+  // But typically we wait for at least auth to know if we are logged in or not.
+  const isLoading = authLoading; 
 
   if (isLoading) {
     return (
@@ -121,11 +38,6 @@ function AppContent() {
     );
   }
 
-  // Show landing page if not authenticated
-  if (!isAuthenticated && screen !== 'landing') {
-    setScreen('landing');
-  }
-
   return (
     <div className="app min-h-screen bg-gradient-primary">
       <LayoutProvider>
@@ -142,9 +54,7 @@ function App() {
            <ApiProvider>
         <LanguageProvider>
           <ToastProvider>
-            <WalletProvider>
               <AppContent />
-            </WalletProvider>
           </ToastProvider>
         </LanguageProvider>
          </ApiProvider>

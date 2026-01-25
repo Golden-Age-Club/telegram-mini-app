@@ -1,14 +1,40 @@
-import React from 'react';
-import { Play } from 'lucide-react';
+import React, { useState } from 'react';
+import { Play, Flame, Star } from 'lucide-react';
 
 const GameCard = ({ 
   game, 
   variant = 'default', 
   onClick, 
   disabled = false,
-  showStats = false 
+  showStats = false,
+  isLoading = false
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
+
+  if (isLoading) {
+    return (
+      <div className={`game-card animate-pulse ${variant === 'compact' ? 'flex items-center gap-3 p-3' : 'rounded-xl overflow-hidden w-full'}`}>
+        {variant === 'compact' ? (
+          <>
+            <div className="game-card-image bg-gray-700 w-12 h-12 rounded-lg flex-shrink-0"></div>
+            <div className="flex-1">
+              <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
+              <div className="h-3 bg-gray-700 rounded w-1/2"></div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="relative w-full pt-[75%] bg-gray-700"></div>
+            <div className="p-2 bg-[#1a1b26] border-t border-white/5">
+               <div className="h-3 bg-gray-700 rounded w-3/4"></div>
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  if (!game) return null;
 
   const getVariantClasses = () => {
     switch (variant) {
@@ -93,46 +119,59 @@ const GameCard = ({
     <button
       onClick={() => !disabled && onClick?.(game)}
       disabled={disabled}
-      className={`${getVariantClasses()} ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'} transition-all duration-300 relative overflow-hidden rounded-2xl`}
+      className={`${getVariantClasses()} ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 active:scale-95 cursor-pointer'} group transition-all duration-300 flex flex-col relative overflow-hidden rounded-2xl bg-[#1a1b26] w-full`}
     >
-      <div className="game-card-image-clean relative w-full">
-        {game.image ? (
-          <>
-            <img
-              src={game.image}
-              alt={game.name}
-              className={`w-full h-full object-cover transition-all duration-300 ${
-                imageLoaded ? 'opacity-100' : 'opacity-0'
-              }`}
-              onLoad={() => {
-                console.log(`✅ Successfully loaded image for ${game.name}`);
-                setImageLoaded(true);
-              }}
-              onError={(e) => {
-                console.log(`❌ Failed to load image for ${game.name}:`, game.image);
-                e.target.style.display = 'none';
-                setImageLoaded(true);
-              }}
-            />
-            {!imageLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-                <div className="loading-spinner"></div>
+      <div className="relative w-full pt-[75%] bg-gray-800">
+        <div className="absolute inset-0 w-full h-full">
+          {game.image ? (
+            <>
+              <img
+                src={game.image}
+                alt={game.name}
+                className={`w-full h-full object-cover transition-all duration-300 ${
+                  imageLoaded ? 'opacity-100' : 'opacity-0'
+                }`}
+                onLoad={() => {
+                  setImageLoaded(true);
+                }}
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  setImageLoaded(true);
+                }}
+              />
+              {!imageLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                  <div className="loading-spinner"></div>
+                </div>
+              )}
+              {/* Fallback to icon if image fails to load */}
+              {imageLoaded && !game.image && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                  <span className="text-4xl">{game.icon || '🎮'}</span>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 h-full w-full">
+              <span className="text-4xl">{game.icon || '🎮'}</span>
+            </div>
+          )}
+          
+          {/* Play Icon Overlay on Hover */}
+          {!disabled && (
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+              <div className="w-12 h-12 rounded-full bg-emerald-500 text-white flex items-center justify-center transform scale-0 group-hover:scale-100 transition-transform duration-300 shadow-lg shadow-emerald-500/30">
+                <Play size={20} fill="currentColor" className="ml-1" />
               </div>
-            )}
-            {/* Fallback to icon if image fails to load */}
-            {imageLoaded && !game.image && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-                <span className="text-4xl">{game.icon || '🎮'}</span>
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 h-full aspect-[4/3]">
-            <span className="text-4xl">{game.icon || '🎮'}</span>
-          </div>
-        )}
-        
-        {getStatusBadge()}
+            </div>
+          )}
+
+          {getStatusBadge()}
+        </div>
+      </div>
+
+      <div className="w-full p-2 text-left border-t border-white/5 bg-[#1a1b26]">
+        <div className="text-[11px] leading-tight font-medium text-gray-300 truncate">{game.name}</div>
       </div>
     </button>
   );
@@ -158,31 +197,15 @@ export const GameGrid = ({ games, variant = 'default', onGameClick, loading = fa
   }
 
   return (
-    <div 
-      className="group rounded-2xl overflow-hidden border border-[var(--border)] bg-black/40 cursor-pointer"
-      onClick={onClick}
-    >
-      <div className="relative aspect-[4/5] w-full">
-        <img
-          src={image}
-          alt={alt || name}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+    <div className="grid-auto">
+      {games.map((game) => (
+        <GameCard
+          key={game.id || game.game_id}
+          game={game}
+          variant={variant}
+          onClick={onGameClick}
         />
-        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-1">
-            <Play className="w-8 h-8 text-emerald-400" />
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-emerald-200">
-              Play now
-            </span>
-          </div>
-        </div>
-        <div className="pointer-events-none absolute inset-0 rounded-2xl  opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      </div>
-      <div className="px-2 py-1">
-        <span className="block text-[10px] font-semibold text-white truncate">
-          {name}
-        </span>
-      </div>
+      ))}
     </div>
   );
 };
