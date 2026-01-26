@@ -1,30 +1,23 @@
 import { useEffect, useState, useRef } from 'react';
 import {
   Zap,
-  Crown,
-  Diamond,
-  Star,
-  Sparkles,
   Trophy,
   Shield,
   ArrowDownCircle,
   ArrowUpCircle,
   Users,
-  Download,
   MessageCircle,
   ChevronLeft,
   ChevronRight,
-  Clock,
-  CreditCard,
-  HelpCircle,
   Globe,
-  Lock
+  Gift
 } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import { Navigation, Pagination, Autoplay, EffectFade } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import 'swiper/css/effect-fade';
 import { useNavigate } from 'react-router-dom';
 import { useApi } from '../contexts/ApiContext';
 import { useToast } from '../contexts/ToastContext';
@@ -82,11 +75,13 @@ const Landing = () => {
     setLaunchingGameId(game.id);
     const result = await launchGame(game.id);
     setLaunchingGameId(null);
+    console.log('Launch game result:', result);
 
-    if (result.success && result.data.url) {
+    if (result?.success && result?.data?.url) {
       navigate('/start-game', { state: { url: result.data.url } });
     } else {
-      addToast('Failed to launch game. Please try again.', 'error');
+      console.error('Launch game failed or invalid result:', result);
+      addToast(result?.error || 'Failed to launch game. Please try again.', 'error');
     }
   };
 
@@ -126,62 +121,108 @@ const Landing = () => {
 
 
   return (
-    <div className="min-h-screen flex flex-col items-center p-2 bg-gradient-primary relative overflow-hidden">
-      {/* Background Elements - Subtle */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-emerald-500 blur-3xl"></div>
-        <div className="absolute bottom-20 right-10 w-40 h-40 rounded-full bg-amber-500 blur-3xl"></div>
+    <div className="min-h-screen flex flex-col items-center bg-[#1a1c20] relative overflow-x-hidden pb-24 pt-6">
+      {/* Dynamic Background */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-[-20%] left-[-20%] w-[80%] h-[80%] bg-emerald-900/30 rounded-full blur-[120px] animate-pulse-slow" />
+        <div className="absolute bottom-[-20%] right-[-20%] w-[80%] h-[80%] bg-[var(--gold)]/15 rounded-full blur-[120px] animate-pulse-slow delay-1000" />
       </div>
 
-      {/* Banner Slider - Under Navbar (rectangular banners) */}
-      <div className="w-full max-w-4xl px-2 sm:px-4 mt-4 mb-8 relative z-10">
-        <div className="relative rounded-2xl overflow-hidden border border-gold/30 bg-black/40 backdrop-blur-sm">
-          <div className="relative ">
-            <Swiper
-              modules={[Navigation, Pagination, Autoplay]}
-              loop
-              autoplay={{ delay: 4000, disableOnInteraction: false }}
-              className="w-full h-full"
-            >
-              {banners.map((src, idx) => (
-                <SwiperSlide key={src}>
-                  <img
-                    src={src}
-                    alt={`Golden Age banner ${idx + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          </div>
+      {/* Banner Slider */}
+      <div className="w-full max-w-md px-4 mt-2 mb-6 relative z-10">
+        <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10 aspect-video">
+          <Swiper
+            modules={[Navigation, Pagination, Autoplay, EffectFade]}
+            effect="fade"
+            loop
+            autoplay={{ delay: 5000, disableOnInteraction: false }}
+            pagination={{ 
+                clickable: true,
+                bulletActiveClass: 'swiper-pagination-bullet-active !bg-[var(--gold)] !w-6 !rounded-full',
+                bulletClass: 'swiper-pagination-bullet !bg-white/50 !w-1.5 !h-1.5 !opacity-100 transition-all duration-300'
+            }}
+            className="w-full h-full"
+          >
+            {banners.map((src, idx) => (
+              <SwiperSlide key={src}>
+                <div className="relative w-full h-full flex items-center justify-center bg-gray-900">
+                    {/* Blurred Background for Ambiance */}
+                    <div className="absolute inset-0 overflow-hidden">
+                        <img
+                            src={src}
+                            alt=""
+                            className="w-full h-full object-cover blur-2xl opacity-40 scale-110"
+                        />
+                    </div>
+                    
+                    {/* Main Image - Contained to fit perfectly */}
+                    <img
+                        src={src}
+                        alt={`Golden Age banner ${idx + 1}`}
+                        className="relative w-full h-full object-contain z-10"
+                    />
+                    
+                    {/* Subtle Overlay for Depth */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent z-20" />
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </div>
       </div>
 
-      <div className="w-full max-w-4xl px-2 sm:px-4 mb-6 relative z-10">
-        <div className="grid grid-cols-5 gap-2">
-          <button className="flex flex-col items-center justify-center rounded-2xl bg-[var(--bg-card)]/95 border border-[var(--border)] px-2 py-2 text-[11px] font-medium text-gray-200 hover:border-[var(--gold)] hover:text-[var(--gold)] transition-colors cursor-pointer">
-            <ArrowDownCircle className="w-5 h-5 mb-1 text-emerald-400" strokeWidth={2.3} />
-            <span className="truncate">Deposit</span>
-          </button>
-          <button className="flex flex-col items-center justify-center rounded-2xl bg-[var(--bg-card)]/95 border border-[var(--border)] px-2 py-2 text-[11px] font-medium text-gray-200 hover:border-[var(--gold)] hover:text-[var(--gold)] transition-colors cursor-pointer">
-            <ArrowUpCircle className="w-5 h-5 mb-1 text-emerald-400" strokeWidth={2.3} />
-            <span className="truncate">Withdraw</span>
-          </button>
-          <button className="flex flex-col items-center justify-center rounded-2xl bg-[var(--bg-card)]/95 border border-[var(--border)] px-2 py-2 text-[11px] font-medium text-gray-200 hover:border-[var(--gold)] hover:text-[var(--gold)] transition-colors cursor-pointer">
-            <Users className="w-5 h-5 mb-1 text-emerald-400" strokeWidth={2.3} />
-            <span className="truncate">Invite</span>
-          </button>
-          <button className="flex flex-col items-center justify-center rounded-2xl bg-[var(--bg-card)]/95 border border-[var(--border)] px-2 py-2 text-[11px] font-medium text-gray-200 hover:border-[var(--gold)] hover:text-[var(--gold)] transition-colors cursor-pointer">
-            <Download className="w-5 h-5 mb-1 text-emerald-400" strokeWidth={2.3} />
-            <span className="truncate">Download</span>
-          </button>
-          <button className="flex flex-col items-center justify-center rounded-2xl bg-[var(--bg-card)]/95 border border-[var(--border)] px-2 py-2 text-[11px] font-medium text-gray-200 hover:border-[var(--gold)] hover:text-[var(--gold)] transition-colors cursor-pointer">
-            <MessageCircle className="w-5 h-5 mb-1 text-emerald-400" strokeWidth={2.3} />
-            <span className="truncate">Live Support</span>
-          </button>
+      {/* Quick Actions - Glassmorphism */}
+      <div className="w-full max-w-md px-4 mb-8 relative z-10">
+        <div className="grid grid-cols-4 gap-3">
+            {[
+                { icon: ArrowDownCircle, label: 'Deposit', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
+                { icon: ArrowUpCircle, label: 'Withdraw', color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20' },
+                { icon: Users, label: 'Invite', color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
+                { icon: MessageCircle, label: 'Support', color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20' },
+            ].map((action, i) => (
+                <button 
+                    key={i} 
+                    className="flex flex-col items-center gap-2 group"
+                    onClick={() => {
+                        if (action.label === 'Deposit') navigate('/wallet/deposit');
+                        else if (action.label === 'Withdraw') navigate('/wallet/withdraw');
+                        else if (action.label === 'Invite') navigate('/profile'); // Placeholder
+                    }}
+                >
+                    <div className={`w-14 h-14 rounded-2xl ${action.bg} ${action.border} border flex items-center justify-center backdrop-blur-sm shadow-lg transition-transform duration-300 group-hover:scale-105 group-active:scale-95`}>
+                        <action.icon className={`w-6 h-6 ${action.color}`} strokeWidth={2.5} />
+                    </div>
+                    <span className="text-[11px] font-medium text-gray-400 group-hover:text-white transition-colors">{action.label}</span>
+                </button>
+            ))}
         </div>
       </div>
 
+      {/* Jackpot Ticker */}
+      <div className="w-full max-w-md px-4 mb-8 relative z-10">
+        <div className="relative rounded-2xl overflow-hidden border border-[var(--gold)]/30 bg-gradient-to-r from-gray-900 to-black p-0.5">
+            <div className="absolute inset-0 bg-[url('/assets/noise.png')] opacity-10 mix-blend-overlay"></div>
+            <div className="bg-[#0f0f0f] rounded-[14px] p-4 flex items-center justify-between relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-[var(--gold)]/10 rounded-full blur-2xl -mr-10 -mt-10 animate-pulse"></div>
+                
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-[var(--gold)]/10 flex items-center justify-center border border-[var(--gold)]/20">
+                        <Trophy className="w-5 h-5 text-[var(--gold)]" />
+                    </div>
+                    <div>
+                        <div className="text-[10px] font-bold text-[var(--gold)] uppercase tracking-wider mb-0.5">Progressive Jackpot</div>
+                        <div className="text-xl font-black text-white tracking-tight tabular-nums">
+                            $1,245,892.<span className="text-[var(--gold)]">54</span>
+                        </div>
+                    </div>
+                </div>
+                <ChevronRight className="w-5 h-5 text-gray-500" />
+            </div>
+        </div>
+      </div>
+
+      {/* Game Categories */}
+      <div className="w-full max-w-md space-y-8 pb-8">
       {(() => {
         const gamesArray =
           pgGames && Array.isArray(pgGames)
@@ -191,16 +232,13 @@ const Landing = () => {
             : [];
 
         if (isLoading) {
-          return Array.from({ length: 3 }).map((_, i) => (
-            <div
-              key={`loading-type-${i}`}
-              className="w-full max-w-4xl px-2 sm:px-4 mb-6 relative z-10"
-            >
-              <div className="flex items-center justify-between mb-3">
+          return Array.from({ length: 2 }).map((_, i) => (
+            <div key={`loading-type-${i}`} className="px-4">
+              <div className="flex items-center justify-between mb-4">
                 <div className="h-6 w-32 bg-white/10 rounded animate-pulse" />
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full border border-[var(--border)] bg-white/5 animate-pulse" />
-                  <div className="w-8 h-8 rounded-full border border-[var(--border)] bg-white/5 animate-pulse" />
+                <div className="flex gap-2">
+                    <div className="w-8 h-8 rounded-full bg-white/5 animate-pulse" />
+                    <div className="w-8 h-8 rounded-full bg-white/5 animate-pulse" />
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-3">
@@ -212,9 +250,7 @@ const Landing = () => {
           ));
         }
 
-        if (!gamesArray.length) {
-          return null;
-        }
+        if (!gamesArray.length) return null;
 
         // Group games by type
         const gamesByType = {};
@@ -240,104 +276,110 @@ const Landing = () => {
           const hasPages = pages.length > 0;
 
           return (
-            <div
-              key={typeId}
-              className="w-full max-w-4xl px-2 sm:px-4 mb-6 relative z-10"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2 text-sm font-semibold text-white">
-                  <span>{typeName}</span>
-                  <ChevronRight className="w-4 h-4 text-emerald-400" />
+            <div key={typeId} className="relative z-10 border-t border-white/5 pt-6 first:border-0 first:pt-0">
+              <div className="px-4 flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                    <div className="w-1 h-5 rounded-full bg-[var(--gold)]"></div>
+                    <span className="text-lg font-bold text-white tracking-tight">{typeName}</span>
+                    <span className="text-xs font-medium text-gray-500 bg-white/5 px-2 py-0.5 rounded-full">{typeGames.length}</span>
                 </div>
+                
                 {hasPages && (
                   <div className="flex items-center gap-2">
                     <button
-                      className="w-8 h-8 rounded-full border border-[var(--border)] flex items-center justify-center text-gray-300 hover:border-[var(--gold)] hover:text-[var(--gold)] cursor-pointer"
-                      onClick={() =>
-                        providerSwipersRef.current[typeId]?.slidePrev()
-                      }
+                      className="w-8 h-8 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer active:scale-90"
+                      onClick={() => providerSwipersRef.current[typeId]?.slidePrev()}
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
                     <button
-                      className="w-8 h-8 rounded-full border border-[var(--border)] flex items-center justify-center text-gray-300 hover:border-[var(--gold)] hover:text-[var(--gold)] cursor-pointer"
-                      onClick={() =>
-                        providerSwipersRef.current[typeId]?.slideNext()
-                      }
+                      className="w-8 h-8 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer active:scale-90"
+                      onClick={() => providerSwipersRef.current[typeId]?.slideNext()}
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
                 )}
               </div>
-              <Swiper
-                modules={[Navigation]}
-                slidesPerView={1}
-                spaceBetween={12}
-                onSwiper={(swiperInstance) => {
-                  providerSwipersRef.current[typeId] = swiperInstance;
-                }}
-              >
-                {hasPages ? (
-                  pages.map((pageGames, pageIndex) => (
-                    <SwiperSlide key={`type-${typeId}-page-${pageIndex}`}>
-                      <div className="grid grid-cols-3 gap-3">
-                        {pageGames.map((game) => (
-                          <GameCard
-                            key={game.id}
-                            game={game}
-                            onClick={handleGameClick}
-                            disabled={launchingGameId === game.id}
-                          />
-                        ))}
-                      </div>
-                    </SwiperSlide>
-                  ))
-                ) : (
-                  <SwiperSlide>
-                    <div className="grid grid-cols-3 gap-3">
-                      {Array.from({ length: 9 }).map((_, idx) => (
-                        <GameCard
-                          key={idx}
-                          isLoading={true}
-                        />
-                      ))}
-                    </div>
-                  </SwiperSlide>
-                )}
-              </Swiper>
+              
+              <div className="px-4">
+                  <Swiper
+                    modules={[Navigation]}
+                    slidesPerView={1}
+                    spaceBetween={16}
+                    onSwiper={(swiperInstance) => {
+                      providerSwipersRef.current[typeId] = swiperInstance;
+                    }}
+                    className="!overflow-visible"
+                  >
+                    {hasPages ? (
+                      pages.map((pageGames, pageIndex) => (
+                        <SwiperSlide key={`type-${typeId}-page-${pageIndex}`}>
+                          <div className="grid grid-cols-3 gap-3">
+                            {pageGames.map((game) => (
+                              <GameCard
+                                key={game.id}
+                                game={game}
+                                onClick={handleGameClick}
+                                disabled={launchingGameId === game.id}
+                              />
+                            ))}
+                          </div>
+                        </SwiperSlide>
+                      ))
+                    ) : (
+                      <SwiperSlide>
+                        <div className="grid grid-cols-3 gap-3">
+                          {Array.from({ length: 3 }).map((_, idx) => (
+                            <GameCard key={idx} isLoading={true} />
+                          ))}
+                        </div>
+                      </SwiperSlide>
+                    )}
+                  </Swiper>
+              </div>
             </div>
           );
         });
       })()}
+      </div>
 
-
-
-      {/* Live Winners Section */}
-      <div className="w-full max-w-4xl px-2 sm:px-4 mb-8 relative z-10">
-        <div className="rounded-2xl border border-[var(--border)] bg-black/40 p-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Trophy className="w-5 h-5 text-gold" />
-            <h3 className="text-lg font-bold text-white">Live Winners</h3>
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse ml-auto"></div>
+      {/* Live Winners Widget */}
+      <div className="w-full max-w-md px-4 mb-8 relative z-10">
+        <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-b from-emerald-900/10 to-black p-4 backdrop-blur-sm relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+          
+          <div className="flex items-center gap-2 mb-4 relative z-10">
+            <div className="p-1.5 rounded-lg bg-emerald-500/20">
+                <Trophy className="w-4 h-4 text-emerald-500" />
+            </div>
+            <h3 className="text-sm font-bold text-white uppercase tracking-wider">Live Winners</h3>
+            <div className="ml-auto flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span className="text-[10px] font-bold text-emerald-500">LIVE</span>
+            </div>
           </div>
+          
           <Swiper
             direction={'vertical'}
             modules={[Autoplay]}
-            autoplay={{ delay: 2500, disableOnInteraction: false }}
+            autoplay={{ delay: 2000, disableOnInteraction: false }}
             slidesPerView={3}
             loop
-            className="h-32"
+            className="h-36 mask-linear-fade" // Need custom CSS for mask if desired
             allowTouchMove={false}
           >
             {Array.from({ length: 10 }).map((_, i) => (
               <SwiperSlide key={i}>
-                <div className="flex items-center justify-between py-2 border-b border-white/5">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs text-gray-300">
-                      <Users size={12} />
+                <div className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-xs text-gray-400 border border-white/5">
+                      <Users size={14} />
                     </div>
-                    <span className="text-sm text-gray-300">User****{Math.floor(Math.random() * 90 + 10)}</span>
+                    <div className="flex flex-col">
+                        <span className="text-xs font-medium text-gray-200">User****{Math.floor(Math.random() * 90 + 10)}</span>
+                        <span className="text-[10px] text-gray-500">Just won in Slots</span>
+                    </div>
                   </div>
                   <div className="text-emerald-400 font-mono font-bold text-sm">
                     +${(Math.random() * 1000 + 50).toFixed(2)}
@@ -347,63 +389,48 @@ const Landing = () => {
             ))}
           </Swiper>
         </div>
-        {pgOptions &&
-          pgOptions.providers &&
-          pgOptions.providers.length > 0 && (
-          <div className="mt-4 rounded-2xl border border-[var(--border)] bg-black/40 p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Globe className="w-5 h-5 text-gold" />
-                <h3 className="text-sm font-bold text-white">PG Providers</h3>
-              </div>
-              <div className="flex items-center gap-2">
-                <button className="w-8 h-8 rounded-full border border-[var(--border)] flex items-center justify-center text-gray-300 hover:border-[var(--gold)] hover:text-[var(--gold)] cursor-pointer pg-providers-prev">
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button className="w-8 h-8 rounded-full border border-[var(--border)] flex items-center justify-center text-gray-300 hover:border-[var(--gold)] hover:text-[var(--gold)] cursor-pointer pg-providers-next">
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
+      </div>
+
+      {/* Providers Carousel */}
+      {pgOptions && pgOptions.providers && pgOptions.providers.length > 0 && (
+          <div className="w-full max-w-md px-4 mb-10 relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                <Globe className="w-4 h-4 text-[var(--gold)]" />
+                Premium Providers
+              </h3>
             </div>
+            
             {(() => {
-              const providers =
-                pgOptions && Array.isArray(pgOptions.providers)
-                  ? [...pgOptions.providers]
-                      .filter(
-                        (p) => p.is_active === 1 || p.is_active === '1'
-                      )
-                      .sort((a, b) => {
-                        const pa = providerPriority(a);
-                        const pb = providerPriority(b);
-                        if (pa !== pb) return pa - pb;
-                        const sa = Number(a.sorder ?? 0);
-                        const sb = Number(b.sorder ?? 0);
-                        return sa - sb;
-                      })
-                  : [];
+              const providers = [...pgOptions.providers]
+                  .filter((p) => p.is_active === 1 || p.is_active === '1')
+                  .sort((a, b) => {
+                    const pa = providerPriority(a);
+                    const pb = providerPriority(b);
+                    if (pa !== pb) return pa - pb;
+                    return Number(a.sorder ?? 0) - Number(b.sorder ?? 0);
+                  });
+                  
               return (
                 <Swiper
-                  modules={[Navigation]}
-                  navigation={{
-                    prevEl: '.pg-providers-prev',
-                    nextEl: '.pg-providers-next'
-                  }}
-                  slidesPerView={4.5}
-                  spaceBetween={3}
+                  modules={[Autoplay]}
+                  slidesPerView={3.5}
+                  spaceBetween={10}
+                  autoplay={{ delay: 3000, disableOnInteraction: false }}
+                  loop
                 >
                   {providers.map((provider) => (
                     <SwiperSlide key={provider.id}>
-                      <div className="w-full rounded-xl p-0 flex flex-col items-center gap-2 border border-transparent">
-                        {provider.logo_b && (
+                      <div className="aspect-[3/2] rounded-xl bg-white/5 border border-white/5 flex flex-col items-center justify-center p-2 gap-2 hover:bg-white/10 hover:border-[var(--gold)]/30 transition-all grayscale hover:grayscale-0">
+                        {provider.logo_b ? (
                           <img
                             src={provider.logo_b}
                             alt={provider.title || provider.code}
-                            className="w-full h-12 object-contain"
+                            className="w-full h-8 object-contain"
                           />
+                        ) : (
+                             <span className="text-xs font-bold text-gray-400">{provider.title}</span>
                         )}
-                        <div className="text-xs text-center text-gray-200 font-medium truncate w-full">
-                          {provider.title || provider.code}
-                        </div>
                       </div>
                     </SwiperSlide>
                   ))}
@@ -411,118 +438,27 @@ const Landing = () => {
               );
             })()}
           </div>
-        )}
-      </div>
+      )}
 
-      {/* Jackpot Section */}
-      <div className="w-full max-w-4xl px-2 sm:px-4 mb-8 relative z-10">
-        <div className="relative rounded-2xl overflow-hidden border border-gold/50 bg-gradient-to-r from-amber-900/40 to-black p-6 text-center shadow-[0_0_30px_rgba(255,215,0,0.1)]">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold to-transparent opacity-50"></div>
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Crown className="w-4 h-4 text-gold animate-bounce" />
-            <h3 className="text-gold text-sm font-bold uppercase tracking-widest">Progressive Jackpot</h3>
-            <Crown className="w-4 h-4 text-gold animate-bounce" />
-          </div>
-          <div className="text-4xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 via-yellow-500 to-yellow-700 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] font-mono tracking-tighter">
-            $1,245,892.54
-          </div>
-          <p className="text-xs text-yellow-200/60 mt-2 flex items-center justify-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-            Updating in real-time
-          </p>
-        </div>
-      </div>
-
-      {/* Features Grid */}
-      <div className="w-full max-w-4xl px-2 sm:px-4 mb-8 relative z-10">
-        <h3 className="text-lg font-bold text-white mb-4 pl-2 flex items-center gap-2">
-          <Star className="w-5 h-5 text-gold" />
-          Why Choose Us
-        </h3>
+      {/* Why Choose Us - Grid */}
+      <div className="w-full max-w-md px-4 mb-12 relative z-10">
+        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 ml-1">Why Golden Age?</h3>
         <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-xl border border-[var(--border)] bg-black/40 p-4 flex flex-col gap-2 hover:border-emerald-500/50 transition-colors">
-            <Zap className="w-8 h-8 text-emerald-500 mb-1" />
-            <h4 className="text-sm font-bold text-white">Instant Withdrawals</h4>
-            <p className="text-xs text-gray-400">Get your winnings in seconds</p>
-          </div>
-          <div className="rounded-xl border border-[var(--border)] bg-black/40 p-4 flex flex-col gap-2 hover:border-emerald-500/50 transition-colors">
-            <Lock className="w-8 h-8 text-emerald-500 mb-1" />
-            <h4 className="text-sm font-bold text-white">Secure Gaming</h4>
-            <p className="text-xs text-gray-400">Encrypted & protected data</p>
-          </div>
-          <div className="rounded-xl border border-[var(--border)] bg-black/40 p-4 flex flex-col gap-2 hover:border-emerald-500/50 transition-colors">
-            <MessageCircle className="w-8 h-8 text-emerald-500 mb-1" />
-            <h4 className="text-sm font-bold text-white">24/7 Support</h4>
-            <p className="text-xs text-gray-400">Always here to help you</p>
-          </div>
-          <div className="rounded-xl border border-[var(--border)] bg-black/40 p-4 flex flex-col gap-2 hover:border-emerald-500/50 transition-colors">
-            <Diamond className="w-8 h-8 text-emerald-500 mb-1" />
-            <h4 className="text-sm font-bold text-white">VIP Rewards</h4>
-            <p className="text-xs text-gray-400">Exclusive bonuses for loyal players</p>
-          </div>
+          {[
+            { icon: Zap, title: 'Instant Withdrawals', desc: 'Get paid in seconds', color: 'text-yellow-400' },
+            { icon: Shield, title: 'Bank-Grade Security', desc: 'Encrypted & protected', color: 'text-emerald-400' },
+            { icon: MessageCircle, title: '24/7 Live Support', desc: 'Always here to help', color: 'text-blue-400' },
+            { icon: Gift, title: 'VIP Rewards', desc: 'Exclusive daily bonuses', color: 'text-purple-400' }
+          ].map((item, i) => (
+              <div key={i} className="p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
+                <item.icon className={`w-6 h-6 ${item.color} mb-3`} />
+                <h4 className="text-sm font-bold text-white mb-1">{item.title}</h4>
+                <p className="text-[11px] text-gray-400 leading-tight">{item.desc}</p>
+              </div>
+          ))}
         </div>
       </div>
 
-      {/* FAQ Section */}
-      <div className="w-full max-w-4xl px-2 sm:px-4 mb-12 relative z-10">
-        <h3 className="text-lg font-bold text-white mb-4 pl-2 flex items-center gap-2">
-          <HelpCircle className="w-5 h-5 text-gold" />
-          Frequently Asked Questions
-        </h3>
-        <div className="space-y-3">
-          <div className="rounded-xl border border-[var(--border)] bg-black/40 p-4">
-            <h4 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-emerald-500" />
-              How do I deposit?
-            </h4>
-            <p className="text-xs text-gray-400 leading-relaxed">Click the "Deposit" button and choose your preferred payment method. Transfers are instant.</p>
-          </div>
-          <div className="rounded-xl border border-[var(--border)] bg-black/40 p-4">
-            <h4 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
-              <Shield className="w-4 h-4 text-emerald-500" />
-              Is it safe?
-            </h4>
-            <p className="text-xs text-gray-400 leading-relaxed">Yes, we use bank-grade encryption to ensure your data and funds are always secure.</p>
-          </div>
-          <div className="rounded-xl border border-[var(--border)] bg-black/40 p-4">
-            <h4 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-emerald-500" />
-              How to withdraw?
-            </h4>
-            <p className="text-xs text-gray-400 leading-relaxed">Go to Wallet &gt; Withdraw. Requests are processed automatically 24/7.</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className="w-full max-w-4xl px-4 py-8 relative z-10 border-t border-white/5 mt-4 pb-24">
-        <div className="flex flex-col items-center gap-4 text-center">
-          <div className="flex items-center gap-2 text-gold font-bold text-xl">
-            <Crown className="w-6 h-6" />
-            <span>GOLDEN AGE</span>
-          </div>
-          <div className="flex gap-4 text-xs text-gray-400">
-            <span className="cursor-pointer hover:text-white transition-colors">Terms</span>
-            <span className="cursor-pointer hover:text-white transition-colors">Privacy</span>
-            <span className="cursor-pointer hover:text-white transition-colors">Fair Play</span>
-          </div>
-          <div className="flex gap-4 mt-2">
-            <div className="w-8 h-5 rounded bg-white/10 flex items-center justify-center">
-              <span className="text-[8px] text-gray-400 font-bold">VISA</span>
-            </div>
-            <div className="w-8 h-5 rounded bg-white/10 flex items-center justify-center">
-              <span className="text-[8px] text-gray-400 font-bold">MC</span>
-            </div>
-            <div className="w-8 h-5 rounded bg-white/10 flex items-center justify-center">
-              <span className="text-[8px] text-gray-400 font-bold">USDT</span>
-            </div>
-          </div>
-          <p className="text-[10px] text-gray-600 mt-2">
-            © 2024 Golden Age Casino. All rights reserved.<br/>
-            Gambling involves risk. Please play responsibly.
-          </p>
-        </div>
-      </div>
     </div>
   );
 };

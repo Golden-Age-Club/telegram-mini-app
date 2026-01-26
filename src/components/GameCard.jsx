@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Flame, Star } from 'lucide-react';
+import { Play, Flame, Star, Trophy, Radio } from 'lucide-react';
 
 const GameCard = ({ 
   game, 
@@ -13,22 +13,21 @@ const GameCard = ({
 
   if (isLoading) {
     return (
-      <div className={`game-card animate-pulse ${variant === 'compact' ? 'flex items-center gap-3 p-3' : 'rounded-xl overflow-hidden w-full'}`}>
+      <div className={`relative overflow-hidden bg-white/5 border border-white/5 ${variant === 'compact' ? 'rounded-xl p-2 flex items-center gap-3' : 'rounded-2xl aspect-[3/4]'}`}>
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent shimmer" />
         {variant === 'compact' ? (
           <>
-            <div className="game-card-image bg-gray-700 w-12 h-12 rounded-lg flex-shrink-0"></div>
-            <div className="flex-1">
-              <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
-              <div className="h-3 bg-gray-700 rounded w-1/2"></div>
+            <div className="w-12 h-12 rounded-lg bg-white/10 shrink-0" />
+            <div className="flex-1 space-y-2">
+              <div className="h-3 w-2/3 bg-white/10 rounded" />
+              <div className="h-2 w-1/3 bg-white/10 rounded" />
             </div>
           </>
         ) : (
-          <>
-            <div className="relative w-full pt-[75%] bg-gray-700"></div>
-            <div className="p-2 bg-[#1a1b26] border-t border-white/5">
-               <div className="h-3 bg-gray-700 rounded w-3/4"></div>
-            </div>
-          </>
+          <div className="p-3 flex flex-col justify-end h-full space-y-3">
+             <div className="h-4 w-3/4 bg-white/10 rounded" />
+             <div className="h-3 w-1/2 bg-white/10 rounded" />
+          </div>
         )}
       </div>
     );
@@ -36,22 +35,11 @@ const GameCard = ({
 
   if (!game) return null;
 
-  const getVariantClasses = () => {
-    switch (variant) {
-      case 'featured':
-        return 'game-card-featured';
-      case 'compact':
-        return 'game-card-compact';
-      default:
-        return 'game-card-clean';
-    }
-  };
-
   const getStatusBadge = () => {
     if (game.isHot) {
       return (
-        <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-red-600 to-red-500 rounded-full text-xs font-medium z-10">
-          <Flame size={12} />
+        <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-red-600 to-rose-600 rounded-md text-[10px] font-bold text-white shadow-lg shadow-red-900/20 z-10 border border-white/10">
+          <Flame size={10} className="fill-white" />
           <span>HOT</span>
         </div>
       );
@@ -59,8 +47,8 @@ const GameCard = ({
     
     if (game.isNew) {
       return (
-        <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-full text-xs font-medium z-10">
-          <Star size={12} />
+        <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-md text-[10px] font-bold text-white shadow-lg shadow-emerald-900/20 z-10 border border-white/10">
+          <Star size={10} className="fill-white" />
           <span>NEW</span>
         </div>
       );
@@ -68,8 +56,11 @@ const GameCard = ({
     
     if (game.isLive) {
       return (
-        <div className="absolute top-2 right-2 live-indicator z-10">
-          <div className="live-dot"></div>
+        <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 bg-black/60 backdrop-blur-md rounded-md text-[10px] font-bold text-white z-10 border border-red-500/50">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+          </span>
           <span>LIVE</span>
         </div>
       );
@@ -83,121 +74,133 @@ const GameCard = ({
       <button
         onClick={() => !disabled && onClick?.(game)}
         disabled={disabled}
-        className={`${getVariantClasses()} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        className={`w-full group relative overflow-hidden rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all duration-300 ${disabled ? 'opacity-50 cursor-not-allowed' : 'active:scale-[0.98]'}`}
       >
-        <div className="flex items-center gap-3 p-3">
-          <div className="game-card-image w-12 h-12 rounded-lg flex-shrink-0 overflow-hidden relative">
+        <div className="flex items-center gap-3 p-2">
+          <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-black/50 shrink-0 border border-white/10">
             {game.image ? (
               <img
-                src={game.image}
+                src={typeof game.image === 'string' ? game.image.trim() : game.image}
                 alt={game.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 onError={(e) => {
-                  e.target.style.display = 'none';
-                  e.target.nextSibling.style.display = 'flex';
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
                 }}
               />
             ) : null}
-            <div 
-              className={`absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 ${game.image ? 'hidden' : 'flex'}`}
-            >
-              <span className="text-lg">{game.icon}</span>
+            <div className={`absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 ${game.image ? 'hidden' : 'flex'}`}>
+              <span className="text-xl">{game.icon || '🎮'}</span>
             </div>
           </div>
-          <div className="flex-1 text-left">
-            <div className="game-card-title text-sm">{game.name}</div>
-            <div className="game-card-subtitle text-xs">{game.provider || game.subtitle}</div>
+          
+          <div className="flex-1 text-left min-w-0">
+            <div className="text-sm font-bold text-white truncate group-hover:text-[var(--gold)] transition-colors">
+              {game.name}
+            </div>
+            <div className="text-[10px] text-gray-400 truncate flex items-center gap-1">
+              {(game.provider || game.provider_title) && <span className="uppercase tracking-wider opacity-70">{game.provider || game.provider_title}</span>}
+            </div>
           </div>
-          <Play size={16} className="text-gray-400 flex-shrink-0" />
+          
+          <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 group-hover:bg-[var(--gold)] group-hover:text-black transition-all">
+            <Play size={14} fill="currentColor" />
+          </div>
         </div>
       </button>
     );
   }
 
-  // Clean image-only design
+  // Standard Vertical Card
   return (
     <button
       onClick={() => !disabled && onClick?.(game)}
       disabled={disabled}
-      className={`${getVariantClasses()} ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 active:scale-95 cursor-pointer'} group transition-all duration-300 flex flex-col relative overflow-hidden rounded-2xl bg-[#1a1b26] w-full`}
+      className={`group relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-[#1a1b26] border border-white/5 shadow-xl transition-all duration-300 ${
+        disabled 
+          ? 'opacity-50 cursor-not-allowed' 
+          : 'cursor-pointer hover:border-[var(--gold)]/50 hover:shadow-[0_0_20px_rgba(255,215,0,0.15)] hover:-translate-y-1'
+      }`}
     >
-      <div className="relative w-full pt-[75%] bg-gray-800">
-        <div className="absolute inset-0 w-full h-full">
-          {game.image ? (
-            <>
-              <img
-                src={game.image}
-                alt={game.name}
-                className={`w-full h-full object-cover transition-all duration-300 ${
-                  imageLoaded ? 'opacity-100' : 'opacity-0'
-                }`}
-                onLoad={() => {
-                  setImageLoaded(true);
-                }}
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                  setImageLoaded(true);
-                }}
-              />
-              {!imageLoaded && (
-                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-                  <div className="loading-spinner"></div>
-                </div>
-              )}
-              {/* Fallback to icon if image fails to load */}
-              {imageLoaded && !game.image && (
-                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-                  <span className="text-4xl">{game.icon || '🎮'}</span>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 h-full w-full">
-              <span className="text-4xl">{game.icon || '🎮'}</span>
-            </div>
-          )}
-          
-          {/* Play Icon Overlay on Hover */}
-          {!disabled && (
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
-              <div className="w-12 h-12 rounded-full bg-emerald-500 text-white flex items-center justify-center transform scale-0 group-hover:scale-100 transition-transform duration-300 shadow-lg shadow-emerald-500/30">
-                <Play size={20} fill="currentColor" className="ml-1" />
+      {/* Image Container */}
+      <div className="absolute inset-0 w-full h-full bg-gray-900">
+        {game.image ? (
+          <>
+            <img
+              src={typeof game.image === 'string' ? game.image.trim() : game.image}
+              alt={game.name}
+              loading="lazy"
+              className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-110 ${
+                imageLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+              onLoad={() => setImageLoaded(true)}
+              onError={(e) => {
+                e.target.style.display = 'none';
+                setImageLoaded(true);
+              }}
+            />
+            {!imageLoaded && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-[var(--gold)] border-t-transparent rounded-full animate-spin" />
               </div>
-            </div>
-          )}
-
-          {getStatusBadge()}
-        </div>
+            )}
+            {/* Fallback Icon */}
+            {imageLoaded && !game.image && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-black">
+                <span className="text-4xl filter drop-shadow-lg">{game.icon || '🎰'}</span>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-gray-800 to-black">
+             <span className="text-4xl filter drop-shadow-lg">{game.icon || '🎰'}</span>
+          </div>
+        )}
       </div>
 
-      <div className="w-full p-2 text-left border-t border-white/5 bg-[#1a1b26]">
-        <div className="text-[11px] leading-tight font-medium text-gray-300 truncate">{game.name}</div>
+      {/* Gradient Overlay - Always visible at bottom for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
+
+      {/* Hover Overlay - Darkens background slightly to make play button pop */}
+      {!disabled && (
+        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-[2px] flex items-center justify-center">
+            <div className="w-14 h-14 rounded-full bg-[var(--gold)] text-black flex items-center justify-center transform scale-50 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 shadow-[0_0_20px_rgba(255,215,0,0.4)]">
+                <Play size={24} fill="currentColor" className="ml-1" />
+            </div>
+        </div>
+      )}
+
+      {/* Badges */}
+      {getStatusBadge()}
+
+      {/* Content Info (Bottom) */}
+      <div className="absolute bottom-0 left-0 w-full p-3 transform translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
+        <div className="text-left">
+            <h3 className="text-sm font-bold text-white truncate drop-shadow-md group-hover:text-[var(--gold)] transition-colors">
+                {game.name}
+            </h3>
+            <p className="text-[10px] text-gray-300 font-medium uppercase tracking-wider truncate opacity-80">
+                {game.provider || game.provider_title || 'Golden Age'}
+            </p>
+        </div>
       </div>
     </button>
   );
 };
 
-// Game Grid Component
 export const GameGrid = ({ games, variant = 'default', onGameClick, loading = false }) => {
   if (loading) {
     return (
-      <div className="grid-auto">
+      <div className="grid grid-cols-3 gap-3">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="game-card animate-pulse">
-            <div className="game-card-image bg-gray-700"></div>
-            <div className="game-card-content">
-              <div className="h-4 bg-gray-700 rounded mb-2"></div>
-              <div className="h-3 bg-gray-700 rounded w-2/3 mb-3"></div>
-              <div className="h-8 bg-gray-700 rounded"></div>
-            </div>
-          </div>
+          <GameCard key={i} isLoading={true} variant={variant} />
         ))}
       </div>
     );
   }
 
   return (
-    <div className="grid-auto">
+    <div className="grid grid-cols-3 gap-3">
       {games.map((game) => (
         <GameCard
           key={game.id || game.game_id}

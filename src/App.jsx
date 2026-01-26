@@ -9,8 +9,7 @@ import router from './router';
 
 function AppContent() {
   const { isLoading: authLoading } = useAuth();
-  const { isLoading: apiLoading } = useApi();
-  
+
   // Combine loading states
   // We can decide to only block on authLoading if we want the app to be interactive faster
   // But typically we wait for at least auth to know if we are logged in or not.
@@ -50,15 +49,15 @@ function AppContent() {
 function App() {
   return (
  
-      <AuthProvider>
+      <LanguageProvider>
+        <AuthProvider>
            <ApiProvider>
-        <LanguageProvider>
           <ToastProvider>
               <AppContent />
           </ToastProvider>
-        </LanguageProvider>
-         </ApiProvider>
-      </AuthProvider>
+           </ApiProvider>
+        </AuthProvider>
+      </LanguageProvider>
   );
 }
 

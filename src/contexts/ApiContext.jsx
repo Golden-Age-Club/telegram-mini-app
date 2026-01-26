@@ -10,6 +10,7 @@ import authApi from '../api/auth';
 import walletApi from '../api/wallet';
 import api from '../api/axios';
 import { useAuth } from './AuthContext';
+import { useLanguage } from './LanguageContext';
 import { getCookie } from '../api/cookies';
 
 const ApiContext = createContext();
@@ -31,6 +32,7 @@ export const useApi = () => {
 
 export const ApiProvider = ({ children }) => {
   const { user } = useAuth();
+  const { currentLanguage } = useLanguage();
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -166,7 +168,7 @@ export const ApiProvider = ({ children }) => {
         player_id: String(user._id || user.id), // Ensure string
         player_token: token,
         app_id: PG_CONFIG.APP_ID,
-        language: user.language_code || 'en',
+        language: currentLanguage || 'en',
         currency: 'USD',
         request_time: requestTime,
         shop_id:1,
@@ -193,26 +195,19 @@ export const ApiProvider = ({ children }) => {
 
       console.log('🚀 Launching game with payload:', payload);
 
-      // Use axios as requested
-      // The user requested to use URL search params (query string) instead of body
-      const response = await axios.get(`${PG_CONFIG.BASE_URL}/api/v1/playGame`, {
-        params: payload,
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      const data = response.data;
-      console.log('🎮 Game launch result:', data);
+      // Construct the URL with query parameters
+      const queryString = new URLSearchParams(payload).toString();
+      const gameUrl = `https://test-cases.cdnparts.com/api/v1/playGame?${queryString}`;
       
-      if (data.result === false || data.err_code !== 0) {
-        throw new Error(data.err_desc || 'Game launch failed');
-      }
+      console.log('🔗 Generated Game URL:', gameUrl);
 
-      return { success: true, data: data };
+      // Return the URL directly without making an axios request
+      // Return in the format expected by consumers (e.g. Landing.jsx expects result.data.url)
+      return { success: true, data: { url: gameUrl } };
+
     } catch (err) {
-      console.warn('⚠️ Game launch failed:', err.message);
-      // Handle axios error structure if available
-      const errorMessage = err.response?.data?.err_desc || err.message;
-      return { success: false, error: errorMessage };
+      console.error('❌ Launch game failed:', err);
+      return { success: false, error: err.message };
     }
   };
 
