@@ -74,7 +74,7 @@ const GameCard = ({
       <button
         onClick={() => !disabled && onClick?.(game)}
         disabled={disabled}
-        className={`w-full group relative overflow-hidden rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all duration-300 ${disabled ? 'opacity-50 cursor-not-allowed' : 'active:scale-[0.98]'}`}
+        className={`w-full group relative overflow-hidden rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all duration-300 ${disabled ? 'opacity-50 cursor-not-allowed' : 'active:scale-[0.98] cursor-pointer'}`}
       >
         <div className="flex items-center gap-3 p-2">
           <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-black/50 shrink-0 border border-white/10">
@@ -119,7 +119,7 @@ const GameCard = ({
       className={`group relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-[#1a1b26] border border-white/5 shadow-xl transition-all duration-300 ${
         disabled 
           ? 'opacity-50 cursor-not-allowed' 
-          : 'cursor-pointer hover:border-[var(--gold)]/50 hover:shadow-[0_0_20px_rgba(255,215,0,0.15)] hover:-translate-y-1'
+          : 'hover:border-[var(--gold)]/50 hover:shadow-[0_0_20px_rgba(255,215,0,0.15)] hover:-translate-y-1 cursor-pointer'
       }`}
     >
       {/* Image Container */}

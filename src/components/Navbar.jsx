@@ -48,7 +48,7 @@ const Navbar = ({ onNavigate }) => {
       <div className="h-full px-4 flex items-center justify-between">
         {/* Logo */}
         <div 
-          className="flex items-center gap-3 cursor-pointer group" 
+          className="flex items-center gap-2 cursor-pointer group" 
           onClick={() => navigate('/')}
         >
           <div className="relative w-9 h-9">
@@ -57,11 +57,10 @@ const Navbar = ({ onNavigate }) => {
                <img src="/casinologo.jpg" alt="Logo" className="w-full h-full object-cover" />
              </div>
           </div>
-          <div className="hidden sm:flex flex-col">
+          <div className="flex flex-col">
             <span className="font-bold text-base text-white leading-none tracking-wide font-display">GOLDEN</span>
             <span className="text-[10px] font-bold text-[var(--gold)] leading-none tracking-[0.2em] mt-0.5">AGE CLUB</span>
           </div>
-          <span className="sm:hidden font-bold text-lg text-white tracking-wide">Golden Age</span>
         </div>
 
         {/* Right Actions */}
@@ -88,7 +87,7 @@ const Navbar = ({ onNavigate }) => {
                 </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <button
                 onClick={() => setModal('sign-in')}
                 className="px-4 py-2 text-xs font-bold text-gray-400 hover:text-[var(--gold)] uppercase tracking-widest transition-colors cursor-pointer"
@@ -112,7 +111,7 @@ const Navbar = ({ onNavigate }) => {
           <div className="relative">
             <button 
               onClick={() => setIsLangOpen(!isLangOpen)}
-              className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-[var(--gold)] hover:border-[var(--gold)]/50 hover:bg-[var(--gold)]/10 transition-all cursor-pointer"
+              className="w-6 h-6 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-[var(--gold)] hover:border-[var(--gold)]/50 hover:bg-[var(--gold)]/10 transition-all cursor-pointer"
             >
               <Globe size={18} />
             </button>
