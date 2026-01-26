@@ -157,11 +157,11 @@ export const ApiProvider = ({ children }) => {
         throw new Error('User not authenticated');
       }
 
-      // Sample uses Unix timestamp (seconds), not milliseconds
-      const requestTime = Math.floor(Date.now() / 1000);
+      // Sample uses Date.now() (milliseconds)
+      const requestTime = Date.now();
       
-      // Construct payload strictly following the required parameter order
-      // exit, game_id, player_id, player_token, app_id, language, currency, request_time, urls
+      // Construct payload
+      // Important: Keys order matters for signature generation if using Object.entries
       const payload = {
         exit: window.location.origin + '/',
         game_id: parseInt(gameId, 10), // Ensure integer
@@ -171,39 +171,48 @@ export const ApiProvider = ({ children }) => {
         language: currentLanguage || 'en',
         currency: 'USD',
         request_time: requestTime,
-        shop_id:1,
-        callback_url: "https://golden-age-club-f8a5bb71b60a.herokuapp.com/api/callback",
+        urls: {
+            base_url: window.location.origin,
+            wallet_url: window.location.origin + '/wallet',
+            other_url: window.location.origin + '/support'
+        }
       };
 
       console.log('🔑 Payload:', payload);
 
       // Signature generation function based on provided sample
-    const createSign = (params, apiKey) => {
-        // 1. Manually define the order to match exactly what the provider expects
-        const keys = ['exit', 'game_id', 'player_id', 'player_token', 'app_id', 'language', 'currency', 'request_time'];
+      const createSign = (params, apiKey) => {
+        const values = Object.entries(params)
+            .filter(([key]) => key !== 'sign' && key !== 'urls')
+            .map(([, value]) => (value && typeof value === 'object' ? JSON.stringify(value) : value))
+            .join('');
         
-        // 2. Concatenate values in that specific order
-        const signString = keys.map(key => params[key]).join('');
-        
-        // 3. Match the Python logic: encode the WHOLE string, not individual parts
-        const encoded = encodeURIComponent(signString);
-        
+        const encoded = encodeURIComponent(values);
         return CryptoJS.HmacMD5(encoded, apiKey).toString(CryptoJS.enc.Hex);
       };
+
       // Generate signature
       payload.sign = createSign(payload, PG_CONFIG.API_KEY);
 
       console.log('🚀 Launching game with payload:', payload);
 
-      // Construct the URL with query parameters
-      const queryString = new URLSearchParams(payload).toString();
-      const gameUrl = `https://test-cases.cdnparts.com/api/v1/playGame?${queryString}`;
+      // Perform POST request to get the game URL
+      // Using https://test-cases.cdnparts.com as the provider endpoint based on previous code
+      // Adjust this URL if the provider is different
+      const providerBaseUrl = 'http://resolver.mgcapi.com';
       
-      console.log('🔗 Generated Game URL:', gameUrl);
+      // Using fetch to match the sample, but we could use axios
+      const { data } = await axios.post(`${providerBaseUrl}/api/v1/playGame`, payload, {
+        headers: { 'Content-Type': 'application/json' }
+      });
 
-      // Return the URL directly without making an axios request
-      // Return in the format expected by consumers (e.g. Landing.jsx expects result.data.url)
-      return { success: true, data: { url: gameUrl } };
+      console.log('🔗 Game Response:', data);
+
+      if (data.url) {
+         return { success: true, data: { url: data.url } };
+      } else {
+         throw new Error(data.message || 'Failed to get game URL');
+      }
 
     } catch (err) {
       console.error('❌ Launch game failed:', err);
