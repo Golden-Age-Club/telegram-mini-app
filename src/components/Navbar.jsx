@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Globe, LogIn, UserPlus, Menu, X } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useLanguage } from '../contexts/LanguageContext';
-import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext.jsx';
+import { useAuth } from '../contexts/AuthContext.jsx';
 
 const Navbar = ({ onNavigate }) => {
   const { currentLanguage, changeLanguage, languages, t } = useLanguage();

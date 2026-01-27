@@ -1,12 +1,14 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
-import Layout from '../components/Layout';
-import SpinWheel from '../components/SpinWheel';
-import ScratchCard from '../components/ScratchCard';
-import Confetti from '../components/Confetti';
-import Carousel from '../components/Carousel';
+import Layout from '../components/Layout.jsx';
+import SpinWheel from '../components/SpinWheel.jsx';
+import ScratchCard from '../components/ScratchCard.jsx';
+import Confetti from '../components/Confetti.jsx';
+import Carousel from '../components/Carousel.jsx';
 
-const Home = ({ user, navigate }) => {
+const Home = ({ user }) => {
+  const navigate = useNavigate();
   const [showWheel, setShowWheel] = useState(false);
   const [showScratch, setShowScratch] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -87,7 +89,7 @@ const Home = ({ user, navigate }) => {
   ];
 
   const handleGameClick = (game) => {
-    navigate('game', { selectedGame: game.id });
+    navigate('/slots');
   };
 
   const handleWheelWin = () => {

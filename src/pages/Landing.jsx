@@ -19,8 +19,8 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
 import { useNavigate } from 'react-router-dom';
-import { useApi } from '../contexts/ApiContext';
-import { useToast } from '../contexts/ToastContext';
+import { useApi } from '../contexts/ApiContext.jsx';
+import { useToast } from '../contexts/ToastContext.jsx';
 import GameCard from '../components/GameCard';
 
 const providerPriority = (provider) => {
@@ -63,26 +63,13 @@ const GAME_TYPES = {
 const Landing = () => {
   const tg = window.Telegram?.WebApp;
   const [showFallbackButton, setShowFallbackButton] = useState(false);
-  const [launchingGameId, setLaunchingGameId] = useState(null);
   const navigate = useNavigate();
   const { pgOptions, pgGames, isLoading, launchGame, loadMoreGames } = useApi();
   const { addToast } = useToast();
   const providerSwipersRef = useRef({});
 
-  const handleGameClick = async (game) => {
-    if (launchingGameId) return; // Prevent multiple clicks
-    
-    setLaunchingGameId(game.id);
-    const result = await launchGame(game.id);
-    setLaunchingGameId(null);
-    console.log('Launch game result:', result);
-
-    if (result?.success && result?.data?.url) {
-      navigate('/start-game', { state: { url: result.data.url, game } });
-    } else {
-      console.error('Launch game failed or invalid result:', result);
-      addToast(result?.error || 'Failed to launch game. Please try again.', 'error');
-    }
+  const handleGameClick = (game) => {
+    navigate(`/slots/${game.id}`, { state: { game } });
   };
 
   const banners = [
@@ -323,7 +310,6 @@ const Landing = () => {
                                 key={game.id}
                                 game={game}
                                 onClick={handleGameClick}
-                                disabled={launchingGameId === game.id}
                               />
                             ))}
                           </div>

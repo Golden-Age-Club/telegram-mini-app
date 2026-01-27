@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Search, Filter, Gamepad2, AlertCircle, Loader2, X, ChevronDown, Check } from 'lucide-react';
-import { useApi } from '../contexts/ApiContext';
-import { useToast } from '../contexts/ToastContext';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Search, Filter, Loader2, X, Check, ChevronDown } from 'lucide-react';
+import { useApi } from '../contexts/ApiContext.jsx';
+import { useToast } from '../contexts/ToastContext.jsx';
 import GameCard from '../components/GameCard';
 
 const providerPriority = (provider) => {
@@ -28,11 +28,12 @@ const providerPriority = (provider) => {
 
 const Game = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { pgGames, pgOptions, isLoading, launchGame, pagination, loadMoreGames, resetGames } = useApi();
   const { addToast } = useToast();
   
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeProvider, setActiveProvider] = useState('all');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [activeProvider, setActiveProvider] = useState(searchParams.get('provider') || 'all');
   const [launchingGameId, setLaunchingGameId] = useState(null);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -51,13 +52,47 @@ const Game = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Ensure page size is 12 for Game page
+  // Sync state with URL params
   useEffect(() => {
-    if (pagination?.limit !== 12) {
-      resetGames(12);
-    }
+    const provider = searchParams.get('provider') || 'all';
+    const search = searchParams.get('search') || '';
+    setActiveProvider(provider);
+    setSearchQuery(search);
+    
+    // Trigger fetch
+    resetGames(12, provider, search);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchParams]);
+
+  // Debounce search input to URL
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const currentSearch = searchParams.get('search') || '';
+      if (searchQuery !== currentSearch) {
+        const params = new URLSearchParams(searchParams);
+        if (searchQuery) params.set('search', searchQuery);
+        else params.delete('search');
+        setSearchParams(params);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery, searchParams, setSearchParams]);
+
+  const handleProviderSelect = (provider) => {
+    setActiveProvider(provider);
+    setIsFilterOpen(false);
+    
+    const params = new URLSearchParams(searchParams);
+    if (provider && provider !== 'all') params.set('provider', provider);
+    else params.delete('provider');
+    setSearchParams(params);
+  };
+
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setActiveProvider('all');
+    setSearchParams({});
+  };
 
   // Normalize games data
   const games = useMemo(() => {
@@ -83,43 +118,16 @@ const Game = () => {
       return ['all', ...Array.from(new Set(titles))];
     }
 
-    const uniqueProviders = new Set();
-    games.forEach(game => {
-      if (game.provider_title) uniqueProviders.add(game.provider_title);
-      else if (game.uniq_provider) uniqueProviders.add(game.uniq_provider);
-    });
-    
-    // Sort providers alphabetically but keep popular ones first if needed
-    return ['all', ...Array.from(uniqueProviders).sort()];
-  }, [games, pgOptions]);
-
-  // Filter games based on search and provider
-  const filteredGames = useMemo(() => {
-    return games.filter(game => {
-      const matchesSearch = game.name?.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesProvider = activeProvider === 'all' || 
-        game.provider_title === activeProvider || 
-        game.uniq_provider === activeProvider;
-        
-      return matchesSearch && matchesProvider;
-    });
-  }, [games, searchQuery, activeProvider]);
+    // Fallback if options not loaded yet
+    return ['all'];
+  }, [pgOptions]);
 
   const handleGameClick = async (game) => {
     if (launchingGameId) return;
     
     setLaunchingGameId(game.id);
     try {
-      const result = await launchGame(game.id);
-      
-      if (result?.success && result?.data?.url) {
-        navigate('/start-game', { state: { url: result.data.url, game } });
-      } else {
-        addToast(result?.error || 'Failed to launch game. Please try again.', 'error');
-      }
-    } catch (error) {
-      console.error('Launch error:', error);
-      addToast('An unexpected error occurred', 'error');
+      navigate('/slots/' + game.id, { state: { game } });
     } finally {
       setLaunchingGameId(null);
     }
@@ -129,7 +137,7 @@ const Game = () => {
     if (isLoadingMore || !pagination || pagination.page >= pagination.totalPages) return;
     setIsLoadingMore(true);
     try {
-      await loadMoreGames();
+      await loadMoreGames(activeProvider, searchQuery);
     } finally {
       setIsLoadingMore(false);
     }
@@ -169,14 +177,17 @@ const Game = () => {
                 <button
                     onClick={() => setIsFilterOpen(!isFilterOpen)}
                     className={`
-                        h-full cursor-pointer aspect-square flex items-center justify-center rounded-xl border transition-all duration-200
+                        py-2.5 cursor-pointer px-4 flex items-center justify-between gap-2 rounded-xl border transition-all duration-200 min-w-[140px]
                         ${isFilterOpen || activeProvider !== 'all'
                             ? 'bg-[var(--gold)] text-black border-[var(--gold)] shadow-[0_0_15px_rgba(255,215,0,0.3)]'
                             : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white'
                         }
                     `}
                 >
-                    <Filter className="w-5 h-5" />
+                    <span className="text-sm font-medium truncate">
+                        {activeProvider === 'all' ? 'All Providers' : activeProvider}
+                    </span>
+                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isFilterOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {/* Dropdown Menu */}
@@ -187,10 +198,7 @@ const Game = () => {
                             {providers.map((provider) => (
                                 <button
                                     key={provider}
-                                    onClick={() => {
-                                        setActiveProvider(provider);
-                                        setIsFilterOpen(false);
-                                    }}
+                                    onClick={() => handleProviderSelect(provider)}
                                     className={`
                                         w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-colors
                                         ${activeProvider === provider
@@ -214,7 +222,7 @@ const Game = () => {
              <div className="mt-3 flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
                 <span className="text-xs text-gray-500">Filtered by:</span>
                 <button 
-                    onClick={() => setActiveProvider('all')}
+                    onClick={() => handleProviderSelect('all')}
                     className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--gold)]/10 border border-[var(--gold)]/20 text-[10px] font-bold text-[var(--gold)] hover:bg-[var(--gold)]/20 transition-colors"
                 >
                     {activeProvider}
@@ -232,14 +240,13 @@ const Game = () => {
               <GameCard key={i} isLoading={true} />
             ))}
           </div>
-        ) : filteredGames.length > 0 ? (
+        ) : games.length > 0 ? (
           <div className="grid grid-cols-3 gap-3 pb-20">
-            {filteredGames.map((game) => (
+            {games.map((game) => (
               <GameCard
                 key={game.id}
                 game={game}
                 onClick={handleGameClick}
-                disabled={launchingGameId === game.id}
               />
             ))}
             {pagination && pagination.page < pagination.totalPages && (
@@ -276,10 +283,7 @@ const Game = () => {
               Try adjusting your search or filter to find what you're looking for.
             </p>
             <button 
-              onClick={() => {
-                setSearchQuery('');
-                setActiveProvider('all');
-              }}
+              onClick={handleClearFilters}
               className="mt-6 px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm font-medium transition-colors"
             >
               Clear Filters

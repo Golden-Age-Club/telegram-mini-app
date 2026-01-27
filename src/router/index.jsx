@@ -1,11 +1,12 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import Layout from '../components/Layout';
-import Landing from '../pages/Landing';
-import Home from '../pages/Home';
-import Game from '../pages/Game';
-import StartGame from '../pages/StartGame';
-import Wallet from '../pages/Wallet';
-import Profile from '../pages/Profile';
+import Layout from '../components/Layout.jsx';
+import Landing from '../pages/Landing.jsx';
+import Home from '../pages/Home.jsx';
+import Game from '../pages/Game.jsx';
+import GameDetails from '../pages/GameDetails.jsx';
+import StartGame from '../pages/StartGame.jsx';
+import Wallet from '../pages/Wallet.jsx';
+import Profile from '../pages/Profile.jsx';
 
 const router = createBrowserRouter([
   {
@@ -21,8 +22,12 @@ const router = createBrowserRouter([
         element: <Home />
       },
       {
-        path: 'game',
+        path: 'slots',
         element: <Game />
+      },
+      {
+        path: 'slots/:id',
+        element: <GameDetails />
       },
       {
         path: 'start-game',

@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Home, Gamepad2, Wallet, User } from 'lucide-react';
+import { Home, Dices, Wallet, User } from 'lucide-react';
 import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { useLayout } from '../contexts/LayoutContext';
-import Navbar from './Navbar';
-import SignInModal from './auth/SignInModal';
-import SignUpModal from './auth/SignUpModal';
+import { useAuth } from '../contexts/AuthContext.jsx';
+import { useLayout } from '../contexts/LayoutContext.jsx';
+import Navbar from './Navbar.jsx';
+import SignInModal from './auth/SignInModal.jsx';
+import SignUpModal from './auth/SignUpModal.jsx';
 
 const Layout = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -34,7 +34,7 @@ const Layout = () => {
 
   const navigation = [
     { id: 'home', label: 'Home', icon: Home, screen: '/' },
-    { id: 'games', label: 'Games', icon: Gamepad2, screen: '/game' },
+    { id: 'slots', label: 'Slots', icon: Dices, screen: '/slots' },
     { id: 'wallet', label: 'Wallet', icon: Wallet, screen: '/wallet' },
     { id: 'profile', label: 'Profile', icon: User, screen: '/profile' },
   ];

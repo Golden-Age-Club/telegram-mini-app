@@ -9,8 +9,8 @@ import axios from 'axios';
 import authApi from '../api/auth';
 import walletApi from '../api/wallet';
 import api from '../api/axios';
-import { useAuth } from './AuthContext';
-import { useLanguage } from './LanguageContext';
+import { useAuth } from './AuthContext.jsx';
+import { useLanguage } from './LanguageContext.jsx';
 import { getCookie } from '../api/cookies';
 
 const ApiContext = createContext();
@@ -98,9 +98,13 @@ export const ApiProvider = ({ children }) => {
     }
   };
 
-  const resetGames = async (limit = 10) => {
+  const resetGames = async (limit = 10, provider = null, search = null) => {
     try {
-      const response = await api.get(`/api/casino/pg/games?page=1&limit=${limit}`);
+      let url = `/api/casino/pg/games?page=1&limit=${limit}`;
+      if (provider && provider !== 'all') url += `&provider_id=${encodeURIComponent(provider)}`;
+      if (search) url += `&search=${encodeURIComponent(search)}`;
+
+      const response = await api.get(url);
       if (response && response.games) {
         setPgGames(response.games);
         setPagination({
@@ -123,7 +127,7 @@ export const ApiProvider = ({ children }) => {
     }
   };
 
-  const loadMoreGames = async () => {
+  const loadMoreGames = async (provider = null, search = null) => {
     if (pagination.page >= pagination.totalPages) return;
 
     // Don't set global isLoading to avoid full screen loader, 
@@ -133,15 +137,19 @@ export const ApiProvider = ({ children }) => {
     
     try {
       const nextPage = pagination.page + 1;
-      const response = await api.get(`/api/casino/pg/games?page=${nextPage}&limit=${pagination.limit}`);
+      let url = `/api/casino/pg/games?page=${nextPage}&limit=${pagination.limit}`;
+      if (provider && provider !== 'all') url += `&provider_id=${encodeURIComponent(provider)}`;
+      if (search) url += `&search=${encodeURIComponent(search)}`;
+
+      const response = await api.get(url);
       
       if (response && response.games) {
         setPgGames(prev => [...prev, ...response.games]);
         setPagination({
-            page: response.page,
-            limit: response.limit,
-            total: response.total,
-            totalPages: response.total_pages
+          page: response.page,
+          limit: response.limit,
+          total: response.total,
+          totalPages: response.total_pages
         });
       }
     } catch (err) {

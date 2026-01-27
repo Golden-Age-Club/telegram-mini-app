@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { useToast as useToastHook, ToastContainer } from '../components/Toast';
+import { useToast as useToastHook, ToastContainer } from '../components/Toast.jsx';
 
 const ToastContext = createContext();
 

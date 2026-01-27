@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
-import { useToast } from '../../contexts/ToastContext';
+import { useAuth } from '../../contexts/AuthContext.jsx';
+import { useToast } from '../../contexts/ToastContext.jsx';
 
 const TelegramIcon = ({ className }) => (
   <svg
@@ -49,7 +49,7 @@ const SignInModal = ({ onClose }) => {
 
   return (
     <div
-      className="modal-overlay fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-[60] bg-black/70 flex items-center justify-center px-4"
+      className="modal-overlay fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-[110] bg-black/70 flex items-center justify-center px-4"
       onClick={onClose}
     >
       <div

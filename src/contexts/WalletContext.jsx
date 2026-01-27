@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
-import { useApi } from './ApiContext';
-import { useAuth } from './AuthContext';
-import { useToast } from './ToastContext';
+import { useApi } from './ApiContext.jsx';
+import { useAuth } from './AuthContext.jsx';
+import { useToast } from './ToastContext.jsx';
 
 const WalletContext = createContext();
 

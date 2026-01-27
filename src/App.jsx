@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
-import { LanguageProvider } from './contexts/LanguageContext';
-import { ApiProvider, useApi } from './contexts/ApiContext';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { LayoutProvider } from './contexts/LayoutContext';
-import { ToastProvider, useToast } from './contexts/ToastContext';
+import { LanguageProvider } from './contexts/LanguageContext.jsx';
+import { ApiProvider, useApi } from './contexts/ApiContext.jsx';
+import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
+import { LayoutProvider } from './contexts/LayoutContext.jsx';
+import { ToastProvider, useToast } from './contexts/ToastContext.jsx';
 import router from './router';
 
 function AppContent() {

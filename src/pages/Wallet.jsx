@@ -14,9 +14,9 @@ import {
   AlertCircle,
   QrCode
 } from 'lucide-react';
-import { useApi } from '../contexts/ApiContext';
-import { useToast } from '../contexts/ToastContext';
-import { useAuth } from '../contexts/AuthContext';
+import { useApi } from '../contexts/ApiContext.jsx';
+import { useToast } from '../contexts/ToastContext.jsx';
+import { useAuth } from '../contexts/AuthContext.jsx';
 import walletApi from '../api/wallet';
 
 const Wallet = () => {
