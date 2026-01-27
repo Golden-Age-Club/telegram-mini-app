@@ -5,9 +5,30 @@ import { useApi } from '../contexts/ApiContext';
 import { useToast } from '../contexts/ToastContext';
 import GameCard from '../components/GameCard';
 
+const providerPriority = (provider) => {
+  const code = provider?.code || '';
+  const title = (provider?.title || '').toLowerCase();
+  const uniq = (provider?.uniq_name || '').toLowerCase();
+  if (
+    code === 'FERHUB_PGSOFT' ||
+    title.includes('pgsoft') ||
+    uniq.includes('pgsoft')
+  ) {
+    return 0;
+  }
+  if (
+    code === 'FERHUB_EGT' ||
+    title.includes('egt') ||
+    uniq.includes('egt')
+  ) {
+    return 1;
+  }
+  return 2;
+};
+
 const Game = () => {
   const navigate = useNavigate();
-  const { pgGames, isLoading, launchGame } = useApi();
+  const { pgGames, pgOptions, isLoading, launchGame, pagination, loadMoreGames, resetGames } = useApi();
   const { addToast } = useToast();
   
   const [searchQuery, setSearchQuery] = useState('');
@@ -15,6 +36,7 @@ const Game = () => {
   const [launchingGameId, setLaunchingGameId] = useState(null);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const filterRef = useRef(null);
 
   // Close filter dropdown when clicking outside
@@ -29,6 +51,14 @@ const Game = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Ensure page size is 12 for Game page
+  useEffect(() => {
+    if (pagination?.limit !== 12) {
+      resetGames(12);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Normalize games data
   const games = useMemo(() => {
     if (!pgGames) return [];
@@ -39,6 +69,20 @@ const Game = () => {
 
   // Extract unique providers
   const providers = useMemo(() => {
+    if (pgOptions?.providers) {
+      const sortedProviders = [...pgOptions.providers]
+        .filter((p) => p.is_active === 1 || p.is_active === '1')
+        .sort((a, b) => {
+          const pa = providerPriority(a);
+          const pb = providerPriority(b);
+          if (pa !== pb) return pa - pb;
+          return Number(a.sorder ?? 0) - Number(b.sorder ?? 0);
+        });
+
+      const titles = sortedProviders.map(p => p.title).filter(Boolean);
+      return ['all', ...Array.from(new Set(titles))];
+    }
+
     const uniqueProviders = new Set();
     games.forEach(game => {
       if (game.provider_title) uniqueProviders.add(game.provider_title);
@@ -47,7 +91,7 @@ const Game = () => {
     
     // Sort providers alphabetically but keep popular ones first if needed
     return ['all', ...Array.from(uniqueProviders).sort()];
-  }, [games]);
+  }, [games, pgOptions]);
 
   // Filter games based on search and provider
   const filteredGames = useMemo(() => {
@@ -81,6 +125,16 @@ const Game = () => {
     }
   };
 
+  const handleLoadMore = async () => {
+    if (isLoadingMore || !pagination || pagination.page >= pagination.totalPages) return;
+    setIsLoadingMore(true);
+    try {
+      await loadMoreGames();
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
   return (
     <div className="flex flex-col h-full min-h-[calc(100vh-80px)] bg-[#1a1c20]">
       {/* Search & Filter Bar */}
@@ -103,7 +157,7 @@ const Game = () => {
                 {searchQuery && (
                     <button
                     onClick={() => setSearchQuery('')}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-white"
+                    className="absolute inset-y-0 right-0 pr-3 cursor-pointer flex items-center text-gray-500 hover:text-white"
                     >
                     <X className="h-4 w-4" />
                     </button>
@@ -115,7 +169,7 @@ const Game = () => {
                 <button
                     onClick={() => setIsFilterOpen(!isFilterOpen)}
                     className={`
-                        h-full aspect-square flex items-center justify-center rounded-xl border transition-all duration-200
+                        h-full cursor-pointer aspect-square flex items-center justify-center rounded-xl border transition-all duration-200
                         ${isFilterOpen || activeProvider !== 'all'
                             ? 'bg-[var(--gold)] text-black border-[var(--gold)] shadow-[0_0_15px_rgba(255,215,0,0.3)]'
                             : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white'
@@ -188,6 +242,29 @@ const Game = () => {
                 disabled={launchingGameId === game.id}
               />
             ))}
+            {pagination && pagination.page < pagination.totalPages && (
+              <button
+                onClick={handleLoadMore}
+                disabled={isLoadingMore}
+                className={`col-span-3 mt-6 w-full px-4 py-3 cursor-pointer rounded-2xl border border-white/10 bg-gradient-to-r from-white/5 to-white/0 text-white text-xs font-semibold tracking-wide uppercase flex items-center justify-center gap-2 transition-all ${
+                  isLoadingMore
+                    ? 'opacity-70 cursor-wait'
+                    : 'hover:border-[var(--gold)] hover:from-[var(--gold)]/10 hover:to-white/5 hover:shadow-[0_0_20px_rgba(255,215,0,0.25)]'
+                }`}
+              >
+                {isLoadingMore ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-[var(--gold)]" />
+                    <span>Loading more games...</span>
+                  </>
+                ) : (
+                  <>
+                    <Loader2 className="w-4 h-4 text-[var(--gold)]" />
+                    <span>Load more games</span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-center px-4">

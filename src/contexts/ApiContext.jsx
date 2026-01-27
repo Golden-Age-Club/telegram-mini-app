@@ -38,7 +38,13 @@ export const ApiProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [initialized, setInitialized] = useState(false);
   const [pgOptions, setPgOptions] = useState(null);
-  const [pgGames, setPgGames] = useState(null);
+  const [pgGames, setPgGames] = useState([]);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 1,
+  });
 
   // Initialize API connection
   useEffect(() => {
@@ -53,22 +59,21 @@ export const ApiProvider = ({ children }) => {
     setError(null);
 
     try {
-
+      // 1. Load Games First (Page 1)
       try {
-        const options = await api.get('/api/casino/pg/options');
-        console.log(options)
-        setPgOptions(options);
-      } catch (err) {
-        console.warn('⚠️ Could not load PG options:', err.message);
-      }
-
-      try {
-        const games = await api.get('/api/casino/pg/games');
-        console.log(games)
-        if (games && Array.isArray(games.games)) {
-          setPgGames(games.games);
-        } else if (Array.isArray(games)) {
-          setPgGames(games);
+        const gamesResponse = await api.get('/api/casino/pg/games?page=1&limit=10');
+        console.log('Games loaded:', gamesResponse);
+        
+        if (gamesResponse && Array.isArray(gamesResponse.games)) {
+          setPgGames(gamesResponse.games);
+          setPagination({
+            page: gamesResponse.page,
+            limit: gamesResponse.limit,
+            total: gamesResponse.total,
+            totalPages: gamesResponse.total_pages
+          });
+        } else if (Array.isArray(gamesResponse)) {
+          setPgGames(gamesResponse);
         } else {
           setPgGames([]);
         }
@@ -76,12 +81,71 @@ export const ApiProvider = ({ children }) => {
         console.warn('⚠️ Could not load PG games:', err.message);
       }
 
+      // 2. Load Options After
+      try {
+        const options = await api.get('/api/casino/pg/options');
+        console.log(options)
+        setPgOptions(options);
+      } catch (err) {
+        console.warn('⚠️ Could not load PG options:', err.message);
+      }
     } catch (err) {
       console.error('❌ API initialization failed:', err);
       setError(err.message);
       setIsConnected(false);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const resetGames = async (limit = 10) => {
+    try {
+      const response = await api.get(`/api/casino/pg/games?page=1&limit=${limit}`);
+      if (response && response.games) {
+        setPgGames(response.games);
+        setPagination({
+          page: response.page,
+          limit: response.limit,
+          total: response.total,
+          totalPages: response.total_pages
+        });
+      } else {
+        setPgGames([]);
+        setPagination({
+          page: 1,
+          limit,
+          total: 0,
+          totalPages: 1
+        });
+      }
+    } catch (err) {
+      console.warn('⚠️ Could not reset games:', err.message);
+    }
+  };
+
+  const loadMoreGames = async () => {
+    if (pagination.page >= pagination.totalPages) return;
+
+    // Don't set global isLoading to avoid full screen loader, 
+    // maybe add a specific loading state for more games if needed.
+    // For now we'll just use the existing flow but maybe we shouldn't block UI.
+    // let's keep it simple.
+    
+    try {
+      const nextPage = pagination.page + 1;
+      const response = await api.get(`/api/casino/pg/games?page=${nextPage}&limit=${pagination.limit}`);
+      
+      if (response && response.games) {
+        setPgGames(prev => [...prev, ...response.games]);
+        setPagination({
+            page: response.page,
+            limit: response.limit,
+            total: response.total,
+            totalPages: response.total_pages
+        });
+      }
+    } catch (err) {
+      console.warn('⚠️ Could not load more games:', err.message);
     }
   };
 
@@ -235,6 +299,9 @@ export const ApiProvider = ({ children }) => {
     launchGame,
     pgOptions,
     pgGames,
+    pagination,
+    loadMoreGames,
+    resetGames,
     
     // API initialization
     initializeApi,

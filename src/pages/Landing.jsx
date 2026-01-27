@@ -65,7 +65,7 @@ const Landing = () => {
   const [showFallbackButton, setShowFallbackButton] = useState(false);
   const [launchingGameId, setLaunchingGameId] = useState(null);
   const navigate = useNavigate();
-  const { pgOptions, pgGames, isLoading, launchGame } = useApi();
+  const { pgOptions, pgGames, isLoading, launchGame, loadMoreGames } = useApi();
   const { addToast } = useToast();
   const providerSwipersRef = useRef({});
 
@@ -268,10 +268,9 @@ const Landing = () => {
           const typeGames = gamesByType[typeId] || [];
           if (typeGames.length === 0) return null;
 
-          const displayGames = typeGames.slice(0, 27);
           const pages = [];
-          for (let i = 0; i < displayGames.length; i += 9) {
-            pages.push(displayGames.slice(i, i + 9));
+          for (let i = 0; i < typeGames.length; i += 9) {
+            pages.push(typeGames.slice(i, i + 9));
           }
           const hasPages = pages.length > 0;
 
@@ -294,7 +293,10 @@ const Landing = () => {
                     </button>
                     <button
                       className="w-8 h-8 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer active:scale-90"
-                      onClick={() => providerSwipersRef.current[typeId]?.slideNext()}
+                      onClick={() => {
+                        providerSwipersRef.current[typeId]?.slideNext();
+                        loadMoreGames();
+                      }}
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
