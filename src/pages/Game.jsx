@@ -113,7 +113,7 @@ const Game = () => {
       const result = await launchGame(game.id);
       
       if (result?.success && result?.data?.url) {
-        navigate('/start-game', { state: { url: result.data.url } });
+        navigate('/start-game', { state: { url: result.data.url, game } });
       } else {
         addToast(result?.error || 'Failed to launch game. Please try again.', 'error');
       }

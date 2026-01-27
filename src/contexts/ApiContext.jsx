@@ -263,7 +263,7 @@ export const ApiProvider = ({ children }) => {
       // Perform POST request to get the game URL
       // Using https://test-cases.cdnparts.com as the provider endpoint based on previous code
       // Adjust this URL if the provider is different
-      const providerBaseUrl = 'http://resolver.mgcapi.com';
+      const providerBaseUrl = 'https://resolver.mgcapi.com';
       
       // Using fetch to match the sample, but we could use axios
       const { data } = await axios.post(`${providerBaseUrl}/api/v1/playGame`, payload, {

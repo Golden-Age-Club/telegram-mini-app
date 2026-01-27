@@ -78,7 +78,7 @@ const Landing = () => {
     console.log('Launch game result:', result);
 
     if (result?.success && result?.data?.url) {
-      navigate('/start-game', { state: { url: result.data.url } });
+      navigate('/start-game', { state: { url: result.data.url, game } });
     } else {
       console.error('Launch game failed or invalid result:', result);
       addToast(result?.error || 'Failed to launch game. Please try again.', 'error');
