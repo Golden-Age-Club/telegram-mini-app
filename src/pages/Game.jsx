@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Search, Filter, Loader2, X, Check, ChevronDown } from 'lucide-react';
 import { useApi } from '../contexts/ApiContext.jsx';
-import { useToast } from '../contexts/ToastContext.jsx';
+import { toast } from 'sonner';
 import GameCard from '../components/GameCard';
 
 const providerPriority = (provider) => {
@@ -30,7 +30,6 @@ const Game = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { pgGames, pgOptions, isLoading, launchGame, pagination, loadMoreGames, resetGames } = useApi();
-  const { addToast } = useToast();
   
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [activeProvider, setActiveProvider] = useState(searchParams.get('provider') || 'all');

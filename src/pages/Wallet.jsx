@@ -15,7 +15,7 @@ import {
   QrCode
 } from 'lucide-react';
 import { useApi } from '../contexts/ApiContext.jsx';
-import { useToast } from '../contexts/ToastContext.jsx';
+import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import walletApi from '../api/wallet';
 
@@ -24,7 +24,6 @@ const Wallet = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { createWithdrawal } = useApi();
-  const toast = useToast();
   const { isAuthenticated, user } = useAuth();
 
   const isDepositRoute = location.pathname.endsWith('/wallet/deposit') || location.pathname.endsWith('/wallet');

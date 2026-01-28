@@ -1,13 +1,13 @@
 import axios from 'axios';
-import { getCookie } from './cookies';
+import { getCookie, removeCookie } from './cookies';
 
 export const backendUrl = () => {
-  // if (typeof window !== 'undefined') {
-  //   const hostname = window.location.hostname;
-  //   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-  //     return 'http://localhost:8000';
-  //   }
-  // }
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:8000';
+    }
+  }
   return 'https://golden-age-club-f8a5bb71b60a.herokuapp.com';
 };
 
@@ -33,38 +33,36 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle token refresh
+// Response interceptor to handle token refresh and errors
 api.interceptors.response.use(
   (response) => {
     return response.data; // Return only the data part
   },
   async (error) => {
-    const originalRequest = error.config;
+    // Handle network errors
+    if (!error.response) {
+      error.message = 'Network error. Please check your connection.';
+      return Promise.reject(error);
+    }
 
-    // If 401 and not already retrying
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+    const { status, data } = error.response;
 
-      try {
-        // Try to refresh token
-        const refreshResponse = await axios.post(`${API_BASE_URL}/api/auth/refresh`, {}, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN)}`
-          }
-        });
+    // Handle 401 Unauthorized
+    if (status === 401) {
+      removeCookie('access_token');
+      localStorage.removeItem('access_token');
+      // Optional: Dispatch event for UI to handle (e.g., show login modal)
+      window.dispatchEvent(new Event('auth:unauthorized'));
+    }
 
-        if (refreshResponse.data.access_token) {
-          localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, refreshResponse.data.access_token);
-          // Retry the original request
-          originalRequest.headers.Authorization = `Bearer ${refreshResponse.data.access_token}`;
-          return api(originalRequest);
-        }
-      } catch (refreshError) {
-        console.error('Token refresh failed:', refreshError);
-        // Clear tokens and redirect to login if needed
-        localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-        localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
-      }
+    // Standardize error message
+    // Backend usually returns { detail: "message" } or { message: "message" }
+    const message = data?.detail || data?.message || error.message || 'An unexpected error occurred';
+    error.message = message;
+    
+    // Attach formatted message to response data for components that check err.response.data
+    if (error.response && error.response.data) {
+       // Ensure complex objects are handled if necessary, but usually strings work best
     }
 
     return Promise.reject(error);

@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 import { useApi } from './ApiContext.jsx';
 import { useAuth } from './AuthContext.jsx';
-import { useToast } from './ToastContext.jsx';
+import { toast } from 'sonner';
 
 const WalletContext = createContext();
 
@@ -16,7 +16,6 @@ export const useWallet = () => {
 export const WalletProvider = ({ children }) => {
   const { isConnected, deposit, withdraw } = useApi();
   const { user } = useAuth();
-  const toast = useToast();
 
   const updateBalance = async (amount) => {
     if (user && isConnected) {

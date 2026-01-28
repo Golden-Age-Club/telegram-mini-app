@@ -26,6 +26,21 @@ export const AuthProvider = ({ children }) => {
   // Check for existing authentication on mount
   useEffect(() => {
     checkAuthStatus();
+
+    // Listen for unauthorized events from axios
+    const handleUnauthorized = () => {
+      console.log('🔒 Received unauthorized event, logging out...');
+      setUser(null);
+      setIsAuthenticated(false);
+      removeCookie('access_token');
+      localStorage.removeItem('access_token');
+    };
+
+    window.addEventListener('auth:unauthorized', handleUnauthorized);
+
+    return () => {
+      window.removeEventListener('auth:unauthorized', handleUnauthorized);
+    };
   }, []);
 
   const checkAuthStatus = async () => {
@@ -88,7 +103,7 @@ export const AuthProvider = ({ children }) => {
         return { success: false, error: errorMsg };
       }
     } catch (err) {
-      const errorMsg = err?.message || 'Telegram login failed';
+      const errorMsg = err.response?.data?.detail || err.response?.data?.message || err.message || 'Telegram login failed';
       setError(errorMsg);
       return { success: false, error: errorMsg };
     } finally {
@@ -119,7 +134,7 @@ export const AuthProvider = ({ children }) => {
         return { success: false, error: errorMsg };
       }
     } catch (err) {
-      const errorMsg = err?.message || 'Test login failed';
+      const errorMsg = err.response?.data?.detail || err.response?.data?.message || err.message || 'Test login failed';
       setError(errorMsg);
       return { success: false, error: errorMsg };
     } finally {
@@ -151,7 +166,7 @@ export const AuthProvider = ({ children }) => {
 
       return { success: false, error: 'Email login failed' };
     } catch (err) {
-      const errorMsg = err?.message || 'Email login failed';
+      const errorMsg = err.response?.data?.detail || err.response?.data?.message || err.message || 'Email login failed';
       setError(errorMsg);
       return { success: false, error: errorMsg };
     } finally {
@@ -207,11 +222,21 @@ export const AuthProvider = ({ children }) => {
 
       return { success: true, user: result };
     } catch (err) {
-      const errorMsg = err?.message || 'Email registration failed';
+      const errorMsg = err.response?.data?.detail || err.response?.data?.message || err.message || 'Email registration failed';
       setError(errorMsg);
       return { success: false, error: errorMsg };
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const checkUsername = async (username) => {
+    try {
+      return await authApi.checkUsername(username);
+    } catch (err) {
+      console.error('Check username failed:', err);
+      const errorMsg = err.response?.data?.detail || err.response?.data?.message || err.message;
+      return { available: false, error: errorMsg };
     }
   };
 

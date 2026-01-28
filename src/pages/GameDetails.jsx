@@ -2,14 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Play, Globe, Loader2, Star, Share2, Info, ShieldCheck, X } from 'lucide-react';
 import { useApi } from '../contexts/ApiContext.jsx';
-import { useToast } from '../contexts/ToastContext.jsx';
+import { toast } from 'sonner';
+import { useAuth } from '../contexts/AuthContext.jsx';
 
 const GameDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { pgGames, launchGame, isLoading } = useApi();
-  const { addToast } = useToast();  
+  const { isAuthenticated } = useAuth();
   const [game, setGame] = useState(location.state?.game || null);
   const [isLaunching, setIsLaunching] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
@@ -23,6 +24,13 @@ const GameDetails = () => {
   }, [id, pgGames, game]);
 
   const handleStartGame = async () => {
+    if (!isAuthenticated) {
+        const params = new URLSearchParams(location.search);
+        params.set('modal', 'sign-in');
+        navigate({ pathname: location.pathname, search: params.toString() }, { replace: true, state: location.state });
+        return;
+    }
+
     if (isLaunching || !game) return;
     setIsLaunching(true);
     try {
@@ -30,11 +38,11 @@ const GameDetails = () => {
         if (result?.success && result?.data?.url) {
             navigate('/start-game', { state: { url: result.data.url } });
         } else {
-            addToast(result?.error || 'Failed to launch game', 'error');
+            toast.error(result?.error || 'Failed to launch game');
         }
     } catch (err) {
         console.error(err);
-        addToast('Error launching game', 'error');
+        toast.error('Error launching game');
     } finally {
         setIsLaunching(false);
     }

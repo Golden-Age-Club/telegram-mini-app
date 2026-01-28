@@ -20,7 +20,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
 import { useNavigate } from 'react-router-dom';
 import { useApi } from '../contexts/ApiContext.jsx';
-import { useToast } from '../contexts/ToastContext.jsx';
+import { toast } from 'sonner';
 import GameCard from '../components/GameCard';
 
 const providerPriority = (provider) => {
@@ -65,7 +65,6 @@ const Landing = () => {
   const [showFallbackButton, setShowFallbackButton] = useState(false);
   const navigate = useNavigate();
   const { pgOptions, pgGames, isLoading, launchGame, loadMoreGames } = useApi();
-  const { addToast } = useToast();
   const providerSwipersRef = useRef({});
 
   const handleGameClick = (game) => {

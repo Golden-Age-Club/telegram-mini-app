@@ -50,12 +50,20 @@ export const getCurrentUser = async () => {
 
 export const registerWithEmail = async (payload) => {
   try {
-    console.log('📡 Auth API: Email register', payload);
     const response = await api.post('/api/auth/register/email', payload);
-    console.log('✅ Auth API Response - Register Email:', response);
     return response;
   } catch (error) {
     console.error('❌ Auth API Error - Register Email:', error);
+    throw error;
+  }
+};
+
+export const checkUsername = async (username) => {
+  try {
+    const response = await api.get(`/api/auth/check-username?username=${username}`);
+    return response;
+  } catch (error) {
+    console.error('❌ Auth API Error - Check Username:', error);
     throw error;
   }
 };
@@ -65,5 +73,6 @@ export default {
   loginWithEmail,
   refreshToken,
   getCurrentUser,
-  registerWithEmail
+  registerWithEmail,
+  checkUsername
 };

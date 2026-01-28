@@ -4,7 +4,7 @@ import { LanguageProvider } from './contexts/LanguageContext.jsx';
 import { ApiProvider, useApi } from './contexts/ApiContext.jsx';
 import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
 import { LayoutProvider } from './contexts/LayoutContext.jsx';
-import { ToastProvider, useToast } from './contexts/ToastContext.jsx';
+import { Toaster } from 'sonner';
 import router from './router';
 
 function AppContent() {
@@ -48,13 +48,12 @@ function AppContent() {
 
 function App() {
   return (
- 
+
       <LanguageProvider>
         <AuthProvider>
            <ApiProvider>
-          <ToastProvider>
               <AppContent />
-          </ToastProvider>
+              <Toaster position="top-center" theme="dark" richColors closeButton />
            </ApiProvider>
         </AuthProvider>
       </LanguageProvider>
