@@ -286,14 +286,14 @@ export const ApiProvider = ({ children }) => {
       };
 
       // Generate signature
-      payload.sign = createSign(payload, PG_CONFIG.API_KEY);
+      // payload.sign = createSign(payload, PG_CONFIG.API_KEY);
 
       console.log('🚀 Launching game with payload:', payload);
 
       // Perform POST request to get the game URL
       // Using https://test-cases.cdnparts.com as the provider endpoint based on previous code
       // Adjust this URL if the provider is different
-      const providerBaseUrl = 'https://test-cases.cdnparts.com';
+      const providerBaseUrl = 'http://resolver.mgcapi.com';
       
       // Using fetch to match the sample, but we could use axios
       const { data } = await axios.post(`${providerBaseUrl}/api/v1/playGame`, payload, {
