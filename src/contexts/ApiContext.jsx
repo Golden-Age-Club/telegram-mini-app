@@ -63,9 +63,9 @@ export const ApiProvider = ({ children }) => {
     };
 
     fetchLiveTransactions(); // Initial fetch
-    const interval = setInterval(fetchLiveTransactions, 5000); // Poll every 5s
+    // const interval = setInterval(fetchLiveTransactions, 5000); // Poll every 5s
 
-    return () => clearInterval(interval);
+    // return () => clearInterval(interval);
   }, []);
 
   // Initialize API connection
