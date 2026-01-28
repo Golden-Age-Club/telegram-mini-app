@@ -7,6 +7,7 @@ import GameDetails from '../pages/GameDetails.jsx';
 import StartGame from '../pages/StartGame.jsx';
 import Wallet from '../pages/Wallet.jsx';
 import Profile from '../pages/Profile.jsx';
+import BetHistory from '../pages/BetHistory.jsx';
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
       {
         path: 'profile',
         element: <Profile />
+      },
+      {
+        path: 'bet-history',
+        element: <BetHistory />
       }
     ]
   }

@@ -399,8 +399,15 @@ const Landing = () => {
                       <td className="px-3 py-2 text-gray-400 truncate max-w-[80px]">
                         {tx.username}
                       </td>
-                      <td className={`px-3 py-2 text-right font-mono font-bold ${tx.type === 'win' ? 'text-emerald-400' : 'text-gray-300'}`}>
-                        {tx.type === 'win' ? '+' : '-'}${Number(tx.amount).toFixed(2)}
+                      <td className={`px-3 py-2 text-right font-mono font-bold ${
+                        tx.type === 'win' ? 'text-emerald-400' : 
+                        tx.type === 'bet' ? 'text-red-400' :
+                        tx.type === 'refund' ? 'text-yellow-400' :
+                        'text-gray-300'
+                      }`}>
+                        {tx.type === 'win' ? '+' : 
+                         tx.type === 'bet' ? '-' : 
+                         tx.type === 'refund' ? '↺' : ''}${Number(tx.amount).toFixed(2)}
                       </td>
                     </tr>
                   ))

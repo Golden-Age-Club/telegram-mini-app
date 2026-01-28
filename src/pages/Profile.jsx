@@ -124,9 +124,9 @@ const Profile = () => {
   const secondaryIdentifier = user?.username ? `@${user.username}` : (user?.email || `ID: ${user?.telegram_id || 'Unknown'}`);
 
   const stats = [
-    { icon: Target, label: 'Total Bets', value: user?.total_bets || '0' },
-    { icon: Trophy, label: 'Total Wins', value: user?.total_wins || '0' },
-    { icon: Crown, label: 'Best Win', value: user?.best_win ? `$${user.best_win}` : '$0' },
+    { icon: Target, label: 'Total Bets', value: user?.total_bet ? `$${user.total_bet.toFixed(2)}` : '$0.00' },
+    { icon: Trophy, label: 'Total Wins', value: user?.total_won ? `$${user.total_won.toFixed(2)}` : '$0.00' },
+    { icon: Crown, label: 'Best Win', value: user?.best_win ? `$${user.best_win.toFixed(2)}` : '$0.00' },
   ];
 
   const menuGroups = [
@@ -135,7 +135,7 @@ const Profile = () => {
       items: [
         { icon: User, label: 'Personal Details', value: 'Verified' },
         { icon: Wallet, label: 'Wallet', value: `$${user?.balance?.toLocaleString() || '0'}`, action: () => navigate('/wallet') },
-        { icon: History, label: 'Bet History' },
+        { icon: History, label: 'Bet History', action: () => navigate('/bet-history') },
       ]
     },
     {

@@ -6,7 +6,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import CryptoJS from 'crypto-js';
 import axios, { backendUrl } from '../api/axios';
-import { io } from 'socket.io-client';
 import authApi from '../api/auth';
 import walletApi from '../api/wallet';
 import api from '../api/axios';
@@ -49,30 +48,25 @@ export const ApiProvider = ({ children }) => {
     totalPages: 1,
   });
 
-  // Initialize Socket.IO
+  // Polling for live transactions (replacing socket)
   useEffect(() => {
-    const newSocket = io(backendUrl(), {
-        path: '/socket.io',
-        transports: ['websocket'],
-    });
-
-    newSocket.on('connect', () => {
-        console.log('🔌 Socket connected');
-    });
-
-    newSocket.on('new_bet', (data) => {
-        setLiveTransactions(prev => [{...data, type: 'bet'}, ...prev].slice(0, 50));
-    });
-    
-    newSocket.on('new_win', (data) => {
-        setLiveTransactions(prev => [{...data, type: 'win'}, ...prev].slice(0, 50));
-    });
-
-    setSocket(newSocket);
-
-    return () => {
-        if (newSocket) newSocket.close();
+    const fetchLiveTransactions = async () => {
+      try {
+        const response = await api.get('/api/transactions/recent?limit=15');
+        if (response) {
+            // Ensure response is an array
+            const data = Array.isArray(response) ? response : (response.data || []);
+            setLiveTransactions(data);
+        }
+      } catch (err) {
+        console.warn('⚠️ Could not fetch live transactions:', err);
+      }
     };
+
+    fetchLiveTransactions(); // Initial fetch
+    const interval = setInterval(fetchLiveTransactions, 5000); // Poll every 5s
+
+    return () => clearInterval(interval);
   }, []);
 
   // Initialize API connection
