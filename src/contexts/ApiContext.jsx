@@ -300,10 +300,19 @@ export const ApiProvider = ({ children }) => {
 
       console.log('🔗 Game Response:', data);
 
+      if (data.result === false) {
+          console.warn('❌ Game launch error from provider:', data.err_desc);
+          return { 
+              success: false, 
+              error: data.err_desc || 'Game launch failed', 
+              code: data.err_code 
+          };
+      }
+
       if (data.url) {
          return { success: true, data: { url: data.url } };
       } else {
-         throw new Error(data.message || 'Failed to get game URL');
+         throw new Error(data.message || data.err_desc || 'Failed to get game URL');
       }
 
     } catch (err) {
