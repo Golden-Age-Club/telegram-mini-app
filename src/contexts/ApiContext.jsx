@@ -40,7 +40,6 @@ export const ApiProvider = ({ children }) => {
   const [pgOptions, setPgOptions] = useState(null);
   const [pgGames, setPgGames] = useState([]);
   const [liveTransactions, setLiveTransactions] = useState([]);
-  const [socket, setSocket] = useState(null);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -321,7 +320,6 @@ export const ApiProvider = ({ children }) => {
     isLoading,
     error,
     liveTransactions,
-    socket,
     
     // Wallet methods
     getBalance,
