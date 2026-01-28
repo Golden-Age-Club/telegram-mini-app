@@ -20,6 +20,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
 import { useNavigate } from 'react-router-dom';
 import { useApi } from '../contexts/ApiContext.jsx';
+import { useAuth } from '../contexts/AuthContext.jsx';
 import { toast } from 'sonner';
 import GameCard from '../components/GameCard';
 
@@ -64,7 +65,16 @@ const Landing = () => {
   const tg = window.Telegram?.WebApp;
   const [showFallbackButton, setShowFallbackButton] = useState(false);
   const navigate = useNavigate();
-  const { pgOptions, pgGames, isLoading, launchGame, loadMoreGames } = useApi();
+  const { pgOptions, pgGames, isLoading, launchGame, loadMoreGames, liveTransactions } = useApi();
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('all_bets');
+  
+  const filteredTransactions = liveTransactions.filter(t => {
+      if (activeTab === 'my_bets') return t.user_id === user?._id;
+      if (activeTab === 'all_wins') return t.type === 'win';
+      return true;
+  });
+
   const providerSwipersRef = useRef({});
 
   const handleGameClick = (game) => {
@@ -331,51 +341,105 @@ const Landing = () => {
       })()}
       </div>
 
-      {/* Live Winners Widget */}
+      {/* Live Transactions Table */}
       <div className="w-full max-w-md px-4 mb-8 relative z-10">
-        <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-b from-emerald-900/10 to-black p-4 backdrop-blur-sm relative overflow-hidden">
+        <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-b from-emerald-900/10 to-black p-4 backdrop-blur-sm relative overflow-hidden min-h-[300px]">
           <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
           
           <div className="flex items-center gap-2 mb-4 relative z-10">
             <div className="p-1.5 rounded-lg bg-emerald-500/20">
                 <Trophy className="w-4 h-4 text-emerald-500" />
             </div>
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider">Live Winners</h3>
+            <h3 className="text-sm font-bold text-white uppercase tracking-wider">Live Transactions</h3>
             <div className="ml-auto flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
                 <span className="text-[10px] font-bold text-emerald-500">LIVE</span>
             </div>
           </div>
           
-          <Swiper
-            direction={'vertical'}
-            modules={[Autoplay]}
-            autoplay={{ delay: 2000, disableOnInteraction: false }}
-            slidesPerView={3}
-            loop
-            className="h-36 mask-linear-fade" // Need custom CSS for mask if desired
-            allowTouchMove={false}
-          >
-            {Array.from({ length: 10 }).map((_, i) => (
-              <SwiperSlide key={i}>
-                <div className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-xs text-gray-400 border border-white/5">
-                      <Users size={14} />
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="text-xs font-medium text-gray-200">User****{Math.floor(Math.random() * 90 + 10)}</span>
-                        <span className="text-[10px] text-gray-500">Just won in Slots</span>
-                    </div>
-                  </div>
-                  <div className="text-emerald-400 font-mono font-bold text-sm">
-                    +${(Math.random() * 1000 + 50).toFixed(2)}
-                  </div>
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+          {/* Tabs */}
+          <div className="flex p-1 bg-black/40 rounded-lg mb-4 relative z-10">
+              {['all_bets', 'my_bets', 'all_wins'].map(tab => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wide rounded-md transition-all ${
+                        activeTab === tab 
+                        ? 'bg-[var(--gold)] text-black shadow-lg' 
+                        : 'text-gray-400 hover:text-gray-200'
+                    }`}
+                  >
+                      {tab.replace('_', ' ')}
+                  </button>
+              ))}
+          </div>
+
+          <div className="relative z-10 overflow-hidden rounded-lg border border-white/5 bg-black/20">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-white/5 text-[10px] text-gray-400 uppercase tracking-wider">
+                  <th className="px-3 py-2 font-medium">Game</th>
+                  <th className="px-3 py-2 font-medium">User</th>
+                  <th className="px-3 py-2 font-medium text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {filteredTransactions.length === 0 ? (
+                  <tr>
+                    <td colSpan="3" className="px-3 py-8 text-center text-xs text-gray-500">
+                      No live transactions yet...
+                    </td>
+                  </tr>
+                ) : (
+                  filteredTransactions.map((tx, i) => (
+                    <tr key={i} className="text-xs hover:bg-white/5 transition-colors animate-fade-in">
+                      <td className="px-3 py-2 text-gray-300 truncate max-w-[100px]">
+                        {tx.game_id || 'Game'}
+                      </td>
+                      <td className="px-3 py-2 text-gray-400 truncate max-w-[80px]">
+                        {tx.username}
+                      </td>
+                      <td className={`px-3 py-2 text-right font-mono font-bold ${tx.type === 'win' ? 'text-emerald-400' : 'text-gray-300'}`}>
+                        {tx.type === 'win' ? '+' : '-'}${Number(tx.amount).toFixed(2)}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
+
+      {/* Recommended Games */}
+      <div className="w-full max-w-md px-4 mb-8 relative z-10">
+         <div className="flex items-center gap-2 mb-4">
+            <div className="w-1 h-5 rounded-full bg-[var(--gold)]"></div>
+            <h3 className="text-lg font-bold text-white tracking-tight">Recommended For You</h3>
+         </div>
+         <div className="grid grid-cols-3 gap-3">
+            {(() => {
+                const games = pgGames && Array.isArray(pgGames) ? pgGames : (pgGames?.games || []);
+                // Take random 3 or first 3
+                const recommended = games.slice(0, 3); 
+                
+                if (isLoading && recommended.length === 0) {
+                     return Array.from({ length: 3 }).map((_, i) => <GameCard key={i} isLoading={true} />);
+                }
+                
+                if (recommended.length === 0) {
+                    return <div className="col-span-3 text-center text-gray-500 text-xs py-4">No recommendations available</div>;
+                }
+
+                return recommended.map(game => (
+                    <GameCard 
+                        key={game.id || game.game_id} 
+                        game={game} 
+                        onClick={handleGameClick}
+                    />
+                ));
+            })()}
+         </div>
       </div>
 
       {/* Providers Carousel */}

@@ -5,7 +5,8 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import CryptoJS from 'crypto-js';
-import axios from 'axios';
+import axios, { backendUrl } from '../api/axios';
+import { io } from 'socket.io-client';
 import authApi from '../api/auth';
 import walletApi from '../api/wallet';
 import api from '../api/axios';
@@ -39,12 +40,40 @@ export const ApiProvider = ({ children }) => {
   const [initialized, setInitialized] = useState(false);
   const [pgOptions, setPgOptions] = useState(null);
   const [pgGames, setPgGames] = useState([]);
+  const [liveTransactions, setLiveTransactions] = useState([]);
+  const [socket, setSocket] = useState(null);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
     total: 0,
     totalPages: 1,
   });
+
+  // Initialize Socket.IO
+  useEffect(() => {
+    const newSocket = io(backendUrl(), {
+        path: '/socket.io',
+        transports: ['websocket'],
+    });
+
+    newSocket.on('connect', () => {
+        console.log('🔌 Socket connected');
+    });
+
+    newSocket.on('new_bet', (data) => {
+        setLiveTransactions(prev => [{...data, type: 'bet'}, ...prev].slice(0, 50));
+    });
+    
+    newSocket.on('new_win', (data) => {
+        setLiveTransactions(prev => [{...data, type: 'win'}, ...prev].slice(0, 50));
+    });
+
+    setSocket(newSocket);
+
+    return () => {
+        if (newSocket) newSocket.close();
+    };
+  }, []);
 
   // Initialize API connection
   useEffect(() => {
@@ -297,6 +326,8 @@ export const ApiProvider = ({ children }) => {
     isConnected,
     isLoading,
     error,
+    liveTransactions,
+    socket,
     
     // Wallet methods
     getBalance,
