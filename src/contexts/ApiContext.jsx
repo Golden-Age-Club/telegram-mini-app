@@ -272,8 +272,6 @@ export const ApiProvider = ({ children }) => {
         }
       };
 
-      console.log('🔑 Payload:', payload);
-
       // Signature generation function based on provided sample
       const createSign = (params, apiKey) => {
         const values = Object.entries(params)
@@ -286,7 +284,7 @@ export const ApiProvider = ({ children }) => {
       };
 
       // Generate signature
-      // payload.sign = createSign(payload, PG_CONFIG.API_KEY);
+      payload.sign = createSign(payload, PG_CONFIG.API_KEY);
 
       console.log('🚀 Launching game with payload:', payload);
 
