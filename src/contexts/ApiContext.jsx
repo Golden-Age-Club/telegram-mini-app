@@ -221,8 +221,8 @@ export const ApiProvider = ({ children }) => {
       console.log('💰 Deposit created:', result);
       return { success: true, data: result };
     } catch (err) {
-      console.warn('⚠️ Deposit failed:', err.message);
-      return { success: false, error: err.message };
+      console.warn('⚠️ Deposit failed:', err.response?.data || err.message);
+      return { success: false, error: err.response?.data?.detail || err.message };
     }
   };
 
