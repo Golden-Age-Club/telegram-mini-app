@@ -461,7 +461,15 @@ const Landing = () => {
             
             {(() => {
               const providers = [...pgOptions.providers]
-                  .filter((p) => p.is_active === 1 || p.is_active === '1')
+                  .filter((p) => {
+                    const isActive = p.is_active === 1 || p.is_active === '1';
+                    const isExcluded = ['egt', 'pgsoft', 'ferhub_pgsoft', 'ferhub_egt'].some(ex => 
+                        (p.code || '').toLowerCase().includes(ex) || 
+                        (p.title || '').toLowerCase().includes(ex) || 
+                        (p.uniq_name || '').toLowerCase().includes(ex)
+                    );
+                    return isActive && !isExcluded;
+                  })
                   .sort((a, b) => {
                     const pa = providerPriority(a);
                     const pb = providerPriority(b);
@@ -473,21 +481,23 @@ const Landing = () => {
                 <Swiper
                   modules={[Autoplay]}
                   slidesPerView={3.5}
-                  spaceBetween={10}
+                  spaceBetween={2}
                   autoplay={{ delay: 3000, disableOnInteraction: false }}
                   loop
                 >
                   {providers.map((provider) => (
                     <SwiperSlide key={provider.id}>
-                      <div className="aspect-[3/2] rounded-xl bg-white/5 border border-white/5 flex flex-col items-center justify-center p-2 gap-2 hover:bg-white/10 hover:border-[var(--gold)]/30 transition-all grayscale hover:grayscale-0">
+                      <div className="aspect-[3/2] rounded-xl bg-white/5 border border-white/5 overflow-hidden hover:border-[var(--gold)]/30 transition-all grayscale hover:grayscale-0 relative group">
                         {provider.logo_b ? (
                           <img
                             src={provider.logo_b}
                             alt={provider.title || provider.code}
-                            className="w-full h-8 object-contain"
+                            className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
                           />
                         ) : (
-                             <span className="text-xs font-bold text-gray-400">{provider.title}</span>
+                             <div className="w-full h-full flex items-center justify-center p-2">
+                                <span className="text-xs font-bold text-gray-400">{provider.title}</span>
+                             </div>
                         )}
                       </div>
                     </SwiperSlide>

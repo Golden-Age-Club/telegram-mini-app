@@ -285,9 +285,6 @@ export const ApiProvider = ({ children }) => {
 
       // Generate signature
       payload.sign = createSign(payload, PG_CONFIG.API_KEY);
-
-      console.log('🚀 Launching game with payload:', payload);
-
       // Perform POST request to get the game URL
       // Using https://test-cases.cdnparts.com as the provider endpoint based on previous code
       // Adjust this URL if the provider is different
@@ -297,8 +294,6 @@ export const ApiProvider = ({ children }) => {
       const data  = await axios.post(`${providerBaseUrl}/api/v1/playGame`, payload, {
         headers: { 'Content-Type': 'application/json' }
       });
-
-      console.log('🔗 Game Response:', data);
 
       if (data.result === false) {
           console.warn('❌ Game launch error from provider:', data.err_desc);
@@ -316,7 +311,6 @@ export const ApiProvider = ({ children }) => {
       }
 
     } catch (err) {
-      console.error('❌ Launch game failed:', err);
       return { success: false, error: err.message };
     }
   };

@@ -105,7 +105,15 @@ const Game = () => {
   const providers = useMemo(() => {
     if (pgOptions?.providers) {
       const sortedProviders = [...pgOptions.providers]
-        .filter((p) => p.is_active === 1 || p.is_active === '1')
+        .filter((p) => {
+            const isActive = p.is_active === 1 || p.is_active === '1';
+            const isExcluded = [ 'pgsoft', 'ferhub_pgsoft', 'ferhub_egt'].some(ex => 
+                (p.code || '').toLowerCase().includes(ex) || 
+                (p.title || '').toLowerCase().includes(ex) || 
+                (p.uniq_name || '').toLowerCase().includes(ex)
+            );
+            return isActive && !isExcluded;
+        })
         .sort((a, b) => {
           const pa = providerPriority(a);
           const pb = providerPriority(b);
