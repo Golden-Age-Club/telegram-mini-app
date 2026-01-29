@@ -137,7 +137,9 @@ const Wallet = () => {
       }
     } catch (err) {
       console.error('Deposit error:', err);
-      toast.error(err.message || 'Failed to create deposit order');
+      // Show backend error detail if available, otherwise fallback to message
+      const errorMessage = err.response?.data?.detail || err.message || 'Failed to create deposit order';
+      toast.error(errorMessage);
     } finally {
       setIsCreatingDeposit(false);
     }
