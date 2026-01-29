@@ -53,9 +53,9 @@ export const ApiProvider = ({ children }) => {
       try {
         const response = await api.get('/api/transactions/recent?limit=15');
         if (response) {
-            // Ensure response is an array
-            const data = Array.isArray(response) ? response : (response.data || []);
-            setLiveTransactions(data);
+          // Ensure response is an array
+          const data = Array.isArray(response) ? response : (response.data || []);
+          setLiveTransactions(data);
         }
       } catch (err) {
         console.warn('⚠️ Could not fetch live transactions:', err);
@@ -85,7 +85,7 @@ export const ApiProvider = ({ children }) => {
       try {
         const gamesResponse = await api.get('/api/casino/pg/games?page=1&limit=10');
         console.log('Games loaded:', gamesResponse);
-        
+
         if (gamesResponse && Array.isArray(gamesResponse.games)) {
           setPgGames(gamesResponse.games);
           setPagination({
@@ -156,7 +156,7 @@ export const ApiProvider = ({ children }) => {
     // maybe add a specific loading state for more games if needed.
     // For now we'll just use the existing flow but maybe we shouldn't block UI.
     // let's keep it simple.
-    
+
     try {
       const nextPage = pagination.page + 1;
       let url = `/api/casino/pg/games?page=${nextPage}&limit=${pagination.limit}`;
@@ -164,7 +164,7 @@ export const ApiProvider = ({ children }) => {
       if (search) url += `&search=${encodeURIComponent(search)}`;
 
       const response = await api.get(url);
-      
+
       if (response && response.games) {
         setPgGames(prev => [...prev, ...response.games]);
         setPagination({
@@ -217,7 +217,7 @@ export const ApiProvider = ({ children }) => {
         currency: 'USDT.TRC20',
         return_url: returnUrl
       });
-      
+
       console.log('💰 Deposit created:', result);
       return { success: true, data: result };
     } catch (err) {
@@ -228,17 +228,13 @@ export const ApiProvider = ({ children }) => {
 
   const createWithdrawal = async (amount, walletAddress) => {
     try {
-      const result = await walletApi.createWithdrawal({
-        amount,
-        wallet_address: walletAddress,
-        currency: 'USDT.TRC20'
-      });
-      
+      const result = await walletApi.createWithdrawal(amount, walletAddress, 'USDT.TRC20');
+
       console.log('💸 Withdrawal created:', result);
       return { success: true, data: result };
     } catch (err) {
-      console.warn('⚠️ Withdrawal failed:', err.message);
-      return { success: false, error: err.message };
+      console.warn('⚠️ Withdrawal failed:', err.response?.data || err.message);
+      return { success: false, error: err.response?.data?.detail || err.message };
     }
   };
 
@@ -246,14 +242,14 @@ export const ApiProvider = ({ children }) => {
     try {
       // Get auth token from cookie
       const token = getCookie('access_token');
-      
+
       if (!token || !user) {
         throw new Error('User not authenticated');
       }
 
       // Sample uses Date.now() (milliseconds)
       const requestTime = Date.now();
-      
+
       // Construct payload
       // Important: Keys order matters for signature generation if using Object.entries
       const payload = {
@@ -266,19 +262,19 @@ export const ApiProvider = ({ children }) => {
         currency: 'USD',
         request_time: requestTime,
         urls: {
-            base_url: window.location.origin,
-            wallet_url: window.location.origin + '/wallet',
-            other_url: window.location.origin + '/support'
+          base_url: window.location.origin,
+          wallet_url: window.location.origin + '/wallet',
+          other_url: window.location.origin + '/support'
         }
       };
 
       // Signature generation function based on provided sample
       const createSign = (params, apiKey) => {
         const values = Object.entries(params)
-            .filter(([key]) => key !== 'sign' && key !== 'urls')
-            .map(([, value]) => (value && typeof value === 'object' ? JSON.stringify(value) : value))
-            .join('');
-        
+          .filter(([key]) => key !== 'sign' && key !== 'urls')
+          .map(([, value]) => (value && typeof value === 'object' ? JSON.stringify(value) : value))
+          .join('');
+
         const encoded = encodeURIComponent(values);
         return CryptoJS.HmacMD5(encoded, apiKey).toString(CryptoJS.enc.Hex);
       };
@@ -289,25 +285,25 @@ export const ApiProvider = ({ children }) => {
       // Using https://test-cases.cdnparts.com as the provider endpoint based on previous code
       // Adjust this URL if the provider is different
       const providerBaseUrl = 'https://resolver.mgcapi.com';
-      
+
       // Using fetch to match the sample, but we could use axios
-      const data  = await axios.post(`${providerBaseUrl}/api/v1/playGame`, payload, {
+      const data = await axios.post(`${providerBaseUrl}/api/v1/playGame`, payload, {
         headers: { 'Content-Type': 'application/json' }
       });
 
       if (data.result === false) {
-          console.warn('❌ Game launch error from provider:', data.err_desc);
-          return { 
-              success: false, 
-              error: data.err_desc || 'Game launch failed', 
-              code: data.err_code 
-          };
+        console.warn('❌ Game launch error from provider:', data.err_desc);
+        return {
+          success: false,
+          error: data.err_desc || 'Game launch failed',
+          code: data.err_code
+        };
       }
 
       if (data.url) {
-         return { success: true, data: { url: data.url } };
+        return { success: true, data: { url: data.url } };
       } else {
-         throw new Error(data.message || data.err_desc || 'Failed to get game URL');
+        throw new Error(data.message || data.err_desc || 'Failed to get game URL');
       }
 
     } catch (err) {
@@ -321,7 +317,7 @@ export const ApiProvider = ({ children }) => {
     isLoading,
     error,
     liveTransactions,
-    
+
     // Wallet methods
     getBalance,
     getTransactions,
@@ -334,10 +330,10 @@ export const ApiProvider = ({ children }) => {
     pagination,
     loadMoreGames,
     resetGames,
-    
+
     // API initialization
     initializeApi,
-    
+
     // Direct API access (for advanced usage)
     authApi,
     walletApi

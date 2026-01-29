@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { 
-  Copy, 
-  Check, 
-  Clock, 
-  Wallet as WalletIcon, 
-  ArrowDownCircle, 
-  ArrowUpCircle, 
-  History, 
-  Shield, 
-  Zap, 
+import {
+  Copy,
+  Check,
+  Clock,
+  Wallet as WalletIcon,
+  ArrowDownCircle,
+  ArrowUpCircle,
+  History,
+  Shield,
+  Zap,
   ChevronRight,
   AlertCircle,
   QrCode
@@ -41,6 +41,10 @@ const Wallet = () => {
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [withdrawAddress, setWithdrawAddress] = useState('');
   const [isWithdrawing, setIsWithdrawing] = useState(false);
+
+  // Deposit API state
+  const [isCreatingDeposit, setIsCreatingDeposit] = useState(false);
+  const [depositData, setDepositData] = useState(null);
 
   const networks = [
     { id: 'trc20', name: 'USDT.TRC20', label: 'TRC20', fee: '1.00 USDT' },
@@ -109,11 +113,33 @@ const Wallet = () => {
     if (tab === 'deposit') {
       navigate('/wallet/deposit');
       setDepositStep('form');
+      setDepositData(null);
     } else if (tab === 'withdraw') {
       navigate('/wallet/withdraw');
     } else {
-        // history tab - stay on wallet base or specific history route if we had one
-        navigate('/wallet'); 
+      // history tab - stay on wallet base or specific history route if we had one
+      navigate('/wallet');
+    }
+  };
+
+  const handleCreateDeposit = async () => {
+    if (!isValidAmount || isCreatingDeposit) return;
+
+    setIsCreatingDeposit(true);
+    try {
+      const networkCode = networks.find(n => n.id === selectedNetwork)?.name || 'USDT.TRC20';
+      const result = await walletApi.createDeposit(parsedAmount, networkCode);
+
+      if (result) {
+        setDepositData(result);
+        setDepositStep('details');
+        toast.success('Deposit order created!');
+      }
+    } catch (err) {
+      console.error('Deposit error:', err);
+      toast.error(err.message || 'Failed to create deposit order');
+    } finally {
+      setIsCreatingDeposit(false);
     }
   };
 
@@ -175,51 +201,51 @@ const Wallet = () => {
                   <span className="text-xl font-bold text-emerald-500">USDT</span>
                 </div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"/>
-                    <span className="text-xs text-gray-300">Network: {networks.find((n) => n.id === selectedNetwork)?.label}</span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-xs text-gray-300">Network: {networks.find((n) => n.id === selectedNetwork)?.label}</span>
                 </div>
               </div>
 
               <div className="relative group p-4 bg-white rounded-2xl shadow-inner">
-                 <img
-                    src={qrCodeUrl}
-                    alt="Deposit QR Code"
-                    className="w-48 h-48 object-contain mix-blend-multiply"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 rounded-2xl backdrop-blur-sm">
-                      <QrCode className="w-12 h-12 text-white" />
-                  </div>
+                <img
+                  src={qrCodeUrl}
+                  alt="Deposit QR Code"
+                  className="w-48 h-48 object-contain mix-blend-multiply"
+                />
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 rounded-2xl backdrop-blur-sm">
+                  <QrCode className="w-12 h-12 text-white" />
+                </div>
               </div>
 
               <div className="w-full space-y-3">
                 <div className="text-left">
-                    <p className="text-xs text-[var(--text-muted)] mb-1.5 ml-1">Deposit Address</p>
-                    <button
-                        onClick={handleCopy}
-                        className="w-full flex items-center justify-between bg-white/5 border border-white/10 hover:border-[var(--gold)]/50 p-4 rounded-xl group active:scale-[0.98] transition-all"
-                    >
-                        <span className="text-xs font-mono text-gray-300 truncate mr-2">
-                        {address}
-                        </span>
-                        <div
-                        className={`p-2 rounded-lg transition-colors ${
-                            copied
-                            ? 'bg-emerald-500/20 text-emerald-500'
-                            : 'bg-white/5 text-gray-400 group-hover:text-white'
+                  <p className="text-xs text-[var(--text-muted)] mb-1.5 ml-1">Deposit Address</p>
+                  <button
+                    onClick={handleCopy}
+                    className="w-full flex items-center justify-between bg-white/5 border border-white/10 hover:border-[var(--gold)]/50 p-4 rounded-xl group active:scale-[0.98] transition-all"
+                  >
+                    <span className="text-xs font-mono text-gray-300 truncate mr-2">
+                      {depositData?.payment_address || address}
+                    </span>
+                    <div
+                      className={`p-2 rounded-lg transition-colors ${copied
+                        ? 'bg-emerald-500/20 text-emerald-500'
+                        : 'bg-white/5 text-gray-400 group-hover:text-white'
                         }`}
-                        >
-                        {copied ? <Check size={16} /> : <Copy size={16} />}
-                        </div>
-                    </button>
+                    >
+                      {copied ? <Check size={16} /> : <Copy size={16} />}
+                    </div>
+                  </button>
                 </div>
+
               </div>
 
               <div className="flex gap-3 items-start p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-xl text-left">
-                  <AlertCircle className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
-                  <p className="text-xs text-yellow-500/90 leading-relaxed">
-                    Send only <strong>USDT ({networks.find((n) => n.id === selectedNetwork)?.label})</strong> to this address. 
-                    Sending other assets will result in permanent loss.
-                  </p>
+                <AlertCircle className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
+                <p className="text-xs text-yellow-500/90 leading-relaxed">
+                  Send only <strong>USDT ({networks.find((n) => n.id === selectedNetwork)?.label})</strong> to this address.
+                  Sending other assets will result in permanent loss.
+                </p>
               </div>
             </div>
           </div>
@@ -236,20 +262,19 @@ const Wallet = () => {
               <button
                 key={net.id}
                 onClick={() => setSelectedNetwork(net.id)}
-                className={`relative flex items-center justify-between p-4 rounded-xl border transition-all ${
-                  selectedNetwork === net.id
-                    ? 'bg-[var(--gold)]/10 border-[var(--gold)] shadow-[0_0_15px_rgba(255,215,0,0.1)]'
-                    : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10'
-                }`}
+                className={`relative flex items-center justify-between p-4 rounded-xl border transition-all ${selectedNetwork === net.id
+                  ? 'bg-[var(--gold)]/10 border-[var(--gold)] shadow-[0_0_15px_rgba(255,215,0,0.1)]'
+                  : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10'
+                  }`}
               >
                 <div className="flex items-center gap-3">
-                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedNetwork === net.id ? 'border-[var(--gold)]' : 'border-gray-500'}`}>
-                        {selectedNetwork === net.id && <div className="w-2 h-2 rounded-full bg-[var(--gold)]" />}
-                    </div>
-                    <div className="text-left">
-                        <span className={`block text-sm font-bold ${selectedNetwork === net.id ? 'text-[var(--gold)]' : 'text-white'}`}>{net.name}</span>
-                        <span className="text-xs text-gray-500">Fee: ~{net.fee}</span>
-                    </div>
+                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedNetwork === net.id ? 'border-[var(--gold)]' : 'border-gray-500'}`}>
+                    {selectedNetwork === net.id && <div className="w-2 h-2 rounded-full bg-[var(--gold)]" />}
+                  </div>
+                  <div className="text-left">
+                    <span className={`block text-sm font-bold ${selectedNetwork === net.id ? 'text-[var(--gold)]' : 'text-white'}`}>{net.name}</span>
+                    <span className="text-xs text-gray-500">Fee: ~{net.fee}</span>
+                  </div>
                 </div>
                 {selectedNetwork === net.id && <Check className="w-5 h-5 text-[var(--gold)]" />}
               </button>
@@ -268,25 +293,24 @@ const Wallet = () => {
               className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-3xl font-bold text-white placeholder-white/10 focus:outline-none focus:border-[var(--gold)] focus:ring-1 focus:ring-[var(--gold)]/50 transition-all"
             />
             <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
-                <span className="text-lg font-bold text-[var(--text-muted)]">USDT</span>
+              <span className="text-lg font-bold text-[var(--text-muted)]">USDT</span>
             </div>
           </div>
           <div className="flex justify-between px-1">
-             <span className="text-xs text-gray-500">Min. Deposit: 10 USDT</span>
-             <span className="text-xs text-gray-500">Instant Arrival</span>
+            <span className="text-xs text-gray-500">Min. Deposit: 10 USDT</span>
+            <span className="text-xs text-gray-500">Instant Arrival</span>
           </div>
         </div>
 
         <button
-          onClick={() => setDepositStep('details')}
-          disabled={!isValidAmount}
-          className={`w-full py-4 rounded-xl font-bold text-lg uppercase tracking-wide shadow-lg transform transition-all ${
-            isValidAmount
-              ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-emerald-500/20 active:scale-[0.98]'
-              : 'bg-white/5 text-gray-500 border border-white/10 cursor-not-allowed'
-          }`}
+          onClick={handleCreateDeposit}
+          disabled={!isValidAmount || isCreatingDeposit}
+          className={`w-full py-4 rounded-xl font-bold text-lg uppercase tracking-wide shadow-lg transform transition-all ${isValidAmount && !isCreatingDeposit
+            ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-emerald-500/20 active:scale-[0.98]'
+            : 'bg-white/5 text-gray-500 border border-white/10 cursor-not-allowed'
+            }`}
         >
-          Proceed to Pay
+          {isCreatingDeposit ? 'Creating Order...' : 'Proceed to Pay'}
         </button>
       </div>
     );
@@ -294,12 +318,12 @@ const Wallet = () => {
 
   const renderWithdraw = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
-        <div className="p-4 rounded-xl bg-yellow-500/5 border border-yellow-500/10 flex gap-3">
-            <AlertCircle className="w-5 h-5 text-yellow-500 shrink-0" />
-            <p className="text-xs text-yellow-200/80 leading-relaxed">
-                Ensure you enter the correct <strong>TRC20</strong> address. Withdrawals to other networks cannot be recovered.
-            </p>
-        </div>
+      <div className="p-4 rounded-xl bg-yellow-500/5 border border-yellow-500/10 flex gap-3">
+        <AlertCircle className="w-5 h-5 text-yellow-500 shrink-0" />
+        <p className="text-xs text-yellow-200/80 leading-relaxed">
+          Ensure you enter the correct <strong>TRC20</strong> address. Withdrawals to other networks cannot be recovered.
+        </p>
+      </div>
 
       <div className="space-y-4">
         <label className="block text-sm font-medium text-[var(--text-muted)] ml-1">Amount to Withdraw</label>
@@ -312,36 +336,35 @@ const Wallet = () => {
             className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-3xl font-bold text-white placeholder-white/10 focus:outline-none focus:border-[var(--gold)] focus:ring-1 focus:ring-[var(--gold)]/50 transition-all"
           />
           <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
-                <span className="text-lg font-bold text-[var(--text-muted)]">USDT</span>
-            </div>
+            <span className="text-lg font-bold text-[var(--text-muted)]">USDT</span>
+          </div>
         </div>
         <div className="flex justify-between px-1">
-             <span className="text-xs text-gray-500">Available: {user?.balance?.toLocaleString() || '0'} USDT</span>
+          <span className="text-xs text-gray-500">Available: {user?.balance?.toLocaleString() || '0'} USDT</span>
         </div>
       </div>
 
       <div className="space-y-4">
         <label className="block text-sm font-medium text-[var(--text-muted)] ml-1">Wallet Address (TRC20)</label>
         <div className="relative">
-            <input
+          <input
             type="text"
             value={withdrawAddress}
             placeholder="Paste your TRC20 address"
             onChange={(e) => setWithdrawAddress(e.target.value)}
             className="w-full bg-black/40 border border-white/10 rounded-2xl pl-12 pr-5 py-4 text-sm font-mono text-white placeholder-white/20 focus:outline-none focus:border-[var(--gold)] focus:ring-1 focus:ring-[var(--gold)]/50 transition-all"
-            />
-            <WalletIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-muted)]" />
+          />
+          <WalletIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-muted)]" />
         </div>
       </div>
 
       <button
         onClick={handleWithdraw}
         disabled={!isValidWithdrawAmount || !isValidWithdrawAddress || isWithdrawing}
-        className={`w-full py-4 rounded-xl font-bold text-lg uppercase tracking-wide shadow-lg transform transition-all ${
-          isValidWithdrawAmount && isValidWithdrawAddress && !isWithdrawing
-            ? 'bg-gradient-to-r from-[var(--gold)] to-amber-600 text-black shadow-[0_0_20px_rgba(255,215,0,0.2)] active:scale-[0.98]'
-            : 'bg-white/5 text-gray-500 border border-white/10 cursor-not-allowed'
-        }`}
+        className={`w-full py-4 rounded-xl font-bold text-lg uppercase tracking-wide shadow-lg transform transition-all ${isValidWithdrawAmount && isValidWithdrawAddress && !isWithdrawing
+          ? 'bg-gradient-to-r from-[var(--gold)] to-amber-600 text-black shadow-[0_0_20px_rgba(255,215,0,0.2)] active:scale-[0.98]'
+          : 'bg-white/5 text-gray-500 border border-white/10 cursor-not-allowed'
+          }`}
       >
         {isWithdrawing ? 'Processing...' : 'Withdraw Funds'}
       </button>
@@ -350,46 +373,44 @@ const Wallet = () => {
 
   const renderHistory = () => (
     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-        {isLoadingHistory ? (
-            <div className="flex flex-col items-center justify-center py-12 text-[var(--text-muted)]">
-                <div className="w-8 h-8 border-2 border-[var(--gold)] border-t-transparent rounded-full animate-spin mb-4" />
-                <p className="text-sm">Loading transactions...</p>
-            </div>
-        ) : transactions.length > 0 ? (
-            <div className="space-y-3">
-                {transactions.map((tx, idx) => (
-                    <div key={tx.id || idx} className="p-4 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                                tx.type === 'deposit' ? 'bg-emerald-500/20 text-emerald-500' : 'bg-amber-500/20 text-amber-500'
-                            }`}>
-                                {tx.type === 'deposit' ? <ArrowDownCircle size={20} /> : <ArrowUpCircle size={20} />}
-                            </div>
-                            <div>
-                                <p className="text-sm font-bold text-white capitalize">{tx.type}</p>
-                                <p className="text-xs text-[var(--text-muted)]">{new Date(tx.created_at || Date.now()).toLocaleDateString()}</p>
-                            </div>
-                        </div>
-                        <div className="text-right">
-                            <p className={`font-bold ${tx.type === 'deposit' ? 'text-emerald-400' : 'text-white'}`}>
-                                {tx.type === 'deposit' ? '+' : '-'}{Number(tx.amount).toLocaleString()} USDT
-                            </p>
-                            <p className={`text-xs capitalize ${
-                                tx.status === 'completed' ? 'text-emerald-500' : 
-                                tx.status === 'pending' ? 'text-yellow-500' : 'text-red-500'
-                            }`}>{tx.status}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        ) : (
-            <div className="flex flex-col items-center justify-center py-12 text-[var(--text-muted)]">
-                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
-                    <History className="w-8 h-8 opacity-50" />
+      {isLoadingHistory ? (
+        <div className="flex flex-col items-center justify-center py-12 text-[var(--text-muted)]">
+          <div className="w-8 h-8 border-2 border-[var(--gold)] border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="text-sm">Loading transactions...</p>
+        </div>
+      ) : transactions.length > 0 ? (
+        <div className="space-y-3">
+          {transactions.map((tx, idx) => (
+            <div key={tx.id || idx} className="p-4 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tx.type === 'deposit' ? 'bg-emerald-500/20 text-emerald-500' : 'bg-amber-500/20 text-amber-500'
+                  }`}>
+                  {tx.type === 'deposit' ? <ArrowDownCircle size={20} /> : <ArrowUpCircle size={20} />}
                 </div>
-                <p className="text-sm">No transactions yet</p>
+                <div>
+                  <p className="text-sm font-bold text-white capitalize">{tx.type}</p>
+                  <p className="text-xs text-[var(--text-muted)]">{new Date(tx.created_at || Date.now()).toLocaleDateString()}</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className={`font-bold ${tx.type === 'deposit' ? 'text-emerald-400' : 'text-white'}`}>
+                  {tx.type === 'deposit' ? '+' : '-'}{Number(tx.amount).toLocaleString()} USDT
+                </p>
+                <p className={`text-xs capitalize ${tx.status === 'completed' ? 'text-emerald-500' :
+                  tx.status === 'pending' ? 'text-yellow-500' : 'text-red-500'
+                  }`}>{tx.status}</p>
+              </div>
             </div>
-        )}
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-12 text-[var(--text-muted)]">
+          <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+            <History className="w-8 h-8 opacity-50" />
+          </div>
+          <p className="text-sm">No transactions yet</p>
+        </div>
+      )}
     </div>
   );
 
@@ -446,7 +467,7 @@ const Wallet = () => {
               Login to Access Wallet
             </button>
             <p className="text-xs text-[var(--text-muted)]">
-                Don't have an account? <button onClick={() => setModal('sign-up')} className="text-emerald-500 hover:underline">Sign up</button>
+              Don't have an account? <button onClick={() => setModal('sign-up')} className="text-emerald-500 hover:underline">Sign up</button>
             </p>
           </div>
         </div>
@@ -456,82 +477,81 @@ const Wallet = () => {
 
   return (
     <div className="page pb-24 min-h-screen bg-black relative">
-        {/* Background Gradients */}
-        <div className="fixed inset-0 pointer-events-none">
-            <div className="absolute -top-20 left-0 w-72 h-72 bg-emerald-900/20 rounded-full blur-[100px]" />
-            <div className="absolute top-40 right-0 w-72 h-72 bg-[var(--gold)]/5 rounded-full blur-[100px]" />
-        </div>
+      {/* Background Gradients */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute -top-20 left-0 w-72 h-72 bg-emerald-900/20 rounded-full blur-[100px]" />
+        <div className="absolute top-40 right-0 w-72 h-72 bg-[var(--gold)]/5 rounded-full blur-[100px]" />
+      </div>
 
       <div className="relative z-10 p-4 space-y-6 max-w-lg mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between">
           <span className="font-bold text-white text-xl">My Wallet</span>
           <button className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors">
-            <History className="w-5 h-5 text-gray-400" onClick={() => handleTabChange('history')}/>
+            <History className="w-5 h-5 text-gray-400" onClick={() => handleTabChange('history')} />
           </button>
         </div>
 
         {/* Balance Card */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-white/10 shadow-2xl">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-[80px] -mr-16 -mt-16" />
-            <div className="absolute bottom-0 left-0 w-40 h-40 bg-[var(--gold)]/5 rounded-full blur-[60px] -ml-10 -mb-10" />
-            
-            <div className="relative p-6 space-y-6">
-                <div className="flex items-start justify-between">
-                    <div>
-                        <p className="text-sm font-medium text-gray-400 mb-1">Total Balance</p>
-                        <h2 className="text-4xl font-black text-white tracking-tight">
-                            ${user?.balance?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
-                        </h2>
-                    </div>
-                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
-                        <WalletIcon className="w-5 h-5 text-[var(--gold)]" />
-                    </div>
-                </div>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-[80px] -mr-16 -mt-16" />
+          <div className="absolute bottom-0 left-0 w-40 h-40 bg-[var(--gold)]/5 rounded-full blur-[60px] -ml-10 -mb-10" />
 
-                <div className="flex gap-3">
-                    <button 
-                        onClick={() => handleTabChange('deposit')}
-                        className="flex-1 py-2.5 rounded-xl bg-emerald-500 text-white text-sm font-bold shadow-lg shadow-emerald-900/20 hover:bg-emerald-400 transition-colors flex items-center justify-center gap-2"
-                    >
-                        <ArrowDownCircle size={16} /> Deposit
-                    </button>
-                    <button 
-                        onClick={() => handleTabChange('withdraw')}
-                        className="flex-1 py-2.5 rounded-xl bg-white/10 text-white text-sm font-bold border border-white/10 hover:bg-white/20 transition-colors flex items-center justify-center gap-2"
-                    >
-                        <ArrowUpCircle size={16} /> Withdraw
-                    </button>
-                </div>
+          <div className="relative p-6 space-y-6">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-400 mb-1">Total Balance</p>
+                <h2 className="text-4xl font-black text-white tracking-tight">
+                  ${user?.balance?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
+                </h2>
+              </div>
+              <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                <WalletIcon className="w-5 h-5 text-[var(--gold)]" />
+              </div>
             </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => handleTabChange('deposit')}
+                className="flex-1 py-2.5 rounded-xl bg-emerald-500 text-white text-sm font-bold shadow-lg shadow-emerald-900/20 hover:bg-emerald-400 transition-colors flex items-center justify-center gap-2"
+              >
+                <ArrowDownCircle size={16} /> Deposit
+              </button>
+              <button
+                onClick={() => handleTabChange('withdraw')}
+                className="flex-1 py-2.5 rounded-xl bg-white/10 text-white text-sm font-bold border border-white/10 hover:bg-white/20 transition-colors flex items-center justify-center gap-2"
+              >
+                <ArrowUpCircle size={16} /> Withdraw
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Tab Navigation */}
         <div className="flex p-1 bg-white/5 rounded-2xl border border-white/5 backdrop-blur-sm">
-            {[
-                { id: 'deposit', label: 'Deposit' },
-                { id: 'withdraw', label: 'Withdraw' },
-                { id: 'history', label: 'History' }
-            ].map((tab) => (
-                <button
-                    key={tab.id}
-                    onClick={() => handleTabChange(tab.id)}
-                    className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
-                        activeTab === tab.id
-                        ? 'bg-[var(--gold)] text-black shadow-lg shadow-yellow-900/20'
-                        : 'text-gray-400 hover:text-white'
-                    }`}
-                >
-                    {tab.label}
-                </button>
-            ))}
+          {[
+            { id: 'deposit', label: 'Deposit' },
+            { id: 'withdraw', label: 'Withdraw' },
+            { id: 'history', label: 'History' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => handleTabChange(tab.id)}
+              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${activeTab === tab.id
+                ? 'bg-[var(--gold)] text-black shadow-lg shadow-yellow-900/20'
+                : 'text-gray-400 hover:text-white'
+                }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
         {/* Content Area */}
         <div className="min-h-[300px]">
-            {activeTab === 'deposit' && renderDeposit()}
-            {activeTab === 'withdraw' && renderWithdraw()}
-            {activeTab === 'history' && renderHistory()}
+          {activeTab === 'deposit' && renderDeposit()}
+          {activeTab === 'withdraw' && renderWithdraw()}
+          {activeTab === 'history' && renderHistory()}
         </div>
       </div>
     </div>
