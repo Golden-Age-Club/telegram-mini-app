@@ -57,14 +57,19 @@ export const AuthProvider = ({ children }) => {
           setUser(currentUser);
           setIsAuthenticated(true);
           console.log('✅ User authenticated from existing token');
+        } else {
+          // Token is invalid, remove it
+          localStorage.removeItem('access_token');
+          removeCookie('access_token');
+          setIsAuthenticated(false);
+          
+          // Try to auto-login with Telegram if available
+          await autoLoginWithTelegram();
+        }
       } else {
-        // Token is invalid, remove it
-        localStorage.removeItem('access_token');
-        removeCookie('access_token');
         setIsAuthenticated(false);
-      }
-      } else {
-        setIsAuthenticated(false);
+        // Try to auto-login with Telegram if available
+        await autoLoginWithTelegram();
       }
     } catch (err) {
       console.warn('⚠️ Auth check failed:', err.message);
@@ -72,8 +77,19 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('access_token');
       removeCookie('access_token');
       setIsAuthenticated(false);
+      
+      // Try to auto-login with Telegram if available
+      await autoLoginWithTelegram();
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const autoLoginWithTelegram = async () => {
+    const tg = window.Telegram?.WebApp;
+    if (tg && tg.initData && tg.initData.length > 0) {
+      console.log('📡 Telegram environment detected, attempting auto-login...');
+      await loginWithTelegram();
     }
   };
 
