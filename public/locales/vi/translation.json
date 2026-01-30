@@ -31,5 +31,51 @@
   "wildBountyShowdown": "Wild Bounty Showdown",
   "mahjongWays": "Mahjong Ways",
   "luckyNeko": "Lucky Neko",
-  "megaWin": "THẮNG LỚN!"
+  "megaWin": "THẮNG LỚN!",
+  "landing": {
+    "quick_actions": {
+      "deposit": "Nạp tiền",
+      "withdraw": "Rút tiền",
+      "invite": "Mời bạn",
+      "support": "Hỗ trợ"
+    },
+    "jackpot": "Giải Jackpot Lũy Tiến",
+    "live_transactions": {
+      "title": "Giao Dịch Trực Tiếp",
+      "live_badge": "TRỰC TIẾP",
+      "tabs": {
+        "all_bets": "Tất Cả Cược",
+        "my_bets": "Cược Của Tôi",
+        "all_wins": "Tất Cả Thắng"
+      },
+      "table": {
+        "game": "Trò Chơi",
+        "user": "Người Chơi",
+        "amount": "Số Tiền",
+        "empty": "Chưa có giao dịch trực tiếp nào..."
+      }
+    },
+    "recommended": {
+      "title": "Gợi Ý Cho Bạn",
+      "empty": "Không có gợi ý nào"
+    },
+    "providers": {
+      "title": "Nhà Cung Cấp Cao Cấp"
+    }
+  },
+  "game_types": {
+    "1": "Nổ Hũ",
+    "2": "Casino Trực Tuyến",
+    "3": "Thể Thao",
+    "4": "Thể Thao Ảo",
+    "5": "Xổ Số",
+    "6": "Game Bài",
+    "7": "P2P",
+    "8": "Bắn Cá",
+    "9": "Đá Gà",
+    "10": "Khuyến Mãi",
+    "11": "Thể Thao Điện Tử",
+    "12": "Poker",
+    "13": "Khác"
+  }
 }

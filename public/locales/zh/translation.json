@@ -31,5 +31,51 @@
   "wildBountyShowdown": "狂野赏金对决",
   "mahjongWays": "麻将胡了",
   "luckyNeko": "幸运招财猫",
-  "megaWin": "超级大奖!"
+  "megaWin": "超级大奖!",
+  "landing": {
+    "quick_actions": {
+      "deposit": "存款",
+      "withdraw": "提款",
+      "invite": "邀请",
+      "support": "支持"
+    },
+    "jackpot": "累积奖池",
+    "live_transactions": {
+      "title": "实时交易",
+      "live_badge": "实时",
+      "tabs": {
+        "all_bets": "所有投注",
+        "my_bets": "我的投注",
+        "all_wins": "所有赢奖"
+      },
+      "table": {
+        "game": "游戏",
+        "user": "用户",
+        "amount": "金额",
+        "empty": "暂无实时交易..."
+      }
+    },
+    "recommended": {
+      "title": "为您推荐",
+      "empty": "暂无推荐"
+    },
+    "providers": {
+      "title": "优质供应商"
+    }
+  },
+  "game_types": {
+    "1": "老虎机",
+    "2": "真人视讯",
+    "3": "体育博彩",
+    "4": "虚拟体育",
+    "5": "彩票",
+    "6": "棋牌",
+    "7": "P2P",
+    "8": "捕鱼",
+    "9": "斗鸡",
+    "10": "红利",
+    "11": "电子竞技",
+    "12": "扑克",
+    "13": "其他"
+  }
 }

@@ -31,5 +31,51 @@
   "wildBountyShowdown": "ワイルドバウンティショーダウン",
   "mahjongWays": "麻雀ウェイズ",
   "luckyNeko": "ラッキーネコ",
-  "megaWin": "メガウィン!"
+  "megaWin": "メガウィン!",
+  "landing": {
+    "quick_actions": {
+      "deposit": "入金",
+      "withdraw": "出金",
+      "invite": "招待",
+      "support": "サポート"
+    },
+    "jackpot": "ジャックポット",
+    "live_transactions": {
+      "title": "ライブ取引",
+      "live_badge": "ライブ",
+      "tabs": {
+        "all_bets": "全てのベット",
+        "my_bets": "マイベット",
+        "all_wins": "全ての勝利"
+      },
+      "table": {
+        "game": "ゲーム",
+        "user": "ユーザー",
+        "amount": "金額",
+        "empty": "ライブ取引はまだありません..."
+      }
+    },
+    "recommended": {
+        "title": "おすすめゲーム",
+        "empty": "おすすめはありません"
+    },
+    "providers": {
+        "title": "プロバイダー"
+    }
+  },
+  "game_types": {
+    "1": "スロット",
+    "2": "ライブカジノ",
+    "3": "スポーツブック",
+    "4": "バーチャルスポーツ",
+    "5": "宝くじ",
+    "6": "Qipai",
+    "7": "P2P",
+    "8": "フィッシング",
+    "9": "闘鶏",
+    "10": "ボーナス",
+    "11": "eスポーツ",
+    "12": "ポーカー",
+    "13": "その他"
+  }
 }

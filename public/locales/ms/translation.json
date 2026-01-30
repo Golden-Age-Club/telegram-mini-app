@@ -31,5 +31,51 @@
   "wildBountyShowdown": "Wild Bounty Showdown",
   "mahjongWays": "Mahjong Ways",
   "luckyNeko": "Lucky Neko",
-  "megaWin": "MENANG BESAR!"
+  "megaWin": "MENANG BESAR!",
+  "landing": {
+    "quick_actions": {
+      "deposit": "Deposit",
+      "withdraw": "Keluarkan",
+      "invite": "Jemput",
+      "support": "Sokongan"
+    },
+    "jackpot": "Jackpot",
+    "live_transactions": {
+      "title": "Transaksi Langsung",
+      "live_badge": "LANGSUNG",
+      "tabs": {
+        "all_bets": "Semua Taruhan",
+        "my_bets": "Taruhan Saya",
+        "all_wins": "Semua Menang"
+      },
+      "table": {
+        "game": "Permainan",
+        "user": "Pengguna",
+        "amount": "Jumlah",
+        "empty": "Tiada transaksi langsung lagi..."
+      }
+    },
+    "recommended": {
+        "title": "Permainan Disyorkan",
+        "empty": "Tiada cadangan tersedia"
+    },
+    "providers": {
+        "title": "Pembekal"
+    }
+  },
+  "game_types": {
+    "1": "Slot",
+    "2": "Kasino Langsung",
+    "3": "Buku Sukan",
+    "4": "Sukan Maya",
+    "5": "Loteri",
+    "6": "Qipai",
+    "7": "P2P",
+    "8": "Memancing",
+    "9": "Sabung Ayam",
+    "10": "Bonus",
+    "11": "Esport",
+    "12": "Poker",
+    "13": "Lain-lain"
+  }
 }

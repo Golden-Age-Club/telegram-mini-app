@@ -31,5 +31,51 @@
   "wildBountyShowdown": "Wild Bounty Showdown",
   "mahjongWays": "Mahjong Ways",
   "luckyNeko": "Lucky Neko",
-  "megaWin": "MALAKING PANALO!"
+  "megaWin": "MALAKING PANALO!",
+  "landing": {
+    "quick_actions": {
+      "deposit": "Deposito",
+      "withdraw": "Withdraw",
+      "invite": "Imbitahan",
+      "support": "Suporta"
+    },
+    "jackpot": "Jackpot",
+    "live_transactions": {
+      "title": "Mga Live na Transaksyon",
+      "live_badge": "LIVE",
+      "tabs": {
+        "all_bets": "Lahat ng Taya",
+        "my_bets": "Aking Taya",
+        "all_wins": "Lahat ng Panalo"
+      },
+      "table": {
+        "game": "Laro",
+        "user": "Gumagamit",
+        "amount": "Halaga",
+        "empty": "Wala pang live na transaksyon..."
+      }
+    },
+    "recommended": {
+        "title": "Mga Inirerekomendang Laro",
+        "empty": "Walang magagamit na rekomendasyon"
+    },
+    "providers": {
+        "title": "Mga Provider"
+    }
+  },
+  "game_types": {
+    "1": "Slot",
+    "2": "Live Casino",
+    "3": "Sport Book",
+    "4": "Virtual Sport",
+    "5": "Lottery",
+    "6": "Qipai",
+    "7": "P2P",
+    "8": "Fishing",
+    "9": "Sabong",
+    "10": "Bonus",
+    "11": "Esport",
+    "12": "Poker",
+    "13": "Iba pa"
+  }
 }

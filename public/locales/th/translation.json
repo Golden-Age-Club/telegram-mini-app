@@ -31,5 +31,51 @@
   "wildBountyShowdown": "Wild Bounty Showdown",
   "mahjongWays": "Mahjong Ways",
   "luckyNeko": "Lucky Neko",
-  "megaWin": "ชนะใหญ่!"
+  "megaWin": "ชนะใหญ่!",
+  "landing": {
+    "quick_actions": {
+      "deposit": "ฝากเงิน",
+      "withdraw": "ถอนเงิน",
+      "invite": "เชิญเพื่อน",
+      "support": "ซัพพอร์ต"
+    },
+    "jackpot": "แจ็คพอตสะสม",
+    "live_transactions": {
+      "title": "ธุรกรรมสด",
+      "live_badge": "สด",
+      "tabs": {
+        "all_bets": "เดิมพันทั้งหมด",
+        "my_bets": "เดิมพันของฉัน",
+        "all_wins": "ชนะทั้งหมด"
+      },
+      "table": {
+        "game": "เกม",
+        "user": "ผู้ใช้",
+        "amount": "จำนวน",
+        "empty": "ยังไม่มีธุรกรรมสด..."
+      }
+    },
+    "recommended": {
+      "title": "แนะนำสำหรับคุณ",
+      "empty": "ไม่มีคำแนะนำ"
+    },
+    "providers": {
+      "title": "ผู้ให้บริการพรีเมียม"
+    }
+  },
+  "game_types": {
+    "1": "สล็อต",
+    "2": "คาสิโนสด",
+    "3": "กีฬา",
+    "4": "กีฬาเสมือนจริง",
+    "5": "หวย",
+    "6": "เกมไพ่",
+    "7": "P2P",
+    "8": "ยิงปลา",
+    "9": "ชนไก่",
+    "10": "โบนัส",
+    "11": "อีสปอร์ต",
+    "12": "โป๊กเกอร์",
+    "13": "อื่นๆ"
+  }
 }

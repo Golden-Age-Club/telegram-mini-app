@@ -31,5 +31,51 @@
   "wildBountyShowdown": "Wild Bounty Showdown",
   "mahjongWays": "Mahjong Ways",
   "luckyNeko": "Lucky Neko",
-  "megaWin": "MEGA WIN!"
+  "megaWin": "MEGA WIN!",
+  "landing": {
+    "quick_actions": {
+      "deposit": "Deposit",
+      "withdraw": "Withdraw",
+      "invite": "Invite",
+      "support": "Support"
+    },
+    "jackpot": "Progressive Jackpot",
+    "live_transactions": {
+      "title": "Live Transactions",
+      "live_badge": "LIVE",
+      "tabs": {
+        "all_bets": "All Bets",
+        "my_bets": "My Bets",
+        "all_wins": "All Wins"
+      },
+      "table": {
+        "game": "Game",
+        "user": "User",
+        "amount": "Amount",
+        "empty": "No live transactions yet..."
+      }
+    },
+    "recommended": {
+      "title": "Recommended For You",
+      "empty": "No recommendations available"
+    },
+    "providers": {
+      "title": "Premium Providers"
+    }
+  },
+  "game_types": {
+    "1": "Slot",
+    "2": "Live Casino",
+    "3": "Sport Book",
+    "4": "Virtual Sport",
+    "5": "Lottery",
+    "6": "Qipai",
+    "7": "P2P",
+    "8": "Fishing",
+    "9": "Cock Fighting",
+    "10": "Bonus",
+    "11": "Esport",
+    "12": "Poker",
+    "13": "Other"
+  }
 }

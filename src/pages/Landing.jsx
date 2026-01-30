@@ -19,6 +19,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext.jsx';
 import { useApi } from '../contexts/ApiContext.jsx';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { toast } from 'sonner';
@@ -62,6 +63,7 @@ const GAME_TYPES = {
 };
 
 const Landing = () => {
+  const { t } = useLanguage();
   const tg = window.Telegram?.WebApp;
   const [showFallbackButton, setShowFallbackButton] = useState(false);
   const navigate = useNavigate();
@@ -69,9 +71,9 @@ const Landing = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('all_bets');
   
-  const filteredTransactions = liveTransactions.filter(t => {
-      if (activeTab === 'my_bets') return t.user_id === user?._id;
-      if (activeTab === 'all_wins') return t.type === 'win';
+  const filteredTransactions = liveTransactions.filter(tx => {
+      if (activeTab === 'my_bets') return tx.user_id === user?._id;
+      if (activeTab === 'all_wins') return tx.type === 'win';
       return true;
   });
 
@@ -84,7 +86,6 @@ const Landing = () => {
   const banners = [
     '/assets/banner-actThroughtDZ.webp',
     '/assets/banner-yessc2.webp',
-    '/assets/banner-yessc2 (1).webp',
   ];
 
   useEffect(() => {
@@ -171,24 +172,26 @@ const Landing = () => {
       <div className="w-full max-w-md px-4 mb-8 relative z-10">
         <div className="grid grid-cols-4 gap-3">
             {[
-                { icon: ArrowDownCircle, label: 'Deposit', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
-                { icon: ArrowUpCircle, label: 'Withdraw', color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20' },
-                { icon: Users, label: 'Invite', color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
-                { icon: MessageCircle, label: 'Support', color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20' },
+                { icon: ArrowDownCircle, id: 'deposit', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
+                { icon: ArrowUpCircle, id: 'withdraw', color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20' },
+                { icon: Users, id: 'invite', color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
+                { icon: MessageCircle, id: 'support', color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20' },
             ].map((action, i) => (
                 <button 
                     key={i} 
                     className="flex flex-col items-center gap-2 group"
                     onClick={() => {
-                        if (action.label === 'Deposit') navigate('/wallet/deposit');
-                        else if (action.label === 'Withdraw') navigate('/wallet/withdraw');
-                        else if (action.label === 'Invite') navigate('/profile'); // Placeholder
+                        if (action.id === 'deposit') navigate('/wallet/deposit');
+                        else if (action.id === 'withdraw') navigate('/wallet/withdraw');
+                        else if (action.id === 'invite') navigate('/profile'); // Placeholder
                     }}
                 >
                     <div className={`w-14 h-14 rounded-2xl ${action.bg} ${action.border} border flex items-center justify-center backdrop-blur-sm shadow-lg transition-transform duration-300 group-hover:scale-105 group-active:scale-95`}>
                         <action.icon className={`w-6 h-6 ${action.color}`} strokeWidth={2.5} />
                     </div>
-                    <span className="text-[11px] font-medium text-gray-400 group-hover:text-white transition-colors">{action.label}</span>
+                    <span className="text-[11px] font-medium text-gray-400 group-hover:text-white transition-colors">
+                        {t(`landing.quick_actions.${action.id}`)}
+                    </span>
                 </button>
             ))}
         </div>
@@ -206,7 +209,7 @@ const Landing = () => {
                         <Trophy className="w-5 h-5 text-[var(--gold)]" />
                     </div>
                     <div>
-                        <div className="text-[10px] font-bold text-[var(--gold)] uppercase tracking-wider mb-0.5">Progressive Jackpot</div>
+                        <div className="text-[10px] font-bold text-[var(--gold)] uppercase tracking-wider mb-0.5">{t('landing.jackpot')}</div>
                         <div className="text-xl font-black text-white tracking-tight tabular-nums">
                             $1,245,892.<span className="text-[var(--gold)]">54</span>
                         </div>
@@ -260,7 +263,8 @@ const Landing = () => {
           }
         });
 
-        return Object.entries(GAME_TYPES).map(([typeId, typeName]) => {
+        return Object.entries(GAME_TYPES).map(([typeId, _]) => {
+          const typeName = t(`game_types.${typeId}`);
           const typeGames = gamesByType[typeId] || [];
           if (typeGames.length === 0) return null;
 
@@ -350,10 +354,10 @@ const Landing = () => {
             <div className="p-1.5 rounded-lg bg-emerald-500/20">
                 <Trophy className="w-4 h-4 text-emerald-500" />
             </div>
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider">Live Transactions</h3>
+            <h3 className="text-sm font-bold text-white uppercase tracking-wider">{t('landing.live_transactions.title')}</h3>
             <div className="ml-auto flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                <span className="text-[10px] font-bold text-emerald-500">LIVE</span>
+                <span className="text-[10px] font-bold text-emerald-500">{t('landing.live_transactions.live_badge')}</span>
             </div>
           </div>
           
@@ -369,7 +373,7 @@ const Landing = () => {
                         : 'text-gray-400 hover:text-gray-200'
                     }`}
                   >
-                      {tab.replace('_', ' ')}
+                      {t(`landing.live_transactions.tabs.${tab}`)}
                   </button>
               ))}
           </div>
@@ -378,16 +382,16 @@ const Landing = () => {
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-white/5 text-[10px] text-gray-400 uppercase tracking-wider">
-                  <th className="px-3 py-2 font-medium">Game</th>
-                  <th className="px-3 py-2 font-medium">User</th>
-                  <th className="px-3 py-2 font-medium text-right">Amount</th>
+                  <th className="px-3 py-2 font-medium">{t('landing.live_transactions.table.game')}</th>
+                  <th className="px-3 py-2 font-medium">{t('landing.live_transactions.table.user')}</th>
+                  <th className="px-3 py-2 font-medium text-right">{t('landing.live_transactions.table.amount')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
                 {filteredTransactions.length === 0 ? (
                   <tr>
                     <td colSpan="3" className="px-3 py-8 text-center text-xs text-gray-500">
-                      No live transactions yet...
+                      {t('landing.live_transactions.table.empty')}
                     </td>
                   </tr>
                 ) : (
@@ -422,7 +426,7 @@ const Landing = () => {
       <div className="w-full max-w-md px-4 mb-8 relative z-10">
          <div className="flex items-center gap-2 mb-4">
             <div className="w-1 h-5 rounded-full bg-[var(--gold)]"></div>
-            <h3 className="text-lg font-bold text-white tracking-tight">Recommended For You</h3>
+            <h3 className="text-lg font-bold text-white tracking-tight">{t('landing.recommended.title')}</h3>
          </div>
          <div className="grid grid-cols-3 gap-3">
             {(() => {
@@ -435,7 +439,7 @@ const Landing = () => {
                 }
                 
                 if (recommended.length === 0) {
-                    return <div className="col-span-3 text-center text-gray-500 text-xs py-4">No recommendations available</div>;
+                    return <div className="col-span-3 text-center text-gray-500 text-xs py-4">{t('landing.recommended.empty')}</div>;
                 }
 
                 return recommended.map(game => (
@@ -455,7 +459,7 @@ const Landing = () => {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
                 <Globe className="w-4 h-4 text-[var(--gold)]" />
-                Premium Providers
+                {t('landing.providers.title')}
               </h3>
             </div>
             

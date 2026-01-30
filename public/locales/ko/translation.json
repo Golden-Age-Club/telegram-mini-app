@@ -31,5 +31,51 @@
   "wildBountyShowdown": "와일드 바운티 쇼다운",
   "mahjongWays": "마작 웨이즈",
   "luckyNeko": "럭키 네코",
-  "megaWin": "메가 윈!"
+  "megaWin": "메가 윈!",
+  "landing": {
+    "quick_actions": {
+      "deposit": "입금",
+      "withdraw": "출금",
+      "invite": "초대",
+      "support": "지원"
+    },
+    "jackpot": "잭팟",
+    "live_transactions": {
+      "title": "실시간 거래",
+      "live_badge": "라이브",
+      "tabs": {
+        "all_bets": "모든 베팅",
+        "my_bets": "내 베팅",
+        "all_wins": "모든 승리"
+      },
+      "table": {
+        "game": "게임",
+        "user": "사용자",
+        "amount": "금액",
+        "empty": "아직 실시간 거래가 없습니다..."
+      }
+    },
+    "recommended": {
+        "title": "추천 게임",
+        "empty": "추천 게임이 없습니다"
+    },
+    "providers": {
+        "title": "제공업체"
+    }
+  },
+  "game_types": {
+    "1": "슬롯",
+    "2": "라이브 카지노",
+    "3": "스포츠북",
+    "4": "가상 스포츠",
+    "5": "복권",
+    "6": "Qipai",
+    "7": "P2P",
+    "8": "낚시",
+    "9": "투계",
+    "10": "보너스",
+    "11": "e스포츠",
+    "12": "포커",
+    "13": "기타"
+  }
 }
