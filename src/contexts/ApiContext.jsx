@@ -83,11 +83,11 @@ export const ApiProvider = ({ children }) => {
     try {
       // 1. Load Games First (Page 1)
       try {
-        const gamesResponse = await api.get('/api/casino/pg/games?page=1&limit=10');
-        console.log('Games loaded:', gamesResponse);
+        const gamesResponse = await api.get('/api/casino/pg/games?page=1&limit=18');
 
-        if (gamesResponse && Array.isArray(gamesResponse.games)) {
-          setPgGames(gamesResponse.games);
+        if (gamesResponse && Array.isArray(gamesResponse.data) || Array.isArray(gamesResponse.games)) {
+          setPgGames(gamesResponse.games || gamesResponse.data || []);
+
           setPagination({
             page: gamesResponse.page,
             limit: gamesResponse.limit,
@@ -120,20 +120,24 @@ export const ApiProvider = ({ children }) => {
     }
   };
 
-  const resetGames = async (limit = 10, provider = null, search = null) => {
+  const resetGames = async (limit = 20, provider = null, search = null) => {
+    setIsLoading(true);
     try {
       let url = `/api/casino/pg/games?page=1&limit=${limit}`;
       if (provider && provider !== 'all') url += `&provider_id=${encodeURIComponent(provider)}`;
       if (search) url += `&search=${encodeURIComponent(search)}`;
 
       const response = await api.get(url);
-      if (response && response.games) {
-        setPgGames(response.games);
+      
+      const games = response?.games || response?.data || (Array.isArray(response) ? response : null);
+
+      if (Array.isArray(games)) {
+        setPgGames(games);
         setPagination({
-          page: response.page,
-          limit: response.limit,
-          total: response.total,
-          totalPages: response.total_pages
+          page: response.page || 1,
+          limit: response.limit || limit,
+          total: response.total || games.length,
+          totalPages: response.total_pages || Math.ceil(games.length / limit)
         });
       } else {
         setPgGames([]);
@@ -146,6 +150,8 @@ export const ApiProvider = ({ children }) => {
       }
     } catch (err) {
       console.warn('⚠️ Could not reset games:', err.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -158,20 +164,32 @@ export const ApiProvider = ({ children }) => {
     // let's keep it simple.
 
     try {
-      const nextPage = pagination.page + 1;
-      let url = `/api/casino/pg/games?page=${nextPage}&limit=${pagination.limit}`;
+      const offset = pgGames.length;
+      const limit = 18;
+      // We calculate "page" just for consistency in URL/backend logs if they care, 
+      // but we use offset primarily now.
+      const nextPage = Math.floor(offset / limit) + 1;
+      
+      let url = `/api/casino/pg/games?page=${nextPage}&limit=${limit}&offset=${offset}`;
       if (provider && provider !== 'all') url += `&provider_id=${encodeURIComponent(provider)}`;
       if (search) url += `&search=${encodeURIComponent(search)}`;
 
       const response = await api.get(url);
+      const newGames = response?.games || response?.data || (Array.isArray(response) ? response : null);
 
-      if (response && response.games) {
-        setPgGames(prev => [...prev, ...response.games]);
+      if (Array.isArray(newGames)) {
+        if (newGames.length === 0) {
+            // No more games, update totalPages to stop trying
+            setPagination(prev => ({ ...prev, page: prev.totalPages, totalPages: prev.page }));
+            return;
+        }
+
+        setPgGames(prev => [...prev, ...newGames]);
         setPagination({
-          page: response.page,
-          limit: response.limit,
-          total: response.total,
-          totalPages: response.total_pages
+          page: response.page || nextPage,
+          limit: response.limit || limit,
+          total: response.total || pagination.total,
+          totalPages: response.total_pages || pagination.totalPages
         });
       }
     } catch (err) {
@@ -240,74 +258,29 @@ export const ApiProvider = ({ children }) => {
 
   const launchGame = async (gameId) => {
     try {
-      // Get auth token from cookie
-      const token = getCookie('access_token');
-
-      if (!token || !user) {
-        throw new Error('User not authenticated');
-      }
-
-      // Sample uses Date.now() (milliseconds)
-      const requestTime = Date.now();
-
-      // Construct payload
-      // Important: Keys order matters for signature generation if using Object.entries
-      const payload = {
-        exit: window.location.origin + '/',
-        game_id: parseInt(gameId, 10), // Ensure integer
-        player_id: String(user._id || user.id), // Ensure string
-        player_token: token,
-        app_id: PG_CONFIG.APP_ID,
-        language: currentLanguage || 'en',
-        currency: 'USD',
-        request_time: requestTime,
-        urls: {
-          base_url: window.location.origin,
-          wallet_url: window.location.origin + '/wallet',
-          other_url: window.location.origin + '/support'
-        }
-      };
-
-      // Signature generation function based on provided sample
-      const createSign = (params, apiKey) => {
-        const values = Object.entries(params)
-          .filter(([key]) => key !== 'sign' && key !== 'urls')
-          .map(([, value]) => (value && typeof value === 'object' ? JSON.stringify(value) : value))
-          .join('');
-
-        const encoded = encodeURIComponent(values);
-        return CryptoJS.HmacMD5(encoded, apiKey).toString(CryptoJS.enc.Hex);
-      };
-
-      // Generate signature
-      payload.sign = createSign(payload, PG_CONFIG.API_KEY);
-      // Perform POST request to get the game URL
-      // Using https://test-cases.cdnparts.com as the provider endpoint based on previous code
-      // Adjust this URL if the provider is different
-      const providerBaseUrl = 'https://resolver.mgcapi.com';
-
-      // Using fetch to match the sample, but we could use axios
-      const data = await axios.post(`${providerBaseUrl}/api/v1/playGame`, payload, {
-        headers: { 'Content-Type': 'application/json' }
+      const response = await api.post('/api/casino/pg/play', {
+        game_id: gameId,
+        exit_url: window.location.origin + '/'
       });
 
-      if (data.result === false) {
-        console.warn('❌ Game launch error from provider:', data.err_desc);
+      if (response.result === false) {
+        console.warn('❌ Game launch error from provider:', response.err_desc);
         return {
           success: false,
-          error: data.err_desc || 'Game launch failed',
-          code: data.err_code
+          error: response.err_desc || 'Game launch failed',
+          code: response.err_code
         };
       }
 
-      if (data.url) {
-        return { success: true, data: { url: data.url } };
+      if (response.url) {
+        return { success: true, data: { url: response.url } };
       } else {
-        throw new Error(data.message || data.err_desc || 'Failed to get game URL');
+        throw new Error(response.message || response.err_desc || 'Failed to get game URL');
       }
 
     } catch (err) {
-      return { success: false, error: err.message };
+      console.warn('⚠️ Could not launch game:', err.message);
+      return { success: false, error: err.response?.data?.message || err.message };
     }
   };
 

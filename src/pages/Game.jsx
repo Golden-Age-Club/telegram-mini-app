@@ -34,7 +34,7 @@ const Game = () => {
   const { t } = useLanguage();
   
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
-  const [activeProvider, setActiveProvider] = useState(searchParams.get('provider') || 'all');
+  const [activeProviderId, setActiveProviderId] = useState(searchParams.get('provider') || 'all');
   const [launchingGameId, setLaunchingGameId] = useState(null);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -57,11 +57,11 @@ const Game = () => {
   useEffect(() => {
     const provider = searchParams.get('provider') || 'all';
     const search = searchParams.get('search') || '';
-    setActiveProvider(provider);
+    setActiveProviderId(provider);
     setSearchQuery(search);
     
     // Trigger fetch
-    resetGames(12, provider, search);
+    resetGames(18, provider, search);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
@@ -79,19 +79,19 @@ const Game = () => {
     return () => clearTimeout(timer);
   }, [searchQuery, searchParams, setSearchParams]);
 
-  const handleProviderSelect = (provider) => {
-    setActiveProvider(provider);
+  const handleProviderSelect = (providerId) => {
+    setActiveProviderId(providerId);
     setIsFilterOpen(false);
     
     const params = new URLSearchParams(searchParams);
-    if (provider && provider !== 'all') params.set('provider', provider);
+    if (providerId && providerId !== 'all') params.set('provider', providerId);
     else params.delete('provider');
     setSearchParams(params);
   };
 
   const handleClearFilters = () => {
     setSearchQuery('');
-    setActiveProvider('all');
+    setActiveProviderId('all');
     setSearchParams({});
   };
 
@@ -105,6 +105,8 @@ const Game = () => {
 
   // Extract unique providers
   const providers = useMemo(() => {
+    const allOption = { id: 'all', title: t('game_page.all_providers') };
+
     if (pgOptions?.providers) {
       const sortedProviders = [...pgOptions.providers]
         .filter((p) => {
@@ -123,13 +125,27 @@ const Game = () => {
           return Number(a.sorder ?? 0) - Number(b.sorder ?? 0);
         });
 
-      const titles = sortedProviders.map(p => p.title).filter(Boolean);
-      return ['all', ...Array.from(new Set(titles))];
+      // Deduplicate by ID
+      const unique = [];
+      const seen = new Set();
+      sortedProviders.forEach(p => {
+        if (!seen.has(p.id)) {
+          seen.add(p.id);
+          unique.push(p);
+        }
+      });
+
+      return [allOption, ...unique];
     }
 
     // Fallback if options not loaded yet
-    return ['all'];
-  }, [pgOptions]);
+    return [allOption];
+  }, [pgOptions, t]);
+
+  const activeProviderTitle = useMemo(() => {
+    const found = providers.find(p => String(p.id) === String(activeProviderId));
+    return found ? found.title : activeProviderId;
+  }, [providers, activeProviderId]);
 
   const handleGameClick = async (game) => {
     if (launchingGameId) return;
@@ -146,7 +162,7 @@ const Game = () => {
     if (isLoadingMore || !pagination || pagination.page >= pagination.totalPages) return;
     setIsLoadingMore(true);
     try {
-      await loadMoreGames(activeProvider, searchQuery);
+      await loadMoreGames(activeProviderId, searchQuery);
     } finally {
       setIsLoadingMore(false);
     }
@@ -187,14 +203,14 @@ const Game = () => {
                     onClick={() => setIsFilterOpen(!isFilterOpen)}
                     className={`
                         py-2.5 cursor-pointer px-4 flex items-center justify-between gap-2 rounded-xl border transition-all duration-200 min-w-[140px]
-                        ${isFilterOpen || activeProvider !== 'all'
+                        ${isFilterOpen || activeProviderId !== 'all'
                             ? 'bg-[var(--gold)] text-black border-[var(--gold)] shadow-[0_0_15px_rgba(255,215,0,0.3)]'
                             : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white'
                         }
                     `}
                 >
                     <span className="text-sm font-medium truncate">
-                        {activeProvider === 'all' ? t('game_page.all_providers') : activeProvider}
+                        {activeProviderTitle}
                     </span>
                     <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isFilterOpen ? 'rotate-180' : ''}`} />
                 </button>
@@ -206,18 +222,18 @@ const Game = () => {
                             <div className="px-3 py-2 text-xs font-bold text-gray-500 uppercase tracking-wider">{t('game_page.providers')}</div>
                             {providers.map((provider) => (
                                 <button
-                                    key={provider}
-                                    onClick={() => handleProviderSelect(provider)}
+                                    key={provider.id}
+                                    onClick={() => handleProviderSelect(provider.id)}
                                     className={`
                                         w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-colors
-                                        ${activeProvider === provider
+                                        ${String(activeProviderId) === String(provider.id)
                                             ? 'bg-[var(--gold)]/10 text-[var(--gold)]'
                                             : 'text-gray-300 hover:bg-white/5 hover:text-white'
                                         }
                                     `}
                                 >
-                                    <span className="truncate">{provider === 'all' ? t('game_page.all_providers') : provider}</span>
-                                    {activeProvider === provider && <Check className="w-4 h-4" />}
+                                    <span className="truncate">{provider.title}</span>
+                                    {String(activeProviderId) === String(provider.id) && <Check className="w-4 h-4" />}
                                 </button>
                             ))}
                         </div>
@@ -227,14 +243,14 @@ const Game = () => {
         </div>
         
         {/* Active Filter Badge */}
-        {activeProvider !== 'all' && (
+        {activeProviderId !== 'all' && (
              <div className="mt-3 flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
                 <span className="text-xs text-gray-500">{t('game_page.filtered_by')}</span>
                 <button 
                     onClick={() => handleProviderSelect('all')}
                     className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--gold)]/10 border border-[var(--gold)]/20 text-[10px] font-bold text-[var(--gold)] hover:bg-[var(--gold)]/20 transition-colors"
                 >
-                    {activeProvider}
+                    {activeProviderTitle}
                     <X className="w-3 h-3" />
                 </button>
             </div>
