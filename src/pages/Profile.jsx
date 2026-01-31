@@ -69,24 +69,24 @@ const Profile = () => {
               Golden Age <span className="text-[var(--gold)]">Club</span>
             </h1>
             <p className="text-gray-400 text-sm leading-relaxed">
-              Join the elite casino experience. Unlock exclusive VIP rewards, instant withdrawals, and 24/7 premium support.
+              {t('profile_page.subtitle')}
             </p>
           </div>
 
           {/* Feature Grid */}
           <div className="grid grid-cols-2 gap-3 py-4">
             {[
-              { icon: Trophy, label: 'VIP Rewards' },
-              { icon: Sparkles, label: 'Daily Bonus' },
-              { icon: Shield, label: 'Secure Play' },
-              { icon: MessageCircle, label: '24/7 Support' }
+              { icon: Trophy, label: t('profile_page.features.vip_rewards') },
+              { icon: Sparkles, label: t('profile_page.features.daily_bonus') },
+              { icon: Shield, label: t('profile_page.features.secure_play') },
+              { icon: MessageCircle, label: t('profile_page.features.support_247') }
             ].map((feature, i) => (
               <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 backdrop-blur-sm">
                 <feature.icon className="w-5 h-5 text-[var(--gold)]" />
                 <span className="text-xs font-medium text-gray-300">{feature.label}</span>
               </div>
-            ))}
-          </div>
+            ))
+          }</div>
 
           {/* Action Buttons */}
           <div className="space-y-3 pt-2">
@@ -94,13 +94,13 @@ const Profile = () => {
               onClick={() => setModal('sign-up')}
               className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[var(--gold)] to-amber-500 text-black font-bold text-sm uppercase tracking-wider shadow-[0_0_20px_rgba(255,215,0,0.3)] hover:shadow-[0_0_30px_rgba(255,215,0,0.5)] hover:brightness-110 active:scale-95 transition-all"
             >
-              {t('signup') || 'Join Now'}
+              {t('profile_page.guest.join_now')}
             </button>
             <button
               onClick={() => setModal('sign-in')}
               className="w-full py-3.5 rounded-xl bg-white/5 border border-white/10 text-white font-bold text-sm uppercase tracking-wider hover:bg-white/10 active:scale-95 transition-all"
             >
-              {t('login') || 'Log In'}
+              {t('profile_page.guest.log_in')}
             </button>
           </div>
 
@@ -110,7 +110,7 @@ const Profile = () => {
                className="flex items-center justify-center gap-2 text-xs text-gray-500 hover:text-white transition-colors"
              >
                <Globe className="w-3 h-3" />
-               <span>Change Language</span>
+               <span>{t('profile_page.guest.change_language')}</span>
              </button>
           </div>
         </div>
@@ -124,22 +124,22 @@ const Profile = () => {
   const secondaryIdentifier = user?.username ? `@${user.username}` : (user?.email || `ID: ${user?.telegram_id || 'Unknown'}`);
 
   const stats = [
-    { icon: Target, label: 'Total Bets', value: user?.total_bet ? `$${user.total_bet.toFixed(2)}` : '$0.00' },
-    { icon: Trophy, label: 'Total Wins', value: user?.total_won ? `$${user.total_won.toFixed(2)}` : '$0.00' },
-    { icon: Crown, label: 'Best Win', value: user?.best_win ? `$${user.best_win.toFixed(2)}` : '$0.00' },
+    { icon: Target, label: t('profile_page.stats.total_bets'), value: user?.total_bet ? `$${user.total_bet.toFixed(2)}` : '$0.00' },
+    { icon: Trophy, label: t('profile_page.stats.total_wins'), value: user?.total_won ? `$${user.total_won.toFixed(2)}` : '$0.00' },
+    { icon: Crown, label: t('profile_page.stats.best_win'), value: user?.best_win ? `$${user.best_win.toFixed(2)}` : '$0.00' },
   ];
 
   const menuGroups = [
     {
-      title: 'Account',
+      title: t('profile_page.menu.account'),
       items: [
-        { icon: User, label: 'Personal Details', value: 'Verified' },
-        { icon: Wallet, label: 'Wallet', value: `$${user?.balance?.toLocaleString() || '0'}`, action: () => navigate('/wallet') },
-        { icon: History, label: 'Bet History', action: () => navigate('/bet-history') },
+        { icon: User, label: t('profile_page.menu.personal_details'), value: t('profile_page.menu.verified') },
+        { icon: Wallet, label: t('wallet'), value: `$${user?.balance?.toLocaleString() || '0'}`, action: () => navigate('/wallet') },
+        { icon: History, label: t('profile_page.menu.bet_history'), action: () => navigate('/bet-history') },
       ]
     },
     {
-      title: 'Settings',
+      title: t('profile_page.menu.settings'),
       items: [
         { 
           icon: Globe, 
@@ -147,14 +147,14 @@ const Profile = () => {
           value: languages.find(l => l.code === currentLanguage)?.name,
           action: () => setShowLanguageModal(true)
         },
-        { icon: Bell, label: 'Notifications', value: 'On' },
-        { icon: Shield, label: 'Security', value: '2FA' },
+        { icon: Bell, label: t('profile_page.menu.notifications'), value: t('profile_page.menu.on') },
+        { icon: Shield, label: t('profile_page.menu.security'), value: t('profile_page.menu.2fa') },
       ]
     },
     {
-      title: 'Support',
+      title: t('profile_page.menu.support'),
       items: [
-        { icon: MessageCircle, label: 'Live Support', value: 'Online' },
+        { icon: MessageCircle, label: t('profile_page.menu.live_support'), value: t('profile_page.menu.online') },
         { icon: LogOut, label: t('logout'), action: logout, danger: true },
       ]
     }
@@ -221,14 +221,14 @@ const Profile = () => {
       {/* Wallet Quick Action */}
       <div className="rounded-2xl bg-gradient-to-r from-emerald-900/40 to-emerald-900/10 border border-emerald-500/20 p-4 flex items-center justify-between">
         <div>
-          <span className="text-xs text-emerald-400 font-medium uppercase tracking-wider">Total Balance</span>
+          <span className="text-xs text-emerald-400 font-medium uppercase tracking-wider">{t('profile_page.total_balance')}</span>
           <div className="text-2xl font-bold text-white mt-0.5">${user?.balance?.toLocaleString() || '0.00'}</div>
         </div>
         <button 
           onClick={() => navigate('/wallet')}
           className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs rounded-lg shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
         >
-          Deposit
+          {t('profile_page.deposit')}
         </button>
       </div>
 

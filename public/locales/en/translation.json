@@ -1,6 +1,7 @@
 {
   "home": "Home",
   "games": "Games",
+  "slots": "Slots",
   "wallet": "Wallet",
   "profile": "Profile",
   "telegramMiniApp": "Telegram Mini App",
@@ -32,6 +33,96 @@
   "mahjongWays": "Mahjong Ways",
   "luckyNeko": "Lucky Neko",
   "megaWin": "MEGA WIN!",
+  "profile_page": {
+    "subtitle": "Join the elite casino experience. Unlock exclusive VIP rewards, instant withdrawals, and 24/7 premium support.",
+    "features": {
+      "vip_rewards": "VIP Rewards",
+      "daily_bonus": "Daily Bonus",
+      "secure_play": "Secure Play",
+      "support_247": "24/7 Support"
+    },
+    "guest": {
+      "join_now": "Join Now",
+      "log_in": "Log In",
+      "change_language": "Change Language"
+    },
+    "change_language": "Change Language",
+    "stats": {
+      "total_bets": "Total Bets",
+      "total_wins": "Total Wins",
+      "best_win": "Best Win"
+    },
+    "menu": {
+      "account": "Account",
+      "personal_details": "Personal Details",
+      "verified": "Verified",
+      "bet_history": "Bet History",
+      "settings": "Settings",
+      "notifications": "Notifications",
+      "on": "On",
+      "security": "Security",
+      "2fa": "2FA",
+      "support": "Support",
+      "live_support": "Live Support",
+      "online": "Online"
+    },
+    "total_balance": "Total Balance",
+    "deposit": "Deposit",
+    "select_language": "Select your preferred language"
+  },
+  "game_page": {
+    "search_placeholder": "Search games...",
+    "all_providers": "All Providers",
+    "providers": "Providers",
+    "filtered_by": "Filtered by:",
+    "loading_more": "Loading more games...",
+    "load_more": "Load more games",
+    "no_games_found": "No games found",
+    "no_games_desc": "Try adjusting your search or filter to find what you're looking for.",
+    "clear_filters": "Clear Filters"
+  },
+  "wallet_page": {
+    "copy_success": "Address copied to clipboard",
+    "deposit_created": "Deposit order created!",
+    "deposit_failed": "Deposit Failed",
+    "withdrawal_success": "Withdrawal request submitted successfully.",
+    "withdrawal_failed": "Withdrawal failed. Please try again.",
+    "edit_amount": "Edit Amount",
+    "send_exact_amount": "Send Exact Amount",
+    "network": "Network",
+    "deposit_address": "Deposit Address",
+    "warning_send_only": "Send only",
+    "warning_loss": "to this address. Sending other assets will result in permanent loss.",
+    "select_network": "Select Network",
+    "fee": "Fee",
+    "deposit_amount": "Deposit Amount",
+    "min_deposit": "Min. Deposit: 10 USDT",
+    "instant_arrival": "Instant Arrival",
+    "creating_order": "Creating Order...",
+    "proceed_to_pay": "Proceed to Pay",
+    "withdraw_warning_intro": "Ensure you enter the correct",
+    "withdraw_warning_text": "address. Withdrawals to other networks cannot be recovered.",
+    "amount_to_withdraw": "Amount to Withdraw",
+    "available": "Available",
+    "wallet_address_trc20": "Wallet Address (TRC20)",
+    "paste_address_placeholder": "Paste your TRC20 address",
+    "processing": "Processing...",
+    "withdraw_funds": "Withdraw Funds",
+    "loading_transactions": "Loading transactions...",
+    "no_transactions": "No transactions yet",
+    "secure_wallet_title": "Secure",
+    "wallet_title_highlight": "Wallet",
+    "secure_wallet_desc": "Instant USDT deposits and withdrawals. Your funds are protected by industry-leading security protocols.",
+    "features": {
+      "instant_deposit": "Instant Deposit",
+      "secure_storage": "Secure Storage",
+      "fast_withdraw": "Fast Withdraw",
+      "detailed_history": "Detailed History"
+    },
+    "login_access": "Login to Access Wallet",
+    "no_account": "Don't have an account?",
+    "history_tab": "History"
+  },
   "landing": {
     "quick_actions": {
       "deposit": "Deposit",
@@ -40,6 +131,7 @@
       "support": "Support"
     },
     "jackpot": "Progressive Jackpot",
+    "telegram_enter": "👑 Enter Golden Age Cash 👑",
     "live_transactions": {
       "title": "Live Transactions",
       "live_badge": "LIVE",
@@ -61,6 +153,27 @@
     },
     "providers": {
       "title": "Premium Providers"
+    },
+    "why_choose_us": {
+      "title": "Why Golden Age?",
+      "items": {
+        "instant_withdrawals": {
+          "title": "Instant Withdrawals",
+          "desc": "Get paid in seconds"
+        },
+        "security": {
+          "title": "Bank-Grade Security",
+          "desc": "Encrypted & protected"
+        },
+        "support": {
+          "title": "24/7 Live Support",
+          "desc": "Always here to help"
+        },
+        "vip_rewards": {
+          "title": "VIP Rewards",
+          "desc": "Exclusive daily bonuses"
+        }
+      }
     }
   },
   "game_types": {
@@ -77,5 +190,55 @@
     "11": "Esport",
     "12": "Poker",
     "13": "Other"
+  },
+  "auth": {
+    "welcome_back": "Welcome Back",
+    "sign_in_subtitle": "Sign in to access your wallet",
+    "email_label": "Email Address",
+    "password_label": "Password",
+    "forgot_password": "Forgot password?",
+    "password_placeholder": "Enter your password",
+    "sign_in": "Sign In",
+    "signing_in": "Signing in...",
+    "or_continue_with": "Or continue with",
+    "create_account": "Create Account",
+    "sign_up_subtitle": "Join now to start playing and earning",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "username": "Username",
+    "confirm_password": "Confirm Password",
+    "first_name_placeholder": "John",
+    "last_name_placeholder": "Doe",
+    "username_placeholder": "Choose a username",
+    "email_placeholder": "name@example.com",
+    "create_password_placeholder": "Create a password",
+    "repeat_password_placeholder": "Repeat your password",
+    "username_taken": "Username is already taken",
+    "username_available": "Username is available",
+    "checking_username": "Please wait while we check your username.",
+    "creating_account": "Creating account...",
+    "or_sign_up_with": "Or sign up with",
+    "telegram": "Telegram",
+    "fill_all_fields": "Please fill in all fields.",
+    "passwords_mismatch": "Passwords do not match.",
+    "account_created": "Account created successfully.",
+    "sign_up_failed": "Sign up failed. Please try again.",
+    "sign_in_success": "Signed in successfully.",
+    "sign_in_failed": "Sign in failed. Please check your credentials."
+  },
+  "game_details": {
+    "loading_game": "LOADING GAME...",
+    "game_not_found": "Game Not Found",
+    "game_not_found_desc": "The game you are looking for is currently unavailable or may have been removed.",
+    "return_to_lobby": "Return to Lobby",
+    "fair": "Fair",
+    "popular": "Popular",
+    "experience_gameplay": "Experience the premium gameplay of {{name}}. Win big with high multipliers and instant payouts.",
+    "launching": "Launching...",
+    "start_game": "Start Game Now",
+    "official_game": "* Official Game • Instant Withdrawals",
+    "premium": "Premium",
+    "launch_failed": "Failed to launch game",
+    "launch_error": "Error launching game"
   }
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext.jsx';
+import { useLanguage } from '../../contexts/LanguageContext.jsx';
 import { toast } from 'sonner';
 
 const TelegramIcon = ({ className }) => (
@@ -22,6 +23,7 @@ const SignInModal = ({ onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { loginWithEmail } = useAuth();
+  const { t } = useLanguage();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -31,13 +33,13 @@ const SignInModal = ({ onClose }) => {
     try {
       const result = await loginWithEmail({ email, password });
       if (result?.success) {
-        toast.success('Signed in successfully.');
+        toast.success(t('auth.sign_in_success'));
         onClose();
       } else {
-        toast.error(result?.error || 'Sign in failed. Please check your credentials.');
+        toast.error(result?.error || t('auth.sign_in_failed'));
       }
     } catch (error) {
-      toast.error(error?.message || 'Sign in failed. Please try again.');
+      toast.error(error?.message || t('auth.sign_in_failed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -57,9 +59,9 @@ const SignInModal = ({ onClose }) => {
 
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="font-bold text-white text-xl tracking-tight">Welcome Back</h3>
+            <h3 className="font-bold text-white text-xl tracking-tight">{t('auth.welcome_back')}</h3>
             <p className="text-xs text-[var(--text-muted)] mt-1">
-              Sign in to access your wallet
+              {t('auth.sign_in_subtitle')}
             </p>
           </div>
           <button
@@ -72,7 +74,7 @@ const SignInModal = ({ onClose }) => {
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-[var(--text-secondary)] ml-1">Email Address</label>
+            <label className="text-xs font-medium text-[var(--text-secondary)] ml-1">{t('auth.email_label')}</label>
             <div className="relative group">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--gold)] transition-colors">
                 <Mail className="w-4 h-4" />
@@ -82,7 +84,7 @@ const SignInModal = ({ onClose }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full rounded-xl bg-[var(--bg-card)] border border-[var(--border)] pl-10 pr-4 py-3 text-sm text-white outline-none focus:border-[var(--gold)] focus:ring-1 focus:ring-[var(--gold)]/20 transition-all placeholder:text-white/20"
-                placeholder="name@example.com"
+                placeholder={t('auth.email_placeholder')}
                 autoComplete="email"
               />
             </div>
@@ -90,12 +92,12 @@ const SignInModal = ({ onClose }) => {
           
           <div className="space-y-1.5">
             <div className="flex items-center justify-between ml-1">
-              <label className="text-xs font-medium text-[var(--text-secondary)]">Password</label>
+              <label className="text-xs font-medium text-[var(--text-secondary)]">{t('auth.password_label')}</label>
               <button
                 type="button"
                 className="text-xs text-[var(--gold)] hover:text-[var(--gold-light)] hover:underline cursor-pointer transition-colors"
               >
-                Forgot password?
+                {t('auth.forgot_password')}
               </button>
             </div>
             <div className="relative group">
@@ -107,7 +109,7 @@ const SignInModal = ({ onClose }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full rounded-xl bg-[var(--bg-card)] border border-[var(--border)] pl-10 pr-10 py-3 text-sm text-white outline-none focus:border-[var(--gold)] focus:ring-1 focus:ring-[var(--gold)]/20 transition-all placeholder:text-white/20"
-                placeholder="Enter your password"
+                placeholder={t('auth.password_placeholder')}
                 autoComplete="current-password"
               />
               <button
@@ -129,13 +131,13 @@ const SignInModal = ({ onClose }) => {
                 : 'bg-gradient-to-r from-[var(--emerald-medium)] to-[var(--emerald-light)] hover:from-[var(--emerald-medium)] hover:to-[#14b8a6] text-white shadow-emerald-900/20 active:scale-[0.98]'
             }`}
           >
-            {isSubmitting ? 'Signing in...' : 'Sign In'}
+            {isSubmitting ? t('auth.signing_in') : t('auth.sign_in')}
           </button>
 
           <div className="py-3">
             <div className="flex items-center gap-3 text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-medium">
               <div className="flex-1 h-px bg-[var(--border)]" />
-              <span>Or continue with</span>
+              <span>{t('auth.or_continue_with')}</span>
               <div className="flex-1 h-px bg-[var(--border)]" />
             </div>
             <div className="mt-4">
@@ -146,7 +148,7 @@ const SignInModal = ({ onClose }) => {
                 <div className="w-6 h-6 rounded-full bg-[#2AABEE] text-white flex items-center justify-center group-hover:scale-110 transition-transform">
                   <TelegramIcon className="w-3.5 h-3.5" />
                 </div>
-                <span className="text-sm font-semibold">Telegram</span>
+                <span className="text-sm font-semibold">{t('auth.telegram')}</span>
               </button>
             </div>
           </div>

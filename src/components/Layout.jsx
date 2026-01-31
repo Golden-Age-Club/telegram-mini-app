@@ -3,6 +3,7 @@ import { Home, Dices, Wallet, User } from 'lucide-react';
 import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { useLayout } from '../contexts/LayoutContext.jsx';
+import { useLanguage } from '../contexts/LanguageContext.jsx';
 import Navbar from './Navbar.jsx';
 import SignInModal from './auth/SignInModal.jsx';
 import SignUpModal from './auth/SignUpModal.jsx';
@@ -12,6 +13,7 @@ const Layout = () => {
   const tg = window.Telegram?.WebApp;
   
   const { user } = useAuth();
+  const { t } = useLanguage();
   const { title, showBack, onBack } = useLayout();
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,10 +35,10 @@ const Layout = () => {
   }, [tg]);
 
   const navigation = [
-    { id: 'home', label: 'Home', icon: Home, screen: '/' },
-    { id: 'slots', label: 'Slots', icon: Dices, screen: '/slots' },
-    { id: 'wallet', label: 'Wallet', icon: Wallet, screen: '/wallet' },
-    { id: 'profile', label: 'Profile', icon: User, screen: '/profile' },
+    { id: 'home', label: t('home'), icon: Home, screen: '/' },
+    { id: 'slots', label: t('slots'), icon: Dices, screen: '/slots' },
+    { id: 'wallet', label: t('wallet'), icon: Wallet, screen: '/wallet' },
+    { id: 'profile', label: t('profile'), icon: User, screen: '/profile' },
   ];
 
   const handleNavigation = (screen) => {

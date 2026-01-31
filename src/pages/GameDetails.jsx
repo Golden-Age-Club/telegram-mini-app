@@ -4,6 +4,7 @@ import { ArrowLeft, Play, Globe, Loader2, Star, Share2, Info, ShieldCheck, X } f
 import { useApi } from '../contexts/ApiContext.jsx';
 import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext.jsx';
+import { useLanguage } from '../contexts/LanguageContext.jsx';
 
 const GameDetails = () => {
   const { id } = useParams();
@@ -11,6 +12,7 @@ const GameDetails = () => {
   const location = useLocation();
   const { pgGames, launchGame, isLoading } = useApi();
   const { isAuthenticated } = useAuth();
+  const { t } = useLanguage();
   const [game, setGame] = useState(location.state?.game || null);
   const [isLaunching, setIsLaunching] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
@@ -38,11 +40,11 @@ const GameDetails = () => {
         if (result?.success && result?.data?.url) {
             navigate('/start-game', { state: { url: result.data.url } });
         } else {
-            toast.error(result?.error || 'Failed to launch game');
+            toast.error(result?.error || t('game_details.launch_failed'));
         }
     } catch (err) {
         console.error(err);
-        toast.error('Error launching game');
+        toast.error(t('game_details.launch_error'));
     } finally {
         setIsLaunching(false);
     }
@@ -54,7 +56,7 @@ const GameDetails = () => {
         <div className="absolute inset-0 bg-[var(--gold)]/20 blur-xl rounded-full"></div>
         <Loader2 className="w-12 h-12 animate-spin text-[var(--gold)] relative z-10" />
       </div>
-      <span className="text-[var(--gold)] font-medium tracking-wider text-sm animate-pulse">LOADING GAME...</span>
+      <span className="text-[var(--gold)] font-medium tracking-wider text-sm animate-pulse">{t('game_details.loading_game')}</span>
     </div>
   );
 
@@ -68,13 +70,13 @@ const GameDetails = () => {
             <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
               <Info className="w-8 h-8 text-gray-400" />
             </div>
-            <h2 className="text-xl font-bold text-white mb-2">Game Not Found</h2>
-            <p className="text-gray-400 mb-6 text-sm leading-relaxed">The game you are looking for is currently unavailable or may have been removed.</p>
+            <h2 className="text-xl font-bold text-white mb-2">{t('game_details.game_not_found')}</h2>
+            <p className="text-gray-400 mb-6 text-sm leading-relaxed">{t('game_details.game_not_found_desc')}</p>
             <button 
               onClick={() => navigate('/slots')}
               className="px-8 py-3 rounded-xl bg-[var(--gold)] text-black font-bold hover:bg-yellow-400 transition-all active:scale-95 shadow-[0_4px_20px_rgba(212,175,55,0.2)]"
             >
-              Return to Lobby
+              {t('game_details.return_to_lobby')}
             </button>
           </div>
         )}
@@ -133,7 +135,7 @@ const GameDetails = () => {
                   <div className="bg-black/60 backdrop-blur-md rounded-lg px-2 py-1 flex items-center justify-center gap-1 border border-white/10">
                     <Globe className="w-3 h-3 text-[var(--gold)]" />
                     <span className="text-[10px] font-bold text-white uppercase truncate">
-                      {game.provider_title || 'Premium'}
+                      {game.provider_title || t('game_details.premium')}
                     </span>
                   </div>
                 </div>
@@ -150,16 +152,16 @@ const GameDetails = () => {
                 <div className="flex flex-wrap gap-2 mb-3">
                    <div className="px-2 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-1">
                       <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                      <span className="text-[10px] font-medium text-emerald-400">Fair</span>
+                      <span className="text-[10px] font-medium text-emerald-400">{t('game_details.fair')}</span>
                    </div>
                    <div className="px-2 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 flex items-center gap-1">
                       <Star className="w-3 h-3 text-blue-400" />
-                      <span className="text-[10px] font-medium text-blue-400">Popular</span>
+                      <span className="text-[10px] font-medium text-blue-400">{t('game_details.popular')}</span>
                    </div>
                 </div>
 
                 <p className="text-xs text-gray-400 line-clamp-3 leading-relaxed">
-                  Experience the premium gameplay of {game.name}. Win big with high multipliers and instant payouts.
+                  {t('game_details.experience_gameplay', { name: game.name })}
                 </p>
               </div>
             </div>
@@ -185,18 +187,18 @@ const GameDetails = () => {
               {isLaunching ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Launching...</span>
+                  <span>{t('game_details.launching')}</span>
                 </>
               ) : (
                 <>
                   <Play className="w-5 h-5 fill-current" />
-                  <span>Start Game Now</span>
+                  <span>{t('game_details.start_game')}</span>
                 </>
               )}
             </button>
             
             <p className="text-center text-[10px] text-gray-500">
-              * Official Game • Instant Withdrawals
+              {t('game_details.official_game')}
             </p>
           </div>
         </div>

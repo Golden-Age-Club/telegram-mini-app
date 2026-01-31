@@ -1,6 +1,7 @@
 {
   "home": "홈",
   "games": "게임",
+  "slots": "슬롯",
   "wallet": "지갑",
   "profile": "프로필",
   "telegramMiniApp": "텔레그램 미니 앱",
@@ -32,6 +33,96 @@
   "mahjongWays": "마작 웨이즈",
   "luckyNeko": "럭키 네코",
   "megaWin": "메가 윈!",
+  "profile_page": {
+    "subtitle": "엘리트 카지노 경험에 참여하세요. 독점 VIP 보상, 즉시 인출 및 24/7 프리미엄 지원을 잠금 해제하세요.",
+    "features": {
+      "vip_rewards": "VIP 보상",
+      "daily_bonus": "일일 보너스",
+      "secure_play": "안전한 플레이",
+      "support_247": "24/7 지원"
+    },
+    "guest": {
+      "join_now": "지금 가입하세요",
+      "log_in": "로그인",
+      "change_language": "언어 변경"
+    },
+    "change_language": "언어 변경",
+    "stats": {
+      "total_bets": "총 베팅",
+      "total_wins": "총 당첨",
+      "best_win": "최고 당첨"
+    },
+    "menu": {
+      "account": "계정",
+      "personal_details": "개인 정보",
+      "verified": "인증됨",
+      "bet_history": "베팅 내역",
+      "settings": "설정",
+      "notifications": "알림",
+      "on": "켜짐",
+      "security": "보안",
+      "2fa": "2FA",
+      "support": "지원",
+      "live_support": "라이브 지원",
+      "online": "온라인"
+    },
+    "total_balance": "총 잔액",
+    "deposit": "입금",
+    "select_language": "선호하는 언어를 선택하세요"
+  },
+  "game_page": {
+    "search_placeholder": "게임 검색...",
+    "all_providers": "모든 제공자",
+    "providers": "제공자",
+    "filtered_by": "필터:",
+    "loading_more": "게임 더 불러오는 중...",
+    "load_more": "더 보기",
+    "no_games_found": "게임을 찾을 수 없습니다",
+    "no_games_desc": "검색 또는 필터를 조정하여 원하는 내용을 찾아보세요.",
+    "clear_filters": "필터 지우기"
+  },
+  "wallet_page": {
+    "copy_success": "주소가 클립보드에 복사되었습니다",
+    "deposit_created": "입금 주문이 생성되었습니다!",
+    "deposit_failed": "입금 실패",
+    "withdrawal_success": "출금 요청이 성공적으로 제출되었습니다.",
+    "withdrawal_failed": "출금 실패. 다시 시도해 주세요.",
+    "edit_amount": "금액 수정",
+    "send_exact_amount": "정확한 금액 보내기",
+    "network": "네트워크",
+    "deposit_address": "입금 주소",
+    "warning_send_only": "오직",
+    "warning_loss": "만이 주소로 보내세요. 다른 자산을 보내면 영구적으로 손실됩니다.",
+    "select_network": "네트워크 선택",
+    "fee": "수수료",
+    "deposit_amount": "입금 금액",
+    "min_deposit": "최소 입금: 10 USDT",
+    "instant_arrival": "즉시 도착",
+    "creating_order": "주문 생성 중...",
+    "proceed_to_pay": "결제 진행",
+    "withdraw_warning_intro": "올바른",
+    "withdraw_warning_text": "주소를 입력했는지 확인하세요. 다른 네트워크로의 출금은 복구할 수 없습니다.",
+    "amount_to_withdraw": "출금 금액",
+    "available": "사용 가능",
+    "wallet_address_trc20": "지갑 주소 (TRC20)",
+    "paste_address_placeholder": "TRC20 주소 붙여넣기",
+    "processing": "처리 중...",
+    "withdraw_funds": "자금 출금",
+    "loading_transactions": "거래 불러오는 중...",
+    "no_transactions": "거래 내역 없음",
+    "secure_wallet_title": "안전한",
+    "wallet_title_highlight": "지갑",
+    "secure_wallet_desc": "즉시 USDT 입출금. 귀하의 자금은 업계 최고의 보안 프로토콜로 보호됩니다.",
+    "features": {
+      "instant_deposit": "즉시 입금",
+      "secure_storage": "안전한 보관",
+      "fast_withdraw": "빠른 출금",
+      "detailed_history": "상세 내역"
+    },
+    "login_access": "Login to Access Wallet",
+    "no_account": "Don't have an account?",
+    "history_tab": "History"
+  },
   "landing": {
     "quick_actions": {
       "deposit": "입금",
@@ -40,6 +131,7 @@
       "support": "지원"
     },
     "jackpot": "잭팟",
+    "telegram_enter": "👑 Golden Age Cash 입장 👑",
     "live_transactions": {
       "title": "실시간 거래",
       "live_badge": "라이브",
@@ -56,11 +148,32 @@
       }
     },
     "recommended": {
-        "title": "추천 게임",
-        "empty": "추천 게임이 없습니다"
+      "title": "추천 게임",
+      "empty": "추천 게임이 없습니다"
     },
     "providers": {
-        "title": "제공업체"
+      "title": "제공업체"
+    },
+    "why_choose_us": {
+      "title": "Golden Age를 선택하는 이유",
+      "items": {
+        "instant_withdrawals": {
+          "title": "즉시 출금",
+          "desc": "초 단위 입금 완료"
+        },
+        "security": {
+          "title": "은행급 보안",
+          "desc": "암호화 및 보호"
+        },
+        "support": {
+          "title": "24/7 라이브 지원",
+          "desc": "언제나 도움을 드립니다"
+        },
+        "vip_rewards": {
+          "title": "VIP 보상",
+          "desc": "독점 일일 보너스"
+        }
+      }
     }
   },
   "game_types": {
@@ -77,5 +190,54 @@
     "11": "e스포츠",
     "12": "포커",
     "13": "기타"
+  },
+  "auth": {
+    "welcome_back": "다시 오신 것을 환영합니다",
+    "sign_in_subtitle": "지갑에 액세스하려면 로그인하세요",
+    "email_label": "이메일 주소",
+    "password_label": "비밀번호",
+    "forgot_password": "비밀번호를 잊으셨나요?",
+    "password_placeholder": "비밀번호를 입력하세요",
+    "sign_in": "로그인",
+    "signing_in": "로그인 중...",
+    "or_continue_with": "또는 다음으로 계속",
+    "create_account": "계정 만들기",
+    "sign_up_subtitle": "지금 가입하여 플레이하고 수익을 올리세요",
+    "first_name": "이름",
+    "last_name": "성",
+    "username": "사용자 이름",
+    "confirm_password": "비밀번호 확인",
+    "first_name_placeholder": "길동",
+    "last_name_placeholder": "홍",
+    "username_placeholder": "사용자 이름 선택",
+    "email_placeholder": "name@example.com",
+    "create_password_placeholder": "비밀번호 생성",
+    "repeat_password_placeholder": "비밀번호 재입력",
+    "username_taken": "이미 사용 중인 사용자 이름입니다",
+    "username_available": "사용 가능한 사용자 이름입니다",
+    "checking_username": "사용자 이름을 확인하는 동안 기다려 주십시오.",
+    "creating_account": "계정 생성 중...",
+    "or_sign_up_with": "또는 다음으로 가입",
+    "telegram": "Telegram",
+    "fill_all_fields": "모든 필드를 입력해 주세요.",
+    "passwords_mismatch": "비밀번호가 일치하지 않습니다.",
+    "account_created": "계정이 성공적으로 생성되었습니다.",
+    "sign_up_failed": "가입에 실패했습니다. 다시 시도해 주세요.",
+    "sign_in_success": "성공적으로 로그인되었습니다.",
+    "sign_in_failed": "로그인에 실패했습니다. 자격 증명을 확인해 주세요."
+  },
+  "game_details": {
+    "loading_game": "게임 로딩 중...",
+    "game_not_found": "게임을 찾을 수 없음",
+    "game_not_found_desc": "찾으시는 게임은 현재 이용할 수 없거나 제거되었을 수 있습니다.",
+    "return_to_lobby": "로비로 돌아가기",
+    "fair": "공정",
+    "popular": "인기",
+    "experience_gameplay": "{{name}}의 프리미엄 게임플레이를 경험하세요. 높은 배수와 즉시 지급으로 큰 승리를 거두세요.",
+    "launching": "실행 중...",
+    "start_game": "지금 게임 시작",
+    "official_game": "* 공식 게임 • 즉시 출금",
+    "launch_failed": "게임 실행 실패",
+    "launch_error": "게임 실행 오류"
   }
 }

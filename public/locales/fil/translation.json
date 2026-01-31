@@ -1,6 +1,7 @@
 {
   "home": "Home",
   "games": "Mga Laro",
+  "slots": "Slots",
   "wallet": "Wallet",
   "profile": "Profile",
   "telegramMiniApp": "Telegram Mini App",
@@ -32,6 +33,96 @@
   "mahjongWays": "Mahjong Ways",
   "luckyNeko": "Lucky Neko",
   "megaWin": "MALAKING PANALO!",
+  "profile_page": {
+    "subtitle": "Sumali sa elite na karanasan sa casino. I-unlock ang eksklusibong VIP rewards, instant withdrawals, at 24/7 premium support.",
+    "features": {
+      "vip_rewards": "VIP Rewards",
+      "daily_bonus": "Araw-araw na Bonus",
+      "secure_play": "Ligtas na Laro",
+      "support_247": "24/7 Suporta"
+    },
+    "guest": {
+      "join_now": "Sumali Ngayon",
+      "log_in": "Mag-log In",
+      "change_language": "Palitan ang Wika"
+    },
+    "change_language": "Palitan ang Wika",
+    "stats": {
+      "total_bets": "Kabuuang Pusta",
+      "total_wins": "Kabuuang Panalo",
+      "best_win": "Pinakamalaking Panalo"
+    },
+    "menu": {
+      "account": "Account",
+      "personal_details": "Personal na Detalye",
+      "verified": "Beripikado",
+      "bet_history": "Kasaysayan ng Pusta",
+      "settings": "Mga Setting",
+      "notifications": "Mga Abiso",
+      "on": "Bukas",
+      "security": "Seguridad",
+      "2fa": "2FA",
+      "support": "Suporta",
+      "live_support": "Live na Suporta",
+      "online": "Online"
+    },
+    "total_balance": "Kabuuang Balanse",
+    "deposit": "Mag-deposito",
+    "select_language": "Piliin ang iyong wika"
+  },
+  "game_page": {
+    "search_placeholder": "Maghanap ng laro...",
+    "all_providers": "Lahat ng Provider",
+    "providers": "Mga Provider",
+    "filtered_by": "Na-filter sa:",
+    "loading_more": "Naglo-load pa ng mga laro...",
+    "load_more": "Mag-load pa ng laro",
+    "no_games_found": "Walang nakitang laro",
+    "no_games_desc": "Subukang ayusin ang iyong paghahanap o filter upang mahanap ang iyong hinahanap.",
+    "clear_filters": "Alisin ang Filter"
+  },
+  "wallet_page": {
+    "copy_success": "Nakopya ang address sa clipboard",
+    "deposit_created": "Nagawa na ang deposit order!",
+    "deposit_failed": "Nabigo ang Deposito",
+    "withdrawal_success": "Matagumpay na naisumite ang withdrawal request.",
+    "withdrawal_failed": "Nabigo ang pag-withdraw. Pakisubukan muli.",
+    "edit_amount": "I-edit ang Halaga",
+    "send_exact_amount": "Ipadala ang Eksaktong Halaga",
+    "network": "Network",
+    "deposit_address": "Deposit Address",
+    "warning_send_only": "Ipadala lamang ang",
+    "warning_loss": "sa address na ito. Ang pagpapadala ng ibang assets ay magreresulta sa permanenteng pagkawala.",
+    "select_network": "Piliin ang Network",
+    "fee": "Bayad",
+    "deposit_amount": "Halaga ng Deposito",
+    "min_deposit": "Min. Deposito: 10 USDT",
+    "instant_arrival": "Agad na Pagdating",
+    "creating_order": "Ginagawa ang Order...",
+    "proceed_to_pay": "Magpatuloy sa Pagbayad",
+    "withdraw_warning_intro": "Siguraduhing inilagay mo ang tamang",
+    "withdraw_warning_text": "address. Ang mga withdrawal sa ibang networks ay hindi na mababawi.",
+    "amount_to_withdraw": "Halagang Iwi-withdraw",
+    "available": "Magagamit",
+    "wallet_address_trc20": "Wallet Address (TRC20)",
+    "paste_address_placeholder": "I-paste ang iyong TRC20 address",
+    "processing": "Pinoproseso...",
+    "withdraw_funds": "I-withdraw ang Pondo",
+    "loading_transactions": "Naglo-load ng mga transaksyon...",
+    "no_transactions": "Wala pang transaksyon",
+    "secure_wallet_title": "Ligtas na",
+    "wallet_title_highlight": "Wallet",
+    "secure_wallet_desc": "Agad na USDT deposito at withdrawal. Ang iyong pondo ay protektado ng nangungunang security protocols.",
+    "features": {
+      "instant_deposit": "Agad na Deposito",
+      "secure_storage": "Ligtas na Imbakan",
+      "fast_withdraw": "Mabilis na Withdraw",
+      "detailed_history": "Detalyadong Kasaysayan"
+    },
+    "login_access": "Login to Access Wallet",
+    "no_account": "Don't have an account?",
+    "history_tab": "History"
+  },
   "landing": {
     "quick_actions": {
       "deposit": "Deposito",
@@ -40,6 +131,7 @@
       "support": "Suporta"
     },
     "jackpot": "Jackpot",
+    "telegram_enter": "👑 Pumasok sa Golden Age Cash 👑",
     "live_transactions": {
       "title": "Mga Live na Transaksyon",
       "live_badge": "LIVE",
@@ -56,11 +148,32 @@
       }
     },
     "recommended": {
-        "title": "Mga Inirerekomendang Laro",
-        "empty": "Walang magagamit na rekomendasyon"
+      "title": "Mga Inirerekomendang Laro",
+      "empty": "Walang magagamit na rekomendasyon"
     },
     "providers": {
-        "title": "Mga Provider"
+      "title": "Mga Provider"
+    },
+    "why_choose_us": {
+      "title": "Bakit Piliin ang Golden Age?",
+      "items": {
+        "instant_withdrawals": {
+          "title": "Agad na Withdrawal",
+          "desc": "Mabayaran sa loob ng ilang segundo"
+        },
+        "security": {
+          "title": "Seguridad na Pang-bangko",
+          "desc": "Naka-encrypt at protektado"
+        },
+        "support": {
+          "title": "24/7 Live Support",
+          "desc": "Laging narito para tumulong"
+        },
+        "vip_rewards": {
+          "title": "VIP Rewards",
+          "desc": "Eksklusibong araw-araw na bonus"
+        }
+      }
     }
   },
   "game_types": {
@@ -77,5 +190,55 @@
     "11": "Esport",
     "12": "Poker",
     "13": "Iba pa"
+  },
+  "auth": {
+    "welcome_back": "Maligayang Pagbabalik",
+    "sign_in_subtitle": "Mag-sign in upang ma-access ang iyong wallet",
+    "email_label": "Email Address",
+    "password_label": "Password",
+    "forgot_password": "Nakalimutan ang password?",
+    "password_placeholder": "Ilagay ang iyong password",
+    "sign_in": "Mag-sign In",
+    "signing_in": "Nagsa-sign in...",
+    "or_continue_with": "O magpatuloy gamit ang",
+    "create_account": "Gumawa ng Account",
+    "sign_up_subtitle": "Sumali ngayon upang magsimulang maglaro at kumita",
+    "first_name": "Pangalan",
+    "last_name": "Apelyido",
+    "username": "Username",
+    "confirm_password": "Kumpirmahin ang Password",
+    "first_name_placeholder": "Juan",
+    "last_name_placeholder": "Dela Cruz",
+    "username_placeholder": "Pumili ng username",
+    "email_placeholder": "name@example.com",
+    "create_password_placeholder": "Gumawa ng password",
+    "repeat_password_placeholder": "Ulitin ang iyong password",
+    "username_taken": "Nakuha na ang username",
+    "username_available": "Available ang username",
+    "checking_username": "Mangyaring maghintay habang sinusuri namin ang iyong username.",
+    "creating_account": "Gumagawa ng account...",
+    "or_sign_up_with": "O mag-sign up gamit ang",
+    "telegram": "Telegram",
+    "fill_all_fields": "Mangyaring punan ang lahat ng mga patlang.",
+    "passwords_mismatch": "Hindi magkatugma ang mga password.",
+    "account_created": "Matagumpay na nagawa ang account.",
+    "sign_up_failed": "Nabigo ang pag-sign up. Pakisubukang muli.",
+    "sign_in_success": "Matagumpay na naka-sign in.",
+    "sign_in_failed": "Nabigo ang pag-sign in. Pakisuri ang iyong mga kredensyal."
+  },
+  "game_details": {
+    "loading_game": "NAGLO-LOAD ANG LARO...",
+    "game_not_found": "Hindi Natagpuan ang Laro",
+    "game_not_found_desc": "Ang larong hinahanap mo ay kasalukuyang hindi magagamit o maaaring naalis na.",
+    "return_to_lobby": "Bumalik sa Lobby",
+    "fair": "Patas",
+    "popular": "Sikat",
+    "experience_gameplay": "Maranasan ang premium na gameplay ng {{name}}. Manalo ng malaki gamit ang matataas na multiplier at instant na payout.",
+    "launching": "Naglulunsad...",
+    "start_game": "Simulan ang Laro Ngayon",
+    "official_game": "* Opisyal na Laro • Instant na Withdrawals",
+    "premium": "Premium",
+    "launch_failed": "Nabigong ilunsad ang laro",
+    "launch_error": "Error sa paglulunsad ng laro"
   }
 }

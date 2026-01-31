@@ -4,11 +4,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext.jsx';
 import { useAuth } from '../contexts/AuthContext.jsx';
 
-const Navbar = ({ onNavigate }) => {
+const Navbar = () => {
   const { currentLanguage, changeLanguage, languages, t } = useLanguage();
   const { user, isAuthenticated } = useAuth();
   const [isLangOpen, setIsLangOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();

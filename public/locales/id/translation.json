@@ -1,6 +1,7 @@
 {
   "home": "Beranda",
   "games": "Permainan",
+  "slots": "Slot",
   "wallet": "Dompet",
   "profile": "Profil",
   "telegramMiniApp": "Aplikasi Mini Telegram",
@@ -32,6 +33,96 @@
   "mahjongWays": "Mahjong Ways",
   "luckyNeko": "Lucky Neko",
   "megaWin": "MENANG BESAR!",
+  "profile_page": {
+    "subtitle": "Bergabunglah dengan pengalaman kasino elit. Buka hadiah VIP eksklusif, penarikan instan, dan dukungan premium 24/7.",
+    "features": {
+      "vip_rewards": "Hadiah VIP",
+      "daily_bonus": "Bonus Harian",
+      "secure_play": "Main Aman",
+      "support_247": "Dukungan 24/7"
+    },
+    "guest": {
+      "join_now": "Gabung Sekarang",
+      "log_in": "Masuk",
+      "change_language": "Ubah Bahasa"
+    },
+    "change_language": "Ubah Bahasa",
+    "stats": {
+      "total_bets": "Total Taruhan",
+      "total_wins": "Total Menang",
+      "best_win": "Menang Terbaik"
+    },
+    "menu": {
+      "account": "Akun",
+      "personal_details": "Detail Pribadi",
+      "verified": "Terverifikasi",
+      "bet_history": "Riwayat Taruhan",
+      "settings": "Pengaturan",
+      "notifications": "Notifikasi",
+      "on": "Nyala",
+      "security": "Keamanan",
+      "2fa": "2FA",
+      "support": "Dukungan",
+      "live_support": "Dukungan Langsung",
+      "online": "Online"
+    },
+    "total_balance": "Total Saldo",
+    "deposit": "Deposit",
+    "select_language": "Pilih bahasa pilihan Anda"
+  },
+  "game_page": {
+    "search_placeholder": "Cari game...",
+    "all_providers": "Semua Provider",
+    "providers": "Provider",
+    "filtered_by": "Difilter oleh:",
+    "loading_more": "Memuat lebih banyak game...",
+    "load_more": "Muat lebih banyak game",
+    "no_games_found": "Game tidak ditemukan",
+    "no_games_desc": "Coba sesuaikan pencarian atau filter Anda untuk menemukan apa yang Anda cari.",
+    "clear_filters": "Hapus Filter"
+  },
+  "wallet_page": {
+    "copy_success": "Alamat disalin ke papan klip",
+    "deposit_created": "Pesanan deposit dibuat!",
+    "deposit_failed": "Deposit Gagal",
+    "withdrawal_success": "Permintaan penarikan berhasil dikirim.",
+    "withdrawal_failed": "Penarikan gagal. Silakan coba lagi.",
+    "edit_amount": "Ubah Jumlah",
+    "send_exact_amount": "Kirim Jumlah Tepat",
+    "network": "Jaringan",
+    "deposit_address": "Alamat Deposit",
+    "warning_send_only": "Kirim hanya",
+    "warning_loss": "ke alamat ini. Mengirim aset lain akan menyebabkan kehilangan permanen.",
+    "select_network": "Pilih Jaringan",
+    "fee": "Biaya",
+    "deposit_amount": "Jumlah Deposit",
+    "min_deposit": "Min. Deposit: 10 USDT",
+    "instant_arrival": "Tiba Instan",
+    "creating_order": "Membuat Pesanan...",
+    "proceed_to_pay": "Lanjut Bayar",
+    "withdraw_warning_intro": "Pastikan Anda memasukkan",
+    "withdraw_warning_text": "alamat yang benar. Penarikan ke jaringan lain tidak dapat dipulihkan.",
+    "amount_to_withdraw": "Jumlah Penarikan",
+    "available": "Tersedia",
+    "wallet_address_trc20": "Alamat Dompet (TRC20)",
+    "paste_address_placeholder": "Tempel alamat TRC20 Anda",
+    "processing": "Memproses...",
+    "withdraw_funds": "Tarik Dana",
+    "loading_transactions": "Memuat transaksi...",
+    "no_transactions": "Belum ada transaksi",
+    "secure_wallet_title": "Dompet",
+    "wallet_title_highlight": "Aman",
+    "secure_wallet_desc": "Deposit dan penarikan USDT instan. Dana Anda dilindungi oleh protokol keamanan terkemuka.",
+    "features": {
+      "instant_deposit": "Deposit Instan",
+      "secure_storage": "Penyimpanan Aman",
+      "fast_withdraw": "Penarikan Cepat",
+      "detailed_history": "Riwayat Rinci"
+    },
+    "login_access": "Login to Access Wallet",
+    "no_account": "Don't have an account?",
+    "history_tab": "History"
+  },
   "landing": {
     "quick_actions": {
       "deposit": "Deposit",
@@ -40,6 +131,7 @@
       "support": "Dukungan"
     },
     "jackpot": "Jackpot Progresif",
+    "telegram_enter": "👑 Masuk Golden Age Cash 👑",
     "live_transactions": {
       "title": "Transaksi Langsung",
       "live_badge": "LANGSUNG",
@@ -61,6 +153,27 @@
     },
     "providers": {
       "title": "Penyedia Premium"
+    },
+    "why_choose_us": {
+      "title": "Mengapa Memilih Golden Age?",
+      "items": {
+        "instant_withdrawals": {
+          "title": "Penarikan Instan",
+          "desc": "Dibayar dalam hitungan detik"
+        },
+        "security": {
+          "title": "Keamanan Tingkat Bank",
+          "desc": "Dienkripsi & dilindungi"
+        },
+        "support": {
+          "title": "Dukungan Langsung 24/7",
+          "desc": "Selalu di sini untuk membantu"
+        },
+        "vip_rewards": {
+          "title": "Hadiah VIP",
+          "desc": "Bonus harian eksklusif"
+        }
+      }
     }
   },
   "game_types": {
@@ -77,5 +190,55 @@
     "11": "Esports",
     "12": "Poker",
     "13": "Lainnya"
+  },
+  "auth": {
+    "welcome_back": "Selamat Datang Kembali",
+    "sign_in_subtitle": "Masuk untuk mengakses dompet Anda",
+    "email_label": "Alamat Email",
+    "password_label": "Kata Sandi",
+    "forgot_password": "Lupa kata sandi?",
+    "password_placeholder": "Masukkan kata sandi Anda",
+    "sign_in": "Masuk",
+    "signing_in": "Sedang masuk...",
+    "or_continue_with": "Atau lanjutkan dengan",
+    "create_account": "Buat Akun",
+    "sign_up_subtitle": "Bergabung sekarang untuk mulai bermain dan menghasilkan",
+    "first_name": "Nama Depan",
+    "last_name": "Nama Belakang",
+    "username": "Nama Pengguna",
+    "confirm_password": "Konfirmasi Kata Sandi",
+    "first_name_placeholder": "Budi",
+    "last_name_placeholder": "Santoso",
+    "username_placeholder": "Pilih nama pengguna",
+    "email_placeholder": "nama@contoh.com",
+    "create_password_placeholder": "Buat kata sandi",
+    "repeat_password_placeholder": "Ulangi kata sandi Anda",
+    "username_taken": "Nama pengguna sudah dipakai",
+    "username_available": "Nama pengguna tersedia",
+    "checking_username": "Harap tunggu sementara kami memeriksa nama pengguna Anda.",
+    "creating_account": "Membuat akun...",
+    "or_sign_up_with": "Atau daftar dengan",
+    "telegram": "Telegram",
+    "fill_all_fields": "Harap isi semua kolom.",
+    "passwords_mismatch": "Kata sandi tidak cocok.",
+    "account_created": "Akun berhasil dibuat.",
+    "sign_up_failed": "Pendaftaran gagal. Silakan coba lagi.",
+    "sign_in_success": "Berhasil masuk.",
+    "sign_in_failed": "Gagal masuk. Silakan periksa kredensial Anda."
+  },
+  "game_details": {
+    "loading_game": "MEMUAT PERMAINAN...",
+    "game_not_found": "Permainan Tidak Ditemukan",
+    "game_not_found_desc": "Permainan yang Anda cari saat ini tidak tersedia atau mungkin telah dihapus.",
+    "return_to_lobby": "Kembali ke Lobi",
+    "fair": "Adil",
+    "popular": "Populer",
+    "experience_gameplay": "Nikmati gameplay premium dari {{name}}. Menangkan besar dengan pengganda tinggi dan pembayaran instan.",
+    "launching": "Meluncurkan...",
+    "start_game": "Mulai Permainan Sekarang",
+    "official_game": "* Permainan Resmi • Penarikan Instan",
+    "premium": "Premium",
+    "launch_failed": "Gagal meluncurkan permainan",
+    "launch_error": "Kesalahan meluncurkan permainan"
   }
 }

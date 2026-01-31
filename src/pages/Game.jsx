@@ -4,6 +4,7 @@ import { Search, Filter, Loader2, X, Check, ChevronDown } from 'lucide-react';
 import { useApi } from '../contexts/ApiContext.jsx';
 import { toast } from 'sonner';
 import GameCard from '../components/GameCard';
+import { useLanguage } from '../contexts/LanguageContext.jsx';
 
 const providerPriority = (provider) => {
   const code = provider?.code || '';
@@ -30,6 +31,7 @@ const Game = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { pgGames, pgOptions, isLoading, launchGame, pagination, loadMoreGames, resetGames } = useApi();
+  const { t } = useLanguage();
   
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [activeProvider, setActiveProvider] = useState(searchParams.get('provider') || 'all');
@@ -162,7 +164,7 @@ const Game = () => {
                 </div>
                 <input
                     type="text"
-                    placeholder="Search games..."
+                    placeholder={t('game_page.search_placeholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => setIsSearchFocused(true)}
@@ -192,7 +194,7 @@ const Game = () => {
                     `}
                 >
                     <span className="text-sm font-medium truncate">
-                        {activeProvider === 'all' ? 'All Providers' : activeProvider}
+                        {activeProvider === 'all' ? t('game_page.all_providers') : activeProvider}
                     </span>
                     <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isFilterOpen ? 'rotate-180' : ''}`} />
                 </button>
@@ -201,7 +203,7 @@ const Game = () => {
                 {isFilterOpen && (
                     <div className="absolute right-0 top-full mt-2 w-56 max-h-[60vh] overflow-y-auto rounded-xl bg-[#1a1c20] border border-white/10 shadow-2xl shadow-black z-50 animate-in fade-in slide-in-from-top-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                         <div className="p-2 space-y-1">
-                            <div className="px-3 py-2 text-xs font-bold text-gray-500 uppercase tracking-wider">Providers</div>
+                            <div className="px-3 py-2 text-xs font-bold text-gray-500 uppercase tracking-wider">{t('game_page.providers')}</div>
                             {providers.map((provider) => (
                                 <button
                                     key={provider}
@@ -214,7 +216,7 @@ const Game = () => {
                                         }
                                     `}
                                 >
-                                    <span className="truncate">{provider === 'all' ? 'All Providers' : provider}</span>
+                                    <span className="truncate">{provider === 'all' ? t('game_page.all_providers') : provider}</span>
                                     {activeProvider === provider && <Check className="w-4 h-4" />}
                                 </button>
                             ))}
@@ -227,7 +229,7 @@ const Game = () => {
         {/* Active Filter Badge */}
         {activeProvider !== 'all' && (
              <div className="mt-3 flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
-                <span className="text-xs text-gray-500">Filtered by:</span>
+                <span className="text-xs text-gray-500">{t('game_page.filtered_by')}</span>
                 <button 
                     onClick={() => handleProviderSelect('all')}
                     className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--gold)]/10 border border-[var(--gold)]/20 text-[10px] font-bold text-[var(--gold)] hover:bg-[var(--gold)]/20 transition-colors"
@@ -269,12 +271,12 @@ const Game = () => {
                 {isLoadingMore ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin text-[var(--gold)]" />
-                    <span>Loading more games...</span>
+                    <span>{t('game_page.loading_more')}</span>
                   </>
                 ) : (
                   <>
                     <Loader2 className="w-4 h-4 text-[var(--gold)]" />
-                    <span>Load more games</span>
+                    <span>{t('game_page.load_more')}</span>
                   </>
                 )}
               </button>
@@ -285,15 +287,15 @@ const Game = () => {
             <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
               <Search className="w-8 h-8 text-gray-600" />
             </div>
-            <h3 className="text-lg font-bold text-white mb-2">No games found</h3>
+            <h3 className="text-lg font-bold text-white mb-2">{t('game_page.no_games_found')}</h3>
             <p className="text-sm text-gray-500 max-w-[200px]">
-              Try adjusting your search or filter to find what you're looking for.
+              {t('game_page.no_games_desc')}
             </p>
             <button 
               onClick={handleClearFilters}
               className="mt-6 px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm font-medium transition-colors"
             >
-              Clear Filters
+              {t('game_page.clear_filters')}
             </button>
           </div>
         )}

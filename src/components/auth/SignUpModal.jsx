@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, User, Mail, Lock, Eye, EyeOff, Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext.jsx';
+import { useLanguage } from '../../contexts/LanguageContext.jsx';
 import { toast } from 'sonner';
 
 const TelegramIcon = ({ className }) => (
@@ -26,6 +27,7 @@ const SignUpModal = ({ onClose }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { registerWithEmail, checkUsername } = useAuth();
+  const { t } = useLanguage();
   const [usernameStatus, setUsernameStatus] = useState('idle'); // idle, checking, available, taken, error
 
   useEffect(() => {
@@ -55,22 +57,22 @@ const SignUpModal = ({ onClose }) => {
     if (isSubmitting) return;
 
     if (!email || !username || !password || !confirmPassword || !firstName || !lastName) {
-      toast.error('Please fill in all fields.');
+      toast.error(t('auth.fill_all_fields'));
       return;
     }
 
     if (usernameStatus === 'taken') {
-      toast.error('Username is already taken. Please choose another one.');
+      toast.error(t('auth.username_taken'));
       return;
     }
 
     if (usernameStatus === 'checking') {
-      toast.error('Please wait while we check your username.');
+      toast.error(t('auth.checking_username'));
       return;
     }
 
     if (password !== confirmPassword) {
-      toast.error('Passwords do not match.');
+      toast.error(t('auth.passwords_mismatch'));
       return;
     }
 
@@ -86,13 +88,13 @@ const SignUpModal = ({ onClose }) => {
       });
 
       if (result?.success) {
-        toast.success('Account created successfully.');
+        toast.success(t('auth.account_created'));
         onClose();
       } else {
-        toast.error(result?.error || 'Sign up failed. Please try again.');
+        toast.error(result?.error || t('auth.sign_up_failed'));
       }
     } catch (err) {
-      toast.error('Sign up failed. Please try again.');
+      toast.error(t('auth.sign_up_failed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -112,9 +114,9 @@ const SignUpModal = ({ onClose }) => {
 
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="font-bold text-white text-xl tracking-tight">Create Account</h3>
+            <h3 className="font-bold text-white text-xl tracking-tight">{t('auth.create_account')}</h3>
             <p className="text-xs text-[var(--text-muted)] mt-1">
-              Join now to start playing and earning
+              {t('auth.sign_up_subtitle')}
             </p>
           </div>
           <button
@@ -128,7 +130,7 @@ const SignUpModal = ({ onClose }) => {
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-[var(--text-secondary)] ml-1">First Name</label>
+              <label className="text-xs font-medium text-[var(--text-secondary)] ml-1">{t('auth.first_name')}</label>
               <div className="relative group">
                 <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--gold)] transition-colors">
                   <User className="w-4 h-4" />
@@ -136,14 +138,14 @@ const SignUpModal = ({ onClose }) => {
                 <input
                   type="text"
                   className="w-full rounded-xl bg-[var(--bg-card)] border border-[var(--border)] pl-10 pr-3 py-3 text-sm text-white outline-none focus:border-[var(--gold)] focus:ring-1 focus:ring-[var(--gold)]/20 transition-all placeholder:text-white/20"
-                  placeholder="John"
+                  placeholder={t('auth.first_name_placeholder')}
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                 />
               </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-[var(--text-secondary)] ml-1">Last Name</label>
+              <label className="text-xs font-medium text-[var(--text-secondary)] ml-1">{t('auth.last_name')}</label>
               <div className="relative group">
                 <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--gold)] transition-colors">
                   <User className="w-4 h-4" />
@@ -151,7 +153,7 @@ const SignUpModal = ({ onClose }) => {
                 <input
                   type="text"
                   className="w-full rounded-xl bg-[var(--bg-card)] border border-[var(--border)] pl-10 pr-3 py-3 text-sm text-white outline-none focus:border-[var(--gold)] focus:ring-1 focus:ring-[var(--gold)]/20 transition-all placeholder:text-white/20"
-                  placeholder="Doe"
+                  placeholder={t('auth.last_name_placeholder')}
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                 />
@@ -160,7 +162,7 @@ const SignUpModal = ({ onClose }) => {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-[var(--text-secondary)] ml-1">Username</label>
+            <label className="text-xs font-medium text-[var(--text-secondary)] ml-1">{t('auth.username')}</label>
             <div className="relative group">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--gold)] transition-colors">
                 <User className="w-4 h-4" />
@@ -174,7 +176,7 @@ const SignUpModal = ({ onClose }) => {
                       ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/20' 
                       : 'border-[var(--border)] focus:border-[var(--gold)] focus:ring-[var(--gold)]/20'
                 }`}
-                placeholder="Choose a username"
+                placeholder={t('auth.username_placeholder')}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
@@ -185,15 +187,15 @@ const SignUpModal = ({ onClose }) => {
               </div>
             </div>
             {usernameStatus === 'taken' && (
-              <p className="text-[10px] text-red-400 ml-1 animate-fade-in">Username is already taken</p>
+              <p className="text-[10px] text-red-400 ml-1 animate-fade-in">{t('auth.username_taken')}</p>
             )}
             {usernameStatus === 'available' && (
-              <p className="text-[10px] text-green-400 ml-1 animate-fade-in">Username is available</p>
+              <p className="text-[10px] text-green-400 ml-1 animate-fade-in">{t('auth.username_available')}</p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-[var(--text-secondary)] ml-1">Email Address</label>
+            <label className="text-xs font-medium text-[var(--text-secondary)] ml-1">{t('auth.email_label')}</label>
             <div className="relative group">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--gold)] transition-colors">
                 <Mail className="w-4 h-4" />
@@ -201,7 +203,7 @@ const SignUpModal = ({ onClose }) => {
               <input
                 type="email"
                 className="w-full rounded-xl bg-[var(--bg-card)] border border-[var(--border)] pl-10 pr-3 py-3 text-sm text-white outline-none focus:border-[var(--gold)] focus:ring-1 focus:ring-[var(--gold)]/20 transition-all placeholder:text-white/20"
-                placeholder="name@example.com"
+                placeholder={t('auth.email_placeholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -209,7 +211,7 @@ const SignUpModal = ({ onClose }) => {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-[var(--text-secondary)] ml-1">Password</label>
+            <label className="text-xs font-medium text-[var(--text-secondary)] ml-1">{t('auth.password_label')}</label>
             <div className="relative group">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--gold)] transition-colors">
                 <Lock className="w-4 h-4" />
@@ -217,7 +219,7 @@ const SignUpModal = ({ onClose }) => {
               <input
                 type={showPassword ? "text" : "password"}
                 className="w-full rounded-xl bg-[var(--bg-card)] border border-[var(--border)] pl-10 pr-10 py-3 text-sm text-white outline-none focus:border-[var(--gold)] focus:ring-1 focus:ring-[var(--gold)]/20 transition-all placeholder:text-white/20"
-                placeholder="Create a password"
+                placeholder={t('auth.create_password_placeholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -232,7 +234,7 @@ const SignUpModal = ({ onClose }) => {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-[var(--text-secondary)] ml-1">Confirm Password</label>
+            <label className="text-xs font-medium text-[var(--text-secondary)] ml-1">{t('auth.confirm_password')}</label>
             <div className="relative group">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--gold)] transition-colors">
                 <Lock className="w-4 h-4" />
@@ -240,7 +242,7 @@ const SignUpModal = ({ onClose }) => {
               <input
                 type={showPassword ? "text" : "password"}
                 className="w-full rounded-xl bg-[var(--bg-card)] border border-[var(--border)] pl-10 pr-10 py-3 text-sm text-white outline-none focus:border-[var(--gold)] focus:ring-1 focus:ring-[var(--gold)]/20 transition-all placeholder:text-white/20"
-                placeholder="Repeat your password"
+                placeholder={t('auth.repeat_password_placeholder')}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
@@ -252,13 +254,13 @@ const SignUpModal = ({ onClose }) => {
             disabled={isSubmitting}
             className="w-full mt-2 rounded-xl bg-gradient-to-r from-[var(--emerald-medium)] to-[var(--emerald-light)] hover:from-[var(--emerald-medium)] hover:to-[#14b8a6] text-white text-sm font-bold py-3.5 shadow-lg shadow-emerald-900/20 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none"
           >
-            {isSubmitting ? 'Creating account...' : 'Create Account'}
+            {isSubmitting ? t('auth.creating_account') : t('auth.create_account')}
           </button>
 
           <div className="py-3">
             <div className="flex items-center gap-3 text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-medium">
               <div className="flex-1 h-px bg-[var(--border)]" />
-              <span>Or sign up with</span>
+              <span>{t('auth.or_sign_up_with')}</span>
               <div className="flex-1 h-px bg-[var(--border)]" />
             </div>
             <div className="mt-4">
@@ -269,7 +271,7 @@ const SignUpModal = ({ onClose }) => {
                 <div className="w-6 h-6 rounded-full bg-[#2AABEE] text-white flex items-center justify-center group-hover:scale-110 transition-transform">
                   <TelegramIcon className="w-3.5 h-3.5" />
                 </div>
-                <span className="text-sm font-semibold">Telegram</span>
+                <span className="text-sm font-semibold">{t('auth.telegram')}</span>
               </button>
             </div>
           </div>

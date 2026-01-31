@@ -98,7 +98,7 @@ const Landing = () => {
       tg.expand?.();
       tg.ready?.();
 
-      tg.MainButton?.setText('👑 Enter Golden Age Cash 👑');
+      tg.MainButton?.setText(t('landing.telegram_enter'));
       tg.MainButton?.show();
       tg.MainButton?.onClick(() => navigate('/home'));
       setShowFallbackButton(false);
@@ -114,7 +114,7 @@ const Landing = () => {
         tg?.MainButton?.offClick();
       }
     };
-  }, [tg, navigate]);
+  }, [tg, navigate, t]);
 
 
   return (
@@ -514,18 +514,18 @@ const Landing = () => {
 
       {/* Why Choose Us - Grid */}
       <div className="w-full max-w-md px-4 mb-12 relative z-10">
-        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 ml-1">Why Golden Age?</h3>
+        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 ml-1">{t('landing.why_choose_us.title')}</h3>
         <div className="grid grid-cols-2 gap-3">
           {[
-            { icon: Zap, title: 'Instant Withdrawals', desc: 'Get paid in seconds', color: 'text-yellow-400' },
-            { icon: Shield, title: 'Bank-Grade Security', desc: 'Encrypted & protected', color: 'text-emerald-400' },
-            { icon: MessageCircle, title: '24/7 Live Support', desc: 'Always here to help', color: 'text-blue-400' },
-            { icon: Gift, title: 'VIP Rewards', desc: 'Exclusive daily bonuses', color: 'text-purple-400' }
+            { icon: Zap, id: 'instant_withdrawals', color: 'text-yellow-400' },
+            { icon: Shield, id: 'security', color: 'text-emerald-400' },
+            { icon: MessageCircle, id: 'support', color: 'text-blue-400' },
+            { icon: Gift, id: 'vip_rewards', color: 'text-purple-400' }
           ].map((item, i) => (
               <div key={i} className="p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
                 <item.icon className={`w-6 h-6 ${item.color} mb-3`} />
-                <h4 className="text-sm font-bold text-white mb-1">{item.title}</h4>
-                <p className="text-[11px] text-gray-400 leading-tight">{item.desc}</p>
+                <h4 className="text-sm font-bold text-white mb-1">{t(`landing.why_choose_us.items.${item.id}.title`)}</h4>
+                <p className="text-[11px] text-gray-400 leading-tight">{t(`landing.why_choose_us.items.${item.id}.desc`)}</p>
               </div>
           ))}
         </div>

@@ -17,12 +17,14 @@ import {
 import { useApi } from '../contexts/ApiContext.jsx';
 import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext.jsx';
+import { useLanguage } from '../contexts/LanguageContext.jsx';
 import walletApi from '../api/wallet';
 
 const Wallet = () => {
   const tg = window.Telegram?.WebApp;
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const { createWithdrawal } = useApi();
   const { isAuthenticated, user } = useAuth();
 
@@ -104,7 +106,7 @@ const Wallet = () => {
     if (tg?.HapticFeedback) {
       tg.HapticFeedback.notificationOccurred('success');
     }
-    toast.success('Address copied to clipboard');
+    toast.success(t('wallet_page.copy_success'));
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -133,7 +135,7 @@ const Wallet = () => {
       if (result) {
         setDepositData(result);
         setDepositStep('details');
-        toast.success('Deposit order created!');
+        toast.success(t('wallet_page.deposit_created'));
       }
     } catch (err) {
       console.error('Deposit error:', err);
@@ -142,7 +144,7 @@ const Wallet = () => {
         `Status: ${err.response.status}. Data: ${JSON.stringify(err.response.data)}` :
         err.message;
 
-      toast.error(`Deposit Failed: ${debugInfo}`);
+      toast.error(`${t('wallet_page.deposit_failed')}: ${debugInfo}`);
     } finally {
       setIsCreatingDeposit(false);
     }
@@ -162,15 +164,15 @@ const Wallet = () => {
     try {
       const result = await createWithdrawal(withdrawParsedAmount, withdrawAddress.trim());
       if (result?.success) {
-        toast.success('Withdrawal request submitted successfully.');
+        toast.success(t('wallet_page.withdrawal_success'));
         setWithdrawAmount('');
         setWithdrawAddress('');
         loadTransactions();
       } else {
-        toast.error(result?.error || 'Withdrawal failed. Please try again.');
+        toast.error(result?.error || t('wallet_page.withdrawal_failed'));
       }
     } catch (err) {
-      toast.error('Withdrawal failed. Please try again.');
+      toast.error(t('wallet_page.withdrawal_failed'));
     } finally {
       setIsWithdrawing(false);
     }
@@ -194,20 +196,20 @@ const Wallet = () => {
             className="flex items-center text-sm text-[var(--text-muted)] hover:text-white transition-colors"
           >
             <ChevronRight className="w-4 h-4 rotate-180 mr-1" />
-            Edit Amount
+            {t('wallet_page.edit_amount')}
           </button>
 
           <div className="bg-gradient-to-br from-gray-900 to-black border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
             <div className="p-6 flex flex-col items-center text-center space-y-6">
               <div className="space-y-1">
-                <p className="text-[var(--text-muted)] text-sm uppercase tracking-wide">Send Exact Amount</p>
+                <p className="text-[var(--text-muted)] text-sm uppercase tracking-wide">{t('wallet_page.send_exact_amount')}</p>
                 <div className="flex items-baseline justify-center gap-1">
                   <span className="text-4xl font-black text-white tracking-tight">{parsedAmount.toLocaleString()}</span>
                   <span className="text-xl font-bold text-emerald-500">USDT</span>
                 </div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/5">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-xs text-gray-300">Network: {networks.find((n) => n.id === selectedNetwork)?.label}</span>
+                  <span className="text-xs text-gray-300">{t('wallet_page.network')}: {networks.find((n) => n.id === selectedNetwork)?.label}</span>
                 </div>
               </div>
 
@@ -224,7 +226,7 @@ const Wallet = () => {
 
               <div className="w-full space-y-3">
                 <div className="text-left">
-                  <p className="text-xs text-[var(--text-muted)] mb-1.5 ml-1">Deposit Address</p>
+                  <p className="text-xs text-[var(--text-muted)] mb-1.5 ml-1">{t('wallet_page.deposit_address')}</p>
                   <button
                     onClick={handleCopy}
                     className="w-full flex items-center justify-between bg-white/5 border border-white/10 hover:border-[var(--gold)]/50 p-4 rounded-xl group active:scale-[0.98] transition-all"
@@ -248,8 +250,7 @@ const Wallet = () => {
               <div className="flex gap-3 items-start p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-xl text-left">
                 <AlertCircle className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
                 <p className="text-xs text-yellow-500/90 leading-relaxed">
-                  Send only <strong>USDT ({networks.find((n) => n.id === selectedNetwork)?.label})</strong> to this address.
-                  Sending other assets will result in permanent loss.
+                  {t('wallet_page.warning_send_only')} <strong>USDT ({networks.find((n) => n.id === selectedNetwork)?.label})</strong> {t('wallet_page.warning_loss')}
                 </p>
               </div>
             </div>
@@ -261,7 +262,7 @@ const Wallet = () => {
     return (
       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
         <div className="space-y-4">
-          <label className="block text-sm font-medium text-[var(--text-muted)] ml-1">Select Network</label>
+          <label className="block text-sm font-medium text-[var(--text-muted)] ml-1">{t('wallet_page.select_network')}</label>
           <div className="grid grid-cols-1 gap-2">
             {networks.map((net) => (
               <button
@@ -278,7 +279,7 @@ const Wallet = () => {
                   </div>
                   <div className="text-left">
                     <span className={`block text-sm font-bold ${selectedNetwork === net.id ? 'text-[var(--gold)]' : 'text-white'}`}>{net.name}</span>
-                    <span className="text-xs text-gray-500">Fee: ~{net.fee}</span>
+                    <span className="text-xs text-gray-500">{t('wallet_page.fee')}: ~{net.fee}</span>
                   </div>
                 </div>
                 {selectedNetwork === net.id && <Check className="w-5 h-5 text-[var(--gold)]" />}
@@ -288,7 +289,7 @@ const Wallet = () => {
         </div>
 
         <div className="space-y-4">
-          <label className="block text-sm font-medium text-[var(--text-muted)] ml-1">Deposit Amount</label>
+          <label className="block text-sm font-medium text-[var(--text-muted)] ml-1">{t('wallet_page.deposit_amount')}</label>
           <div className="relative group">
             <input
               type="number"
@@ -302,8 +303,8 @@ const Wallet = () => {
             </div>
           </div>
           <div className="flex justify-between px-1">
-            <span className="text-xs text-gray-500">Min. Deposit: 10 USDT</span>
-            <span className="text-xs text-gray-500">Instant Arrival</span>
+            <span className="text-xs text-gray-500">{t('wallet_page.min_deposit')}</span>
+            <span className="text-xs text-gray-500">{t('wallet_page.instant_arrival')}</span>
           </div>
         </div>
 
@@ -315,7 +316,7 @@ const Wallet = () => {
             : 'bg-white/5 text-gray-500 border border-white/10 cursor-not-allowed'
             }`}
         >
-          {isCreatingDeposit ? 'Creating Order...' : 'Proceed to Pay'}
+          {isCreatingDeposit ? t('wallet_page.creating_order') : t('wallet_page.proceed_to_pay')}
         </button>
       </div>
     );
@@ -326,12 +327,12 @@ const Wallet = () => {
       <div className="p-4 rounded-xl bg-yellow-500/5 border border-yellow-500/10 flex gap-3">
         <AlertCircle className="w-5 h-5 text-yellow-500 shrink-0" />
         <p className="text-xs text-yellow-200/80 leading-relaxed">
-          Ensure you enter the correct <strong>TRC20</strong> address. Withdrawals to other networks cannot be recovered.
+          {t('wallet_page.withdraw_warning_intro')} <strong>TRC20</strong> {t('wallet_page.withdraw_warning_text')}
         </p>
       </div>
 
       <div className="space-y-4">
-        <label className="block text-sm font-medium text-[var(--text-muted)] ml-1">Amount to Withdraw</label>
+        <label className="block text-sm font-medium text-[var(--text-muted)] ml-1">{t('wallet_page.amount_to_withdraw')}</label>
         <div className="relative">
           <input
             type="number"
@@ -345,17 +346,17 @@ const Wallet = () => {
           </div>
         </div>
         <div className="flex justify-between px-1">
-          <span className="text-xs text-gray-500">Available: {user?.balance?.toLocaleString() || '0'} USDT</span>
+          <span className="text-xs text-gray-500">{t('wallet_page.available')}: {user?.balance?.toLocaleString() || '0'} USDT</span>
         </div>
       </div>
 
       <div className="space-y-4">
-        <label className="block text-sm font-medium text-[var(--text-muted)] ml-1">Wallet Address (TRC20)</label>
+        <label className="block text-sm font-medium text-[var(--text-muted)] ml-1">{t('wallet_page.wallet_address_trc20')}</label>
         <div className="relative">
           <input
             type="text"
             value={withdrawAddress}
-            placeholder="Paste your TRC20 address"
+            placeholder={t('wallet_page.paste_address_placeholder')}
             onChange={(e) => setWithdrawAddress(e.target.value)}
             className="w-full bg-black/40 border border-white/10 rounded-2xl pl-12 pr-5 py-4 text-sm font-mono text-white placeholder-white/20 focus:outline-none focus:border-[var(--gold)] focus:ring-1 focus:ring-[var(--gold)]/50 transition-all"
           />
@@ -371,7 +372,7 @@ const Wallet = () => {
           : 'bg-white/5 text-gray-500 border border-white/10 cursor-not-allowed'
           }`}
       >
-        {isWithdrawing ? 'Processing...' : 'Withdraw Funds'}
+        {isWithdrawing ? t('wallet_page.processing') : t('wallet_page.withdraw_funds')}
       </button>
     </div>
   );
@@ -381,7 +382,7 @@ const Wallet = () => {
       {isLoadingHistory ? (
         <div className="flex flex-col items-center justify-center py-12 text-[var(--text-muted)]">
           <div className="w-8 h-8 border-2 border-[var(--gold)] border-t-transparent rounded-full animate-spin mb-4" />
-          <p className="text-sm">Loading transactions...</p>
+          <p className="text-sm">{t('wallet_page.loading_transactions')}</p>
         </div>
       ) : transactions.length > 0 ? (
         <div className="space-y-3">
@@ -413,7 +414,7 @@ const Wallet = () => {
           <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
             <History className="w-8 h-8 opacity-50" />
           </div>
-          <p className="text-sm">No transactions yet</p>
+          <p className="text-sm">{t('wallet_page.no_transactions')}</p>
         </div>
       )}
     </div>
@@ -441,20 +442,20 @@ const Wallet = () => {
 
           <div className="space-y-2">
             <h1 className="text-3xl font-bold text-white tracking-tight">
-              Secure <span className="text-emerald-500">Wallet</span>
+              {t('wallet_page.secure_wallet_title')} <span className="text-emerald-500">{t('wallet_page.wallet_title_highlight')}</span>
             </h1>
             <p className="text-gray-400 text-sm leading-relaxed">
-              Instant USDT deposits and withdrawals. Your funds are protected by industry-leading security protocols.
+              {t('wallet_page.secure_wallet_desc')}
             </p>
           </div>
 
           {/* Feature Grid */}
           <div className="grid grid-cols-2 gap-3 py-4">
             {[
-              { icon: Zap, label: 'Instant Deposit' },
-              { icon: Shield, label: 'Secure Storage' },
-              { icon: ArrowUpCircle, label: 'Fast Withdraw' },
-              { icon: History, label: 'Detailed History' }
+              { icon: Zap, label: t('wallet_page.features.instant_deposit') },
+              { icon: Shield, label: t('wallet_page.features.secure_storage') },
+              { icon: ArrowUpCircle, label: t('wallet_page.features.fast_withdraw') },
+              { icon: History, label: t('wallet_page.features.detailed_history') }
             ].map((feature, i) => (
               <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 backdrop-blur-sm">
                 <feature.icon className="w-5 h-5 text-emerald-500" />
@@ -469,10 +470,10 @@ const Wallet = () => {
               onClick={() => setModal('sign-in')}
               className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-sm uppercase tracking-wider shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] active:scale-95 transition-all"
             >
-              Login to Access Wallet
+              {t('wallet_page.login_access')}
             </button>
             <p className="text-xs text-[var(--text-muted)]">
-              Don't have an account? <button onClick={() => setModal('sign-up')} className="text-emerald-500 hover:underline">Sign up</button>
+              {t('wallet_page.no_account')} <button onClick={() => setModal('sign-up')} className="text-emerald-500 hover:underline">{t('signup')}</button>
             </p>
           </div>
         </div>
@@ -491,7 +492,7 @@ const Wallet = () => {
       <div className="relative z-10 p-4 space-y-6 max-w-lg mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <span className="font-bold text-white text-xl">My Wallet</span>
+          <span className="font-bold text-white text-xl">{t('myWallet')}</span>
           <button className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors">
             <History className="w-5 h-5 text-gray-400" onClick={() => handleTabChange('history')} />
           </button>
@@ -505,7 +506,7 @@ const Wallet = () => {
           <div className="relative p-6 space-y-6">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-400 mb-1">Total Balance</p>
+                <p className="text-sm font-medium text-gray-400 mb-1">{t('profile_page.total_balance')}</p>
                 <h2 className="text-4xl font-black text-white tracking-tight">
                   ${user?.balance?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
                 </h2>
@@ -520,13 +521,13 @@ const Wallet = () => {
                 onClick={() => handleTabChange('deposit')}
                 className="flex-1 py-2.5 rounded-xl bg-emerald-500 text-white text-sm font-bold shadow-lg shadow-emerald-900/20 hover:bg-emerald-400 transition-colors flex items-center justify-center gap-2"
               >
-                <ArrowDownCircle size={16} /> Deposit
+                <ArrowDownCircle size={16} /> {t('deposit')}
               </button>
               <button
                 onClick={() => handleTabChange('withdraw')}
                 className="flex-1 py-2.5 rounded-xl bg-white/10 text-white text-sm font-bold border border-white/10 hover:bg-white/20 transition-colors flex items-center justify-center gap-2"
               >
-                <ArrowUpCircle size={16} /> Withdraw
+                <ArrowUpCircle size={16} /> {t('withdraw')}
               </button>
             </div>
           </div>
@@ -535,9 +536,9 @@ const Wallet = () => {
         {/* Tab Navigation */}
         <div className="flex p-1 bg-white/5 rounded-2xl border border-white/5 backdrop-blur-sm">
           {[
-            { id: 'deposit', label: 'Deposit' },
-            { id: 'withdraw', label: 'Withdraw' },
-            { id: 'history', label: 'History' }
+            { id: 'deposit', label: t('deposit') },
+            { id: 'withdraw', label: t('withdraw') },
+            { id: 'history', label: t('wallet_page.history_tab') }
           ].map((tab) => (
             <button
               key={tab.id}

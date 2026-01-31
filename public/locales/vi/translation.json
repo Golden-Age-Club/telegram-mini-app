@@ -1,6 +1,7 @@
 {
   "home": "Trang chủ",
   "games": "Trò chơi",
+  "slots": "Slot",
   "wallet": "Ví",
   "profile": "Hồ sơ",
   "telegramMiniApp": "Ứng dụng Telegram Mini",
@@ -32,6 +33,96 @@
   "mahjongWays": "Mahjong Ways",
   "luckyNeko": "Lucky Neko",
   "megaWin": "THẮNG LỚN!",
+  "profile_page": {
+    "subtitle": "Tham gia trải nghiệm sòng bạc ưu tú. Mở khóa phần thưởng VIP độc quyền, rút tiền tức thì và hỗ trợ cao cấp 24/7.",
+    "features": {
+      "vip_rewards": "Thưởng VIP",
+      "daily_bonus": "Thưởng Hàng Ngày",
+      "secure_play": "Chơi An Toàn",
+      "support_247": "Hỗ Trợ 24/7"
+    },
+    "guest": {
+      "join_now": "Tham Gia Ngay",
+      "log_in": "Đăng Nhập",
+      "change_language": "Đổi Ngôn Ngữ"
+    },
+    "change_language": "Đổi Ngôn Ngữ",
+    "stats": {
+      "total_bets": "Tổng Cược",
+      "total_wins": "Tổng Thắng",
+      "best_win": "Thắng Lớn Nhất"
+    },
+    "menu": {
+      "account": "Tài Khoản",
+      "personal_details": "Chi Tiết Cá Nhân",
+      "verified": "Đã Xác Minh",
+      "bet_history": "Lịch Sử Cược",
+      "settings": "Cài Đặt",
+      "notifications": "Thông Báo",
+      "on": "Bật",
+      "security": "Bảo Mật",
+      "2fa": "2FA",
+      "support": "Hỗ Trợ",
+      "live_support": "Hỗ Trợ Trực Tuyến",
+      "online": "Trực Tuyến"
+    },
+    "total_balance": "Tổng Số Dư",
+    "deposit": "Nạp Tiền",
+    "select_language": "Chọn ngôn ngữ của bạn"
+  },
+  "game_page": {
+    "search_placeholder": "Tìm kiếm trò chơi...",
+    "all_providers": "Tất Cả Nhà Cung Cấp",
+    "providers": "Nhà Cung Cấp",
+    "filtered_by": "Lọc theo:",
+    "loading_more": "Đang tải thêm trò chơi...",
+    "load_more": "Tải thêm trò chơi",
+    "no_games_found": "Không tìm thấy trò chơi",
+    "no_games_desc": "Thử điều chỉnh tìm kiếm hoặc bộ lọc để tìm những gì bạn đang tìm kiếm.",
+    "clear_filters": "Xóa Bộ Lọc"
+  },
+  "wallet_page": {
+    "copy_success": "Đã sao chép địa chỉ vào bộ nhớ tạm",
+    "deposit_created": "Đã tạo lệnh nạp tiền!",
+    "deposit_failed": "Nạp tiền thất bại",
+    "withdrawal_success": "Yêu cầu rút tiền đã được gửi thành công.",
+    "withdrawal_failed": "Rút tiền thất bại. Vui lòng thử lại.",
+    "edit_amount": "Chỉnh Sửa Số Tiền",
+    "send_exact_amount": "Gửi Chính Xác Số Tiền",
+    "network": "Mạng Lưới",
+    "deposit_address": "Địa Chỉ Nạp Tiền",
+    "warning_send_only": "Chỉ gửi",
+    "warning_loss": "đến địa chỉ này. Gửi tài sản khác sẽ bị mất vĩnh viễn.",
+    "select_network": "Chọn Mạng Lưới",
+    "fee": "Phí",
+    "deposit_amount": "Số Tiền Nạp",
+    "min_deposit": "Nạp Tối Thiểu: 10 USDT",
+    "instant_arrival": "Đến Ngay Lập Tức",
+    "creating_order": "Đang Tạo Lệnh...",
+    "proceed_to_pay": "Tiến Hành Thanh Toán",
+    "withdraw_warning_intro": "Đảm bảo bạn nhập đúng",
+    "withdraw_warning_text": "địa chỉ. Rút tiền sang mạng lưới khác sẽ không thể khôi phục.",
+    "amount_to_withdraw": "Số Tiền Rút",
+    "available": "Khả Dụng",
+    "wallet_address_trc20": "Địa Chỉ Ví (TRC20)",
+    "paste_address_placeholder": "Dán địa chỉ TRC20 của bạn",
+    "processing": "Đang Xử Lý...",
+    "withdraw_funds": "Rút Tiền",
+    "loading_transactions": "Đang tải giao dịch...",
+    "no_transactions": "Chưa có giao dịch nào",
+    "secure_wallet_title": "Ví",
+    "wallet_title_highlight": "An Toàn",
+    "secure_wallet_desc": "Nạp và rút USDT tức thì. Tiền của bạn được bảo vệ bởi các giao thức bảo mật hàng đầu.",
+    "features": {
+      "instant_deposit": "Nạp Tiền Tức Thì",
+      "secure_storage": "Lưu Trữ An Toàn",
+      "fast_withdraw": "Rút Tiền Nhanh",
+      "detailed_history": "Lịch Sử Chi Tiết"
+    },
+    "login_access": "Login to Access Wallet",
+    "no_account": "Don't have an account?",
+    "history_tab": "History"
+  },
   "landing": {
     "quick_actions": {
       "deposit": "Nạp tiền",
@@ -40,6 +131,7 @@
       "support": "Hỗ trợ"
     },
     "jackpot": "Giải Jackpot Lũy Tiến",
+    "telegram_enter": "👑 Vào Golden Age Cash 👑",
     "live_transactions": {
       "title": "Giao Dịch Trực Tiếp",
       "live_badge": "TRỰC TIẾP",
@@ -61,6 +153,27 @@
     },
     "providers": {
       "title": "Nhà Cung Cấp Cao Cấp"
+    },
+    "why_choose_us": {
+      "title": "Tại sao chọn Golden Age?",
+      "items": {
+        "instant_withdrawals": {
+          "title": "Rút tiền tức thì",
+          "desc": "Nhận tiền trong vài giây"
+        },
+        "security": {
+          "title": "Bảo mật cấp ngân hàng",
+          "desc": "Được mã hóa & bảo vệ"
+        },
+        "support": {
+          "title": "Hỗ trợ 24/7",
+          "desc": "Luôn sẵn sàng giúp đỡ"
+        },
+        "vip_rewards": {
+          "title": "Phần thưởng VIP",
+          "desc": "Tiền thưởng hàng ngày độc quyền"
+        }
+      }
     }
   },
   "game_types": {
@@ -77,5 +190,55 @@
     "11": "Thể Thao Điện Tử",
     "12": "Poker",
     "13": "Khác"
+  },
+  "auth": {
+    "welcome_back": "Chào mừng trở lại",
+    "sign_in_subtitle": "Đăng nhập để truy cập ví của bạn",
+    "email_label": "Địa chỉ Email",
+    "password_label": "Mật khẩu",
+    "forgot_password": "Quên mật khẩu?",
+    "password_placeholder": "Nhập mật khẩu của bạn",
+    "sign_in": "Đăng nhập",
+    "signing_in": "Đang đăng nhập...",
+    "or_continue_with": "Hoặc tiếp tục với",
+    "create_account": "Tạo tài khoản",
+    "sign_up_subtitle": "Tham gia ngay để bắt đầu chơi và kiếm tiền",
+    "first_name": "Tên",
+    "last_name": "Họ",
+    "username": "Tên đăng nhập",
+    "confirm_password": "Xác nhận mật khẩu",
+    "first_name_placeholder": "Nam",
+    "last_name_placeholder": "Nguyen",
+    "username_placeholder": "Chọn tên đăng nhập",
+    "email_placeholder": "name@example.com",
+    "create_password_placeholder": "Tạo mật khẩu",
+    "repeat_password_placeholder": "Nhập lại mật khẩu của bạn",
+    "username_taken": "Tên đăng nhập đã được sử dụng",
+    "username_available": "Tên đăng nhập khả dụng",
+    "checking_username": "Vui lòng đợi trong khi chúng tôi kiểm tra tên đăng nhập.",
+    "creating_account": "Đang tạo tài khoản...",
+    "or_sign_up_with": "Hoặc đăng ký với",
+    "telegram": "Telegram",
+    "fill_all_fields": "Vui lòng điền vào tất cả các trường.",
+    "passwords_mismatch": "Mật khẩu không khớp.",
+    "account_created": "Tài khoản đã được tạo thành công.",
+    "sign_up_failed": "Đăng ký thất bại. Vui lòng thử lại.",
+    "sign_in_success": "Đăng nhập thành công.",
+    "sign_in_failed": "Đăng nhập thất bại. Vui lòng kiểm tra thông tin đăng nhập."
+  },
+  "game_details": {
+    "loading_game": "ĐANG TẢI TRÒ CHƠI...",
+    "game_not_found": "Không Tìm Thấy Trò Chơi",
+    "game_not_found_desc": "Trò chơi bạn đang tìm kiếm hiện không khả dụng hoặc có thể đã bị xóa.",
+    "return_to_lobby": "Quay Lại Sảnh",
+    "fair": "Công Bằng",
+    "popular": "Phổ Biến",
+    "experience_gameplay": "Trải nghiệm lối chơi cao cấp của {{name}}. Thắng lớn với hệ số nhân cao và thanh toán tức thì.",
+    "launching": "Đang khởi chạy...",
+    "start_game": "Bắt Đầu Trò Chơi Ngay",
+    "official_game": "* Trò Chơi Chính Thức • Rút Tiền Tức Thì",
+    "premium": "Cao Cấp",
+    "launch_failed": "Khởi chạy trò chơi thất bại",
+    "launch_error": "Lỗi khi khởi chạy trò chơi"
   }
 }

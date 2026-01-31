@@ -1,6 +1,7 @@
 {
   "home": "首页",
   "games": "游戏",
+  "slots": "老虎机",
   "wallet": "钱包",
   "profile": "个人资料",
   "telegramMiniApp": "Telegram 小程序",
@@ -32,6 +33,96 @@
   "mahjongWays": "麻将胡了",
   "luckyNeko": "幸运招财猫",
   "megaWin": "超级大奖!",
+  "profile_page": {
+    "subtitle": "加入精英赌场体验。解锁独家VIP奖励、极速提款和24/7尊贵支持。",
+    "features": {
+      "vip_rewards": "VIP奖励",
+      "daily_bonus": "每日红利",
+      "secure_play": "安全游戏",
+      "support_247": "24/7支持"
+    },
+    "guest": {
+      "join_now": "立即加入",
+      "log_in": "登录",
+      "change_language": "更改语言"
+    },
+    "change_language": "更改语言",
+    "stats": {
+      "total_bets": "总投注",
+      "total_wins": "总获胜",
+      "best_win": "最佳获胜"
+    },
+    "menu": {
+      "account": "账户",
+      "personal_details": "个人详情",
+      "verified": "已验证",
+      "bet_history": "投注记录",
+      "settings": "设置",
+      "notifications": "通知",
+      "on": "开启",
+      "security": "安全",
+      "2fa": "双重认证",
+      "support": "支持",
+      "live_support": "在线支持",
+      "online": "在线"
+    },
+    "total_balance": "总余额",
+    "deposit": "存款",
+    "select_language": "选择您的首选语言"
+  },
+  "game_page": {
+    "search_placeholder": "搜索游戏...",
+    "all_providers": "所有提供商",
+    "providers": "提供商",
+    "filtered_by": "筛选条件：",
+    "loading_more": "正在加载更多游戏...",
+    "load_more": "加载更多游戏",
+    "no_games_found": "未找到游戏",
+    "no_games_desc": "尝试调整您的搜索或筛选条件以找到您想要的内容。",
+    "clear_filters": "清除筛选"
+  },
+  "wallet_page": {
+    "copy_success": "地址已复制到剪贴板",
+    "deposit_created": "存款订单已创建！",
+    "deposit_failed": "存款失败",
+    "withdrawal_success": "提款请求提交成功。",
+    "withdrawal_failed": "提款失败。请重试。",
+    "edit_amount": "编辑金额",
+    "send_exact_amount": "发送准确金额",
+    "network": "网络",
+    "deposit_address": "存款地址",
+    "warning_send_only": "仅发送",
+    "warning_loss": "到此地址。发送其他资产将导致永久丢失。",
+    "select_network": "选择网络",
+    "fee": "费用",
+    "deposit_amount": "存款金额",
+    "min_deposit": "最低存款：10 USDT",
+    "instant_arrival": "即时到账",
+    "creating_order": "正在创建订单...",
+    "proceed_to_pay": "继续支付",
+    "withdraw_warning_intro": "确保您输入正确的",
+    "withdraw_warning_text": "地址。提取到其他网络将无法恢复。",
+    "amount_to_withdraw": "提款金额",
+    "available": "可用",
+    "wallet_address_trc20": "钱包地址 (TRC20)",
+    "paste_address_placeholder": "粘贴您的 TRC20 地址",
+    "processing": "处理中...",
+    "withdraw_funds": "提取资金",
+    "loading_transactions": "正在加载交易...",
+    "no_transactions": "暂无交易",
+    "secure_wallet_title": "安全",
+    "wallet_title_highlight": "钱包",
+    "secure_wallet_desc": "即时 USDT 存款和提款。您的资金受到行业领先的安全协议保护。",
+    "features": {
+      "instant_deposit": "即时存款",
+      "secure_storage": "安全存储",
+      "fast_withdraw": "快速提款",
+      "detailed_history": "详细记录"
+    },
+    "login_access": "Login to Access Wallet",
+    "no_account": "Don't have an account?",
+    "history_tab": "History"
+  },
   "landing": {
     "quick_actions": {
       "deposit": "存款",
@@ -40,6 +131,7 @@
       "support": "支持"
     },
     "jackpot": "累积奖池",
+    "telegram_enter": "👑 进入 Golden Age Cash 👑",
     "live_transactions": {
       "title": "实时交易",
       "live_badge": "实时",
@@ -61,6 +153,27 @@
     },
     "providers": {
       "title": "优质供应商"
+    },
+    "why_choose_us": {
+      "title": "为什么选择 Golden Age?",
+      "items": {
+        "instant_withdrawals": {
+          "title": "极速提款",
+          "desc": "秒级到账"
+        },
+        "security": {
+          "title": "银行级安全",
+          "desc": "加密保护"
+        },
+        "support": {
+          "title": "24/7 在线支持",
+          "desc": "随时为您服务"
+        },
+        "vip_rewards": {
+          "title": "VIP 奖励",
+          "desc": "每日专属红利"
+        }
+      }
     }
   },
   "game_types": {
@@ -77,5 +190,55 @@
     "11": "电子竞技",
     "12": "扑克",
     "13": "其他"
+  },
+  "auth": {
+    "welcome_back": "欢迎回来",
+    "sign_in_subtitle": "登录以访问您的钱包",
+    "email_label": "电子邮件地址",
+    "password_label": "密码",
+    "forgot_password": "忘记密码？",
+    "password_placeholder": "输入您的密码",
+    "sign_in": "登录",
+    "signing_in": "正在登录...",
+    "or_continue_with": "或者继续使用",
+    "create_account": "创建账户",
+    "sign_up_subtitle": "立即加入开始游戏并赚钱",
+    "first_name": "名字",
+    "last_name": "姓氏",
+    "username": "用户名",
+    "confirm_password": "确认密码",
+    "first_name_placeholder": "张",
+    "last_name_placeholder": "三",
+    "username_placeholder": "选择一个用户名",
+    "email_placeholder": "name@example.com",
+    "create_password_placeholder": "创建密码",
+    "repeat_password_placeholder": "重复您的密码",
+    "username_taken": "用户名已被占用",
+    "username_available": "用户名可用",
+    "checking_username": "请稍候，我们正在检查您的用户名。",
+    "creating_account": "正在创建账户...",
+    "or_sign_up_with": "或者注册使用",
+    "telegram": "Telegram",
+    "fill_all_fields": "请填写所有字段。",
+    "passwords_mismatch": "密码不匹配。",
+    "account_created": "账户创建成功。",
+    "sign_up_failed": "注册失败。请重试。",
+    "sign_in_success": "登录成功。",
+    "sign_in_failed": "登录失败。请检查您的凭据。"
+  },
+  "game_details": {
+    "loading_game": "正在加载游戏...",
+    "game_not_found": "未找到游戏",
+    "game_not_found_desc": "您查找的游戏当前不可用或已被移除。",
+    "return_to_lobby": "返回大厅",
+    "fair": "公平",
+    "popular": "热门",
+    "experience_gameplay": "体验 {{name}} 的优质游戏玩法。赢取高倍率大奖和即时支付。",
+    "launching": "正在启动...",
+    "start_game": "立即开始游戏",
+    "official_game": "* 官方游戏 • 即时提款",
+    "premium": "优质",
+    "launch_failed": "启动游戏失败",
+    "launch_error": "启动游戏出错"
   }
 }
