@@ -19,8 +19,9 @@ const PG_CONFIG = {
   APP_NAME: "Golden Age Club",
   APP_ID: "f6710138-8c7e-4200-9d3d-4cd1630e4813",
   API_KEY: "3099a19b-647e-4350-8cf4-33a0e78d27df",
-  BASE_URL: "https://resolver.mgcapi.com"
+  BASE_URL: "https://mgcbot.mgcapi.com"
 };
+
 
 export const useApi = () => {
   const context = useContext(ApiContext);
@@ -256,63 +257,61 @@ export const ApiProvider = ({ children }) => {
     }
   };
 
-  const launchGame = async (gameId) => {
+ const launchGame = async (gameId) => {
     try {
-      // Direct frontend launch logic matching provider sample
-      // Note: This exposes the API_KEY in the frontend, which is a security risk but requested by user.
-      
+      // Get auth token from cookie
+      const token = getCookie('access_token');
+
+      if (!token || !user) {
+        throw new Error('User not authenticated');
+      }
+
+      // Sample uses Date.now() (milliseconds)
       const requestTime = Date.now();
-      const baseUrl = window.location.origin;
-      const walletUrl = `${baseUrl}/wallet`;
-      const exitUrl = `${baseUrl}/`;
-      
-      const params = {
-        exit: exitUrl,
-        game_id: parseInt(gameId),
-        player_id: user?._id || 'guest',
-        player_token: getCookie('access_token') || user?.token || 'frontend_token_' + Date.now(), // Use cookie token first
+
+      // Construct payload
+      // Important: Keys order matters for signature generation if using Object.entries
+      const payload = {
+        exit: window.location.origin + '/',
+        game_id: parseInt(gameId, 10), // Ensure integer
+        player_id: String(user._id || user.id), // Ensure string
+        player_token: token,
         app_id: PG_CONFIG.APP_ID,
         language: currentLanguage || 'en',
         currency: 'USD',
         request_time: requestTime,
         urls: {
-          base_url: baseUrl,
-          wallet_url: walletUrl,
-          other_url: `${baseUrl}/support`
+          base_url: window.location.origin,
+          wallet_url: window.location.origin + '/wallet',
+          other_url: window.location.origin + '/support'
         }
       };
 
-      // Signature generation using CryptoJS
-      const createSign = (p, apiKey) => {
-        // Sort keys alphabetically to ensure consistent signature
-        const sortedKeys = Object.keys(p).sort();
-        const values = sortedKeys
-          .filter((key) => key !== 'sign' && key !== 'urls')
-          .map((key) => {
-            const value = p[key];
-            return (value && typeof value === 'object' ? JSON.stringify(value) : value);
-          })
+      // Signature generation function based on provided sample
+      const createSign = (params, apiKey) => {
+        const values = Object.entries(params)
+          .filter(([key]) => key !== 'sign' && key !== 'urls')
+          .map(([, value]) => (value && typeof value === 'object' ? JSON.stringify(value) : value))
           .join('');
-        
-        console.log('📝 Signature Base String:', values);
-        
+
         const encoded = encodeURIComponent(values);
         return CryptoJS.HmacMD5(encoded, apiKey).toString(CryptoJS.enc.Hex);
       };
 
-      params.sign = createSign(params, PG_CONFIG.API_KEY);
+      // Generate signature
+      payload.sign = createSign(payload, PG_CONFIG.API_KEY);
+      // Perform POST request to get the game URL
+      // Using https://test-cases.cdnparts.com as the provider endpoint based on previous code
+      // Adjust this URL if the provider is different
+      const providerBaseUrl = 'https://resolver.mgcapi.com';
 
-      console.log('🚀 Launching game directly from frontend:', params);
-
-      // Use axios to bypass interceptors and handle response better
-      const response = await axios.post(`${PG_CONFIG.BASE_URL}/api/v1/playGame`, params, {
+      // Using fetch to match the sample, but we could use axios
+      const data = await axios.post(`${providerBaseUrl}/api/v1/playGame`, payload, {
         headers: { 'Content-Type': 'application/json' }
       });
 
-      const data = response.data;
-      console.log("rtyuiaad", data);
       if (data.result === false) {
-        console.warn('❌ Game launch error from provider:', data);
+        console.warn('❌ Game launch error from provider:', data.err_desc);
         return {
           success: false,
           error: data.err_desc || 'Game launch failed',
@@ -327,11 +326,6 @@ export const ApiProvider = ({ children }) => {
       }
 
     } catch (err) {
-      console.warn('⚠️ Could not launch game:', err);
-      if (err.response) {
-        console.warn('⚠️ Provider error details:', err);
-        return { success: false, error: err.response.data?.message || err.message };
-      }
       return { success: false, error: err.message };
     }
   };
