@@ -305,7 +305,7 @@ export const ApiProvider = ({ children }) => {
       console.log('🚀 Launching game directly from frontend:', params);
 
       // Use axios to bypass interceptors and handle response better
-      const response = await axios.post(`${PG_CONFIG.BASE_URL}/api/v1/launch-game`, params, {
+      const response = await axios.post(`${PG_CONFIG.BASE_URL}/api/v1/playGame`, params, {
         headers: { 'Content-Type': 'application/json' }
       });
 
