@@ -19,7 +19,7 @@ const PG_CONFIG = {
   APP_NAME: "Golden Age Club",
   APP_ID: "f6710138-8c7e-4200-9d3d-4cd1630e4813",
   API_KEY: "3099a19b-647e-4350-8cf4-33a0e78d27df",
-  BASE_URL: "https://mgcbot.mgcapi.com"
+  BASE_URL: "https://resolver.mgcapi.com"
 };
 
 export const useApi = () => {
