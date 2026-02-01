@@ -5,13 +5,13 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import CryptoJS from 'crypto-js';
-import axios, { backendUrl } from '../api/axios';
+import axios from 'axios';
+import { getCookie } from '../api/cookies';
 import authApi from '../api/auth';
 import walletApi from '../api/wallet';
 import api from '../api/axios';
 import { useAuth } from './AuthContext.jsx';
 import { useLanguage } from './LanguageContext.jsx';
-import { getCookie } from '../api/cookies';
 
 const ApiContext = createContext();
 
@@ -270,7 +270,7 @@ export const ApiProvider = ({ children }) => {
         exit: exitUrl,
         game_id: parseInt(gameId),
         player_id: user?._id || 'guest',
-        player_token: user?.token || 'frontend_token_' + Date.now(), // Use available token or generate one
+        player_token: getCookie('access_token') || user?.token || 'frontend_token_' + Date.now(), // Use cookie token first
         app_id: PG_CONFIG.APP_ID,
         language: currentLanguage || 'en',
         currency: 'USD',
@@ -284,10 +284,18 @@ export const ApiProvider = ({ children }) => {
 
       // Signature generation using CryptoJS
       const createSign = (p, apiKey) => {
-        const values = Object.entries(p)
-          .filter(([key]) => key !== 'sign' && key !== 'urls')
-          .map(([, value]) => (value && typeof value === 'object' ? JSON.stringify(value) : value))
+        // Sort keys alphabetically to ensure consistent signature
+        const sortedKeys = Object.keys(p).sort();
+        const values = sortedKeys
+          .filter((key) => key !== 'sign' && key !== 'urls')
+          .map((key) => {
+            const value = p[key];
+            return (value && typeof value === 'object' ? JSON.stringify(value) : value);
+          })
           .join('');
+        
+        console.log('📝 Signature Base String:', values);
+        
         const encoded = encodeURIComponent(values);
         return CryptoJS.HmacMD5(encoded, apiKey).toString(CryptoJS.enc.Hex);
       };
@@ -296,17 +304,15 @@ export const ApiProvider = ({ children }) => {
 
       console.log('🚀 Launching game directly from frontend:', params);
 
-      // Use fetch to bypass axios instance configuration
-      const response = await fetch(`${PG_CONFIG.BASE_URL}/api/v1/launch-game`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params)
+      // Use axios to bypass interceptors and handle response better
+      const response = await axios.post(`${PG_CONFIG.BASE_URL}/api/v1/launch-game`, params, {
+        headers: { 'Content-Type': 'application/json' }
       });
 
-      const data = await response.json();
-
+      const data = response.data;
+      console.log("rtyuiaad", data);
       if (data.result === false) {
-        console.warn('❌ Game launch error from provider:', data.err_desc);
+        console.warn('❌ Game launch error from provider:', data);
         return {
           success: false,
           error: data.err_desc || 'Game launch failed',
@@ -321,7 +327,11 @@ export const ApiProvider = ({ children }) => {
       }
 
     } catch (err) {
-      console.warn('⚠️ Could not launch game:', err.message);
+      console.warn('⚠️ Could not launch game:', err);
+      if (err.response) {
+        console.warn('⚠️ Provider error details:', err);
+        return { success: false, error: err.response.data?.message || err.message };
+      }
       return { success: false, error: err.message };
     }
   };
