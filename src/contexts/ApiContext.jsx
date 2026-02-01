@@ -258,29 +258,71 @@ export const ApiProvider = ({ children }) => {
 
   const launchGame = async (gameId) => {
     try {
-      const response = await api.post('/api/casino/pg/play', {
-        game_id: gameId,
-        exit_url: window.location.origin + '/'
+      // Direct frontend launch logic matching provider sample
+      // Note: This exposes the API_KEY in the frontend, which is a security risk but requested by user.
+      
+      const requestTime = Date.now();
+      const baseUrl = window.location.origin;
+      const walletUrl = `${baseUrl}/wallet`;
+      const exitUrl = `${baseUrl}/`;
+      
+      const params = {
+        exit: exitUrl,
+        game_id: parseInt(gameId),
+        player_id: user?._id || 'guest',
+        player_token: user?.token || 'frontend_token_' + Date.now(), // Use available token or generate one
+        app_id: PG_CONFIG.APP_ID,
+        language: currentLanguage || 'en',
+        currency: 'USD',
+        request_time: requestTime,
+        urls: {
+          base_url: baseUrl,
+          wallet_url: walletUrl,
+          other_url: `${baseUrl}/support`
+        }
+      };
+
+      // Signature generation using CryptoJS
+      const createSign = (p, apiKey) => {
+        const values = Object.entries(p)
+          .filter(([key]) => key !== 'sign' && key !== 'urls')
+          .map(([, value]) => (value && typeof value === 'object' ? JSON.stringify(value) : value))
+          .join('');
+        const encoded = encodeURIComponent(values);
+        return CryptoJS.HmacMD5(encoded, apiKey).toString(CryptoJS.enc.Hex);
+      };
+
+      params.sign = createSign(params, PG_CONFIG.API_KEY);
+
+      console.log('🚀 Launching game directly from frontend:', params);
+
+      // Use fetch to bypass axios instance configuration
+      const response = await fetch(`${PG_CONFIG.BASE_URL}/api/v1/launch-game`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params)
       });
 
-      if (response.result === false) {
-        console.warn('❌ Game launch error from provider:', response.err_desc);
+      const data = await response.json();
+
+      if (data.result === false) {
+        console.warn('❌ Game launch error from provider:', data.err_desc);
         return {
           success: false,
-          error: response.err_desc || 'Game launch failed',
-          code: response.err_code
+          error: data.err_desc || 'Game launch failed',
+          code: data.err_code
         };
       }
 
-      if (response.url) {
-        return { success: true, data: { url: response.url } };
+      if (data.url) {
+        return { success: true, data: { url: data.url } };
       } else {
-        throw new Error(response.message || response.err_desc || 'Failed to get game URL');
+        throw new Error(data.message || data.err_desc || 'Failed to get game URL');
       }
 
     } catch (err) {
       console.warn('⚠️ Could not launch game:', err.message);
-      return { success: false, error: err.response?.data?.message || err.message };
+      return { success: false, error: err.message };
     }
   };
 
