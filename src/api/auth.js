@@ -39,7 +39,7 @@ export const refreshToken = async () => {
 export const getCurrentUser = async () => {
   try {
     console.log('📡 Auth API: Get current user');
-    const response = await api.get('/api/auth/me');
+    const response = await api.get('/api/users/me');
     console.log('✅ Auth API Response - Get Current User:', response);
     return response;
   } catch (error) {

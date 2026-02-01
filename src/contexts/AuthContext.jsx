@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
     
     try {
       const token = getCookie('access_token');
-      
+      console.log(token)
       if (token) {
         // Try to get current user with existing token
         const currentUser = await authApi.getCurrentUser();

@@ -2,12 +2,12 @@ import axios from 'axios';
 import { getCookie, removeCookie } from './cookies';
 
 export const backendUrl = () => {
-  // if (typeof window !== 'undefined') {
-  //   const hostname = window.location.hostname;
-  //   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-  //     return 'http://localhost:8000';
-  //   }
-  // }
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:8000';
+    }
+  }
   return 'https://golden-age-club-f8a5bb71b60a.herokuapp.com';
 };
 
