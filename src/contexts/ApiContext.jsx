@@ -306,7 +306,7 @@ export const ApiProvider = ({ children }) => {
       const providerBaseUrl = 'https://resolver.mgcapi.com';
 
       // Using fetch to match the sample, but we could use axios
-      const data = await axios.post(`${providerBaseUrl}/api/v1/playGame`, payload, {
+      const {data} = await axios.post(`${providerBaseUrl}/api/v1/playGame`, payload, {
         headers: { 'Content-Type': 'application/json' }
       });
 
