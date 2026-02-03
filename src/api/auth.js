@@ -3,7 +3,7 @@ import api from './axios';
 export const login = async (initData) => {
   try {
     console.log('📡 Auth API: Telegram login');
-    const response = await api.post('/api/auth/login', { init_data: initData });
+    const response = await api.post('/api/auth/login/telegram', { init_data: initData });
     console.log('✅ Auth API Response - Login:', response);
     return response;
   } catch (error) {
