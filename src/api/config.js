@@ -9,20 +9,20 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localho
 export const API_ENDPOINTS = {
   // Auth endpoints
   AUTH: {
-    LOGIN: '/api/auth/login',
+    LOGIN: '/api/auth/login/telegram',
     REFRESH: '/api/auth/refresh',
-    ME: '/api/auth/me'
+    ME: '/api/users/me'
   },
-  
+
   // Wallet endpoints
   WALLET: {
     BALANCE: '/api/wallet/balance',
     DEPOSIT: '/api/wallet/deposit',
     WITHDRAW: '/api/wallet/withdraw',
-    TRANSACTIONS: '/api/wallet/transactions',
+    TRANSACTIONS: '/api/transactions/me',
     TRANSACTION: '/api/wallet/transaction'
   },
-  
+
   // Health check
   HEALTH: '/health'
 };

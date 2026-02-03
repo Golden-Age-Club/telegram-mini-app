@@ -88,7 +88,12 @@ const Wallet = () => {
     try {
       setIsLoadingHistory(true);
       if (walletApi?.getTransactions) {
-        const response = await walletApi.getTransactions(1, 20);
+        // Map tab name to API filter type
+        let typeFilter = null;
+        if (activeTab === 'deposit') typeFilter = 'deposit';
+        if (activeTab === 'withdraw') typeFilter = 'withdrawal';
+
+        const response = await walletApi.getTransactions(1, 20, typeFilter);
         // Handle different response structures based on api/wallet.js check
         const txList = response.transactions || response.data?.transactions || [];
         setTransactions(txList);
@@ -99,6 +104,13 @@ const Wallet = () => {
       setIsLoadingHistory(false);
     }
   };
+
+  // Reload transactions when tab changes
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadTransactions();
+    }
+  }, [activeTab, isAuthenticated]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(address);
