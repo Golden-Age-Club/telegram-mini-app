@@ -8,6 +8,7 @@ import StartGame from '../pages/StartGame.jsx';
 import Wallet from '../pages/Wallet.jsx';
 import Profile from '../pages/Profile.jsx';
 import BetHistory from '../pages/BetHistory.jsx';
+import Activity from '../pages/Activity.jsx';
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
       {
         path: 'bet-history',
         element: <BetHistory />
+      },
+      {
+        path: 'activity',
+        element: <Activity />
       }
     ]
   }

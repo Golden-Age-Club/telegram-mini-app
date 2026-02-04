@@ -464,7 +464,7 @@ const Wallet = () => {
                       {tx.currency && (
                         <div>
                           <p className="text-[var(--text-muted)] mb-1">Currency</p>
-                          <p className="text-white">{tx.currency}</p>
+                          <p className="text-white">{tx.currency.split('.')[0]}</p>
                         </div>
                       )}
                       {tx.wallet_address && (
@@ -564,8 +564,11 @@ const Wallet = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <span className="font-bold text-white text-xl">{t('myWallet')}</span>
-          <button className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors">
-            <History className="w-5 h-5 text-gray-400" onClick={() => handleTabChange('history')} />
+          <button
+            onClick={() => navigate('/activity')}
+            className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors"
+          >
+            <History className="w-5 h-5 text-gray-400" />
           </button>
         </div>
 
