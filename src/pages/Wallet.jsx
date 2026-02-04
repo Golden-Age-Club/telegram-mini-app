@@ -76,11 +76,6 @@ const Wallet = () => {
     }
   }, [tg]);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      loadTransactions();
-    }
-  }, [isAuthenticated]);
 
   useEffect(() => {
     if (isWithdrawRoute) {
