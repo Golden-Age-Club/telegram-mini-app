@@ -50,6 +50,9 @@ const Wallet = () => {
   const [withdrawAddress, setWithdrawAddress] = useState('');
   const [isWithdrawing, setIsWithdrawing] = useState(false);
 
+  // Expanded transaction state
+  const [expandedTxId, setExpandedTxId] = useState(null);
+
   // Deposit API state
   const [isCreatingDeposit, setIsCreatingDeposit] = useState(false);
   const [depositData, setDepositData] = useState(null);
@@ -399,30 +402,83 @@ const Wallet = () => {
         </div>
       ) : transactions.length > 0 ? (
         <div className="space-y-3">
-          {transactions.map((tx, idx) => (
-            <div key={tx.id || idx} className="p-4 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tx.type === 'deposit' ? 'bg-emerald-500/20 text-emerald-500' : 'bg-amber-500/20 text-amber-500'
-                  }`}>
-                  {tx.type === 'deposit' ? <ArrowDownCircle size={20} /> : <ArrowUpCircle size={20} />}
+          {transactions.map((tx, idx) => {
+            const isExpanded = expandedTxId === (tx._id || tx.id || idx);
+            const txId = tx._id || tx.id || `tx-${idx}`;
+
+            return (
+              <div
+                key={txId}
+                className="rounded-xl bg-white/5 border border-white/5 overflow-hidden transition-all"
+              >
+                {/* Main Transaction Row */}
+                <div
+                  onClick={() => setExpandedTxId(isExpanded ? null : txId)}
+                  className="p-4 flex items-center justify-between cursor-pointer hover:bg-white/10 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tx.type === 'deposit' ? 'bg-emerald-500/20 text-emerald-500' : 'bg-amber-500/20 text-amber-500'
+                      }`}>
+                      {tx.type === 'deposit' ? <ArrowDownCircle size={20} /> : <ArrowUpCircle size={20} />}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-white capitalize">{tx.type}</p>
+                      <p className="text-xs text-[var(--text-muted)]">{new Date(tx.created_at || Date.now()).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <p className={`font-bold ${tx.type === 'deposit' ? 'text-emerald-400' : 'text-white'}`}>
+                        {tx.type === 'deposit' ? '+' : '-'}{Number(tx.amount).toLocaleString()} USDT
+                      </p>
+                      <p className={`text-xs capitalize ${tx.status === 'completed' ? 'text-emerald-500' :
+                        tx.status === 'pending' ? 'text-yellow-500' :
+                          tx.status === 'processing' ? 'text-blue-500' :
+                            tx.status === 'expired' ? 'text-gray-500' : 'text-red-500'
+                        }`}>{t(`transaction_status.${tx.status}`, tx.status)}</p>
+                    </div>
+                    <ChevronRight
+                      className={`w-5 h-5 text-gray-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                    />
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-bold text-white capitalize">{tx.type}</p>
-                  <p className="text-xs text-[var(--text-muted)]">{new Date(tx.created_at || Date.now()).toLocaleDateString()}</p>
-                </div>
+
+                {/* Expanded Details */}
+                {isExpanded && (
+                  <div className="px-4 pb-4 pt-2 border-t border-white/5 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div>
+                        <p className="text-[var(--text-muted)] mb-1">Transaction ID</p>
+                        <p className="text-white font-mono text-[10px] break-all">{txId}</p>
+                      </div>
+                      <div>
+                        <p className="text-[var(--text-muted)] mb-1">Date & Time</p>
+                        <p className="text-white">{new Date(tx.created_at || Date.now()).toLocaleString()}</p>
+                      </div>
+                      {tx.merchant_order_id && (
+                        <div>
+                          <p className="text-[var(--text-muted)] mb-1">Order ID</p>
+                          <p className="text-white font-mono text-[10px]">{tx.merchant_order_id}</p>
+                        </div>
+                      )}
+                      {tx.currency && (
+                        <div>
+                          <p className="text-[var(--text-muted)] mb-1">Currency</p>
+                          <p className="text-white">{tx.currency}</p>
+                        </div>
+                      )}
+                      {tx.wallet_address && (
+                        <div className="col-span-2">
+                          <p className="text-[var(--text-muted)] mb-1">Wallet Address</p>
+                          <p className="text-white font-mono text-[10px] break-all">{tx.wallet_address}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="text-right">
-                <p className={`font-bold ${tx.type === 'deposit' ? 'text-emerald-400' : 'text-white'}`}>
-                  {tx.type === 'deposit' ? '+' : '-'}{Number(tx.amount).toLocaleString()} USDT
-                </p>
-                <p className={`text-xs capitalize ${tx.status === 'completed' ? 'text-emerald-500' :
-                  tx.status === 'pending' ? 'text-yellow-500' :
-                    tx.status === 'processing' ? 'text-blue-500' :
-                      tx.status === 'expired' ? 'text-gray-500' : 'text-red-500'
-                  }`}>{t(`transaction_status.${tx.status}`, tx.status)}</p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-12 text-[var(--text-muted)]">
