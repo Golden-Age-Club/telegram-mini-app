@@ -121,7 +121,9 @@
     },
     "login_access": "Login to Access Wallet",
     "no_account": "Don't have an account?",
-    "history_tab": "History"
+    "history_tab": "History",
+    "recent_deposits": "Recent Deposits",
+    "recent_withdrawals": "Recent Withdrawals"
   },
   "landing": {
     "quick_actions": {
@@ -226,6 +228,14 @@
     "sign_up_failed": "Sign up failed. Please try again.",
     "sign_in_success": "Signed in successfully.",
     "sign_in_failed": "Sign in failed. Please check your credentials."
+  },
+  "transaction_status": {
+    "completed": "Successful",
+    "pending": "Pending",
+    "processing": "Processing",
+    "failed": "Failed",
+    "expired": "Expired",
+    "rejected": "Rejected"
   },
   "game_details": {
     "loading_game": "LOADING GAME...",

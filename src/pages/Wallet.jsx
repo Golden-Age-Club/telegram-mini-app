@@ -12,7 +12,8 @@ import {
   Zap,
   ChevronRight,
   AlertCircle,
-  QrCode
+  QrCode,
+  RefreshCw
 } from 'lucide-react';
 import { useApi } from '../contexts/ApiContext.jsx';
 import { toast } from 'sonner';
@@ -25,8 +26,13 @@ const Wallet = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useLanguage();
+  // Safe translation helper
+  const safeT = (key, fallback) => {
+    const res = t(key);
+    return res === key ? fallback : res;
+  };
   const { createWithdrawal } = useApi();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, checkAuthStatus } = useAuth();
 
   const isDepositRoute = location.pathname.endsWith('/wallet/deposit') || location.pathname.endsWith('/wallet');
   const isWithdrawRoute = location.pathname.endsWith('/wallet/withdraw');
@@ -43,6 +49,9 @@ const Wallet = () => {
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [withdrawAddress, setWithdrawAddress] = useState('');
   const [isWithdrawing, setIsWithdrawing] = useState(false);
+
+  // Expanded transaction state
+  const [expandedTxId, setExpandedTxId] = useState(null);
 
   // Deposit API state
   const [isCreatingDeposit, setIsCreatingDeposit] = useState(false);
@@ -70,11 +79,6 @@ const Wallet = () => {
     }
   }, [tg]);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      loadTransactions();
-    }
-  }, [isAuthenticated]);
 
   useEffect(() => {
     if (isWithdrawRoute) {
@@ -88,7 +92,12 @@ const Wallet = () => {
     try {
       setIsLoadingHistory(true);
       if (walletApi?.getTransactions) {
-        const response = await walletApi.getTransactions(1, 20);
+        // Map tab name to API filter type
+        let typeFilter = null;
+        if (activeTab === 'deposit') typeFilter = 'deposit';
+        if (activeTab === 'withdraw') typeFilter = 'withdrawal';
+
+        const response = await walletApi.getTransactions(1, 20, typeFilter);
         // Handle different response structures based on api/wallet.js check
         const txList = response.transactions || response.data?.transactions || [];
         setTransactions(txList);
@@ -99,6 +108,13 @@ const Wallet = () => {
       setIsLoadingHistory(false);
     }
   };
+
+  // Reload transactions when tab changes
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadTransactions();
+    }
+  }, [activeTab, isAuthenticated]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(address);
@@ -386,28 +402,83 @@ const Wallet = () => {
         </div>
       ) : transactions.length > 0 ? (
         <div className="space-y-3">
-          {transactions.map((tx, idx) => (
-            <div key={tx.id || idx} className="p-4 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tx.type === 'deposit' ? 'bg-emerald-500/20 text-emerald-500' : 'bg-amber-500/20 text-amber-500'
-                  }`}>
-                  {tx.type === 'deposit' ? <ArrowDownCircle size={20} /> : <ArrowUpCircle size={20} />}
+          {transactions.map((tx, idx) => {
+            const isExpanded = expandedTxId === (tx._id || tx.id || idx);
+            const txId = tx._id || tx.id || `tx-${idx}`;
+
+            return (
+              <div
+                key={txId}
+                className="rounded-xl bg-white/5 border border-white/5 overflow-hidden transition-all"
+              >
+                {/* Main Transaction Row */}
+                <div
+                  onClick={() => setExpandedTxId(isExpanded ? null : txId)}
+                  className="p-4 flex items-center justify-between cursor-pointer hover:bg-white/10 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tx.type === 'deposit' ? 'bg-emerald-500/20 text-emerald-500' : 'bg-amber-500/20 text-amber-500'
+                      }`}>
+                      {tx.type === 'deposit' ? <ArrowDownCircle size={20} /> : <ArrowUpCircle size={20} />}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-white capitalize">{tx.type}</p>
+                      <p className="text-xs text-[var(--text-muted)]">{new Date(tx.created_at || Date.now()).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <p className={`font-bold ${tx.type === 'deposit' ? 'text-emerald-400' : 'text-white'}`}>
+                        {tx.type === 'deposit' ? '+' : '-'}{Number(tx.amount).toLocaleString()} USDT
+                      </p>
+                      <p className={`text-xs capitalize ${tx.status === 'completed' ? 'text-emerald-500' :
+                        tx.status === 'pending' ? 'text-yellow-500' :
+                          tx.status === 'processing' ? 'text-blue-500' :
+                            tx.status === 'expired' ? 'text-gray-500' : 'text-red-500'
+                        }`}>{t(`transaction_status.${tx.status}`, tx.status)}</p>
+                    </div>
+                    <ChevronRight
+                      className={`w-5 h-5 text-gray-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                    />
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-bold text-white capitalize">{tx.type}</p>
-                  <p className="text-xs text-[var(--text-muted)]">{new Date(tx.created_at || Date.now()).toLocaleDateString()}</p>
-                </div>
+
+                {/* Expanded Details */}
+                {isExpanded && (
+                  <div className="px-4 pb-4 pt-2 border-t border-white/5 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div>
+                        <p className="text-[var(--text-muted)] mb-1">Transaction ID</p>
+                        <p className="text-white font-mono text-[10px] break-all">{txId}</p>
+                      </div>
+                      <div>
+                        <p className="text-[var(--text-muted)] mb-1">Date & Time</p>
+                        <p className="text-white">{new Date(tx.created_at || Date.now()).toLocaleString()}</p>
+                      </div>
+                      {tx.merchant_order_id && (
+                        <div>
+                          <p className="text-[var(--text-muted)] mb-1">Order ID</p>
+                          <p className="text-white font-mono text-[10px]">{tx.merchant_order_id}</p>
+                        </div>
+                      )}
+                      {tx.currency && (
+                        <div>
+                          <p className="text-[var(--text-muted)] mb-1">Currency</p>
+                          <p className="text-white">{tx.currency.split('.')[0]}</p>
+                        </div>
+                      )}
+                      {tx.wallet_address && (
+                        <div className="col-span-2">
+                          <p className="text-[var(--text-muted)] mb-1">Wallet Address</p>
+                          <p className="text-white font-mono text-[10px] break-all">{tx.wallet_address}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="text-right">
-                <p className={`font-bold ${tx.type === 'deposit' ? 'text-emerald-400' : 'text-white'}`}>
-                  {tx.type === 'deposit' ? '+' : '-'}{Number(tx.amount).toLocaleString()} USDT
-                </p>
-                <p className={`text-xs capitalize ${tx.status === 'completed' ? 'text-emerald-500' :
-                  tx.status === 'pending' ? 'text-yellow-500' : 'text-red-500'
-                  }`}>{tx.status}</p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-12 text-[var(--text-muted)]">
@@ -493,8 +564,11 @@ const Wallet = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <span className="font-bold text-white text-xl">{t('myWallet')}</span>
-          <button className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors">
-            <History className="w-5 h-5 text-gray-400" onClick={() => handleTabChange('history')} />
+          <button
+            onClick={() => navigate('/activity')}
+            className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors"
+          >
+            <History className="w-5 h-5 text-gray-400" />
           </button>
         </div>
 
@@ -506,7 +580,19 @@ const Wallet = () => {
           <div className="relative p-6 space-y-6">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-400 mb-1">{t('profile_page.total_balance')}</p>
+                <p className="text-sm font-medium text-gray-400 mb-1 flex items-center gap-2">
+                  {t('profile_page.total_balance')}
+                  <button
+                    onClick={async () => {
+                      toast.loading(t('wallet_page.refreshing', 'Refreshing...'), { id: 'refresh-balance' });
+                      await checkAuthStatus();
+                      toast.success(t('wallet_page.refreshed', 'Balance updated'), { id: 'refresh-balance' });
+                    }}
+                    className="p-1 hover:bg-white/10 rounded-full transition-colors"
+                  >
+                    <RefreshCw size={12} className="text-gray-500" />
+                  </button>
+                </p>
                 <h2 className="text-4xl font-black text-white tracking-tight">
                   ${user?.balance?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
                 </h2>
@@ -554,9 +640,27 @@ const Wallet = () => {
         </div>
 
         {/* Content Area */}
-        <div className="min-h-[300px]">
-          {activeTab === 'deposit' && renderDeposit()}
-          {activeTab === 'withdraw' && renderWithdraw()}
+        <div className="min-h-[300px] space-y-8">
+          {activeTab === 'deposit' && (
+            <>
+              {renderDeposit()}
+              <div className="pt-4 border-t border-white/10">
+                <h3 className="text-lg font-bold text-white mb-4">{t('wallet_page.recent_deposits')}</h3>
+                {renderHistory()}
+              </div>
+            </>
+          )}
+
+          {activeTab === 'withdraw' && (
+            <>
+              {renderWithdraw()}
+              <div className="pt-4 border-t border-white/10">
+                <h3 className="text-lg font-bold text-white mb-4">{t('wallet_page.recent_withdrawals')}</h3>
+                {renderHistory()}
+              </div>
+            </>
+          )}
+
           {activeTab === 'history' && renderHistory()}
         </div>
       </div>

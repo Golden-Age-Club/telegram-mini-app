@@ -45,14 +45,14 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuthStatus = async () => {
     setIsLoading(true);
-    
+
     try {
       const token = getCookie('access_token');
 
       if (token) {
         // Try to get current user with existing token
         const currentUser = await authApi.getCurrentUser();
-        
+
         if (currentUser) {
           setUser(currentUser);
           setIsAuthenticated(true);
@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
           localStorage.removeItem('access_token');
           removeCookie('access_token');
           setIsAuthenticated(false);
-          
+
           // Try to auto-login with Telegram if available
           await autoLoginWithTelegram();
         }
@@ -77,7 +77,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('access_token');
       removeCookie('access_token');
       setIsAuthenticated(false);
-      
+
       // Try to auto-login with Telegram if available
       await autoLoginWithTelegram();
     } finally {
@@ -105,12 +105,12 @@ export const AuthProvider = ({ children }) => {
       }
 
       const result = await authApi.login(tg.initData);
-      
+
       if (result && result.user && result.access_token) {
         setUser(result.user);
         setIsAuthenticated(true);
         setCookie('access_token', result.access_token);
-        
+
         console.log('✅ User logged in with Telegram successfully');
         return { success: true, user: result.user };
       } else {
@@ -134,14 +134,14 @@ export const AuthProvider = ({ children }) => {
     try {
       // For testing mode, send telegram_id as init_data
       const result = await authApi.login(telegramId.toString());
-      
+
       if (result && result.user && result.access_token) {
         setUser(result.user);
         setIsAuthenticated(true);
-        
+
         // Store JWT token in localStorage
         setCookie('access_token', result.access_token);
-        
+
         console.log('✅ User logged in with test data successfully');
         return { success: true, user: result.user };
       } else {
@@ -193,7 +193,7 @@ export const AuthProvider = ({ children }) => {
   const refreshToken = async () => {
     try {
       const result = await authApi.refreshToken();
-      
+
       if (result && result.access_token) {
         setCookie('access_token', result.access_token);
         if (result.user) {
@@ -202,7 +202,7 @@ export const AuthProvider = ({ children }) => {
         console.log('✅ Token refreshed successfully');
         return { success: true };
       }
-      
+
       return { success: false, error: 'Token refresh failed' };
     } catch (err) {
       console.error('❌ Token refresh failed:', err);
@@ -224,7 +224,7 @@ export const AuthProvider = ({ children }) => {
       });
 
 
-     if (result && result.access_token && result.user) {
+      if (result && result.access_token && result.user) {
         setUser(result.user);
         setIsAuthenticated(true);
         setCookie('access_token', result.access_token);
@@ -258,7 +258,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     setIsLoading(true);
-    
+
     try {
       // No logout endpoint in the API, just clear local state
       setUser(null);
@@ -291,7 +291,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated,
     isLoading,
     error,
-    
+
     // Methods
     loginWithTelegram,
     loginWithTestData,
