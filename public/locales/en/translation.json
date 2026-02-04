@@ -121,7 +121,9 @@
     },
     "login_access": "Login to Access Wallet",
     "no_account": "Don't have an account?",
-    "history_tab": "History"
+    "history_tab": "History",
+    "recent_deposits": "Recent Deposits",
+    "recent_withdrawals": "Recent Withdrawals"
   },
   "landing": {
     "quick_actions": {

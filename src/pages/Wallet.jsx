@@ -25,6 +25,11 @@ const Wallet = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useLanguage();
+  // Safe translation helper
+  const safeT = (key, fallback) => {
+    const res = t(key);
+    return res === key ? fallback : res;
+  };
   const { createWithdrawal } = useApi();
   const { isAuthenticated, user } = useAuth();
 
@@ -566,9 +571,27 @@ const Wallet = () => {
         </div>
 
         {/* Content Area */}
-        <div className="min-h-[300px]">
-          {activeTab === 'deposit' && renderDeposit()}
-          {activeTab === 'withdraw' && renderWithdraw()}
+        <div className="min-h-[300px] space-y-8">
+          {activeTab === 'deposit' && (
+            <>
+              {renderDeposit()}
+              <div className="pt-4 border-t border-white/10">
+                <h3 className="text-lg font-bold text-white mb-4">{t('wallet_page.recent_deposits')}</h3>
+                {renderHistory()}
+              </div>
+            </>
+          )}
+
+          {activeTab === 'withdraw' && (
+            <>
+              {renderWithdraw()}
+              <div className="pt-4 border-t border-white/10">
+                <h3 className="text-lg font-bold text-white mb-4">{t('wallet_page.recent_withdrawals')}</h3>
+                {renderHistory()}
+              </div>
+            </>
+          )}
+
           {activeTab === 'history' && renderHistory()}
         </div>
       </div>
