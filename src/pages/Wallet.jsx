@@ -12,7 +12,8 @@ import {
   Zap,
   ChevronRight,
   AlertCircle,
-  QrCode
+  QrCode,
+  RefreshCw
 } from 'lucide-react';
 import { useApi } from '../contexts/ApiContext.jsx';
 import { toast } from 'sonner';
@@ -31,7 +32,7 @@ const Wallet = () => {
     return res === key ? fallback : res;
   };
   const { createWithdrawal } = useApi();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, checkAuthStatus } = useAuth();
 
   const isDepositRoute = location.pathname.endsWith('/wallet/deposit') || location.pathname.endsWith('/wallet');
   const isWithdrawRoute = location.pathname.endsWith('/wallet/withdraw');
@@ -525,7 +526,19 @@ const Wallet = () => {
           <div className="relative p-6 space-y-6">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-400 mb-1">{t('profile_page.total_balance')}</p>
+                <p className="text-sm font-medium text-gray-400 mb-1 flex items-center gap-2">
+                  {t('profile_page.total_balance')}
+                  <button
+                    onClick={async () => {
+                      toast.loading(t('wallet_page.refreshing', 'Refreshing...'), { id: 'refresh-balance' });
+                      await checkAuthStatus();
+                      toast.success(t('wallet_page.refreshed', 'Balance updated'), { id: 'refresh-balance' });
+                    }}
+                    className="p-1 hover:bg-white/10 rounded-full transition-colors"
+                  >
+                    <RefreshCw size={12} className="text-gray-500" />
+                  </button>
+                </p>
                 <h2 className="text-4xl font-black text-white tracking-tight">
                   ${user?.balance?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
                 </h2>
