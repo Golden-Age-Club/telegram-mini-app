@@ -6,6 +6,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
 import { LayoutProvider } from './contexts/LayoutContext.jsx';
 import { Toaster } from 'sonner';
 import router from './router';
+import Preloader from './components/Preloader.jsx';
 
 function AppContent() {
   const { isLoading: authLoading } = useAuth();
@@ -16,25 +17,7 @@ function AppContent() {
   const isLoading = authLoading; 
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-primary">
-        <div className="text-center">
-          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-gold flex items-center justify-center glow-gold overflow-hidden">
-            <img 
-              src="/casinologo.jpg" 
-              alt="Golden Age Cash"
-              className="w-full h-full object-cover rounded-full"
-            />
-          </div>
-          <div className="loading-dots mb-4">
-            <div className="loading-dot"></div>
-            <div className="loading-dot"></div>
-            <div className="loading-dot"></div>
-          </div>
-          <p className="text-gray-400">Initializing Golden Age Club...</p>
-        </div>
-      </div>
-    );
+    return <Preloader />;
   }
 
   return (

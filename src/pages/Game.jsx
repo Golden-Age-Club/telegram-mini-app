@@ -111,12 +111,7 @@ const Game = () => {
       const sortedProviders = [...pgOptions.providers]
         .filter((p) => {
             const isActive = p.is_active === 1 || p.is_active === '1';
-            const isExcluded = [ 'pgsoft', 'ferhub_pgsoft', 'ferhub_egt'].some(ex => 
-                (p.code || '').toLowerCase().includes(ex) || 
-                (p.title || '').toLowerCase().includes(ex) || 
-                (p.uniq_name || '').toLowerCase().includes(ex)
-            );
-            return isActive && !isExcluded;
+            return isActive;
         })
         .sort((a, b) => {
           const pa = providerPriority(a);

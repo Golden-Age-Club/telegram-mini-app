@@ -52,7 +52,7 @@ export const ApiProvider = ({ children }) => {
   useEffect(() => {
     const fetchLiveTransactions = async () => {
       try {
-        const response = await api.get('/api/transactions/recent?limit=15');
+        const response = await api.get('/api/transactions/history?limit=15');
         if (response) {
           // Ensure response is an array
           const data = Array.isArray(response) ? response : (response.data || []);
@@ -84,11 +84,11 @@ export const ApiProvider = ({ children }) => {
     try {
       // 1. Load Games First (Page 1)
       try {
-        const gamesResponse = await api.get('/api/casino/pg/games?page=1&limit=18');
-
-        if (gamesResponse && Array.isArray(gamesResponse.data) || Array.isArray(gamesResponse.games)) {
+        // Fetch 12 games per provider to ensure all providers are displayed initially
+        const gamesResponse = await api.get('/api/casino/pg/games?limit_per_provider=12');
+        console.log(gamesResponse)
+        if (gamesResponse && (Array.isArray(gamesResponse.data) || Array.isArray(gamesResponse.games))) {
           setPgGames(gamesResponse.games || gamesResponse.data || []);
-
           setPagination({
             page: gamesResponse.page,
             limit: gamesResponse.limit,
@@ -176,6 +176,7 @@ export const ApiProvider = ({ children }) => {
       if (search) url += `&search=${encodeURIComponent(search)}`;
 
       const response = await api.get(url);
+      console.log(response)
       const newGames = response?.games || response?.data || (Array.isArray(response) ? response : null);
 
       if (Array.isArray(newGames)) {

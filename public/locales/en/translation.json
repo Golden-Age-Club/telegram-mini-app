@@ -136,13 +136,14 @@
       "title": "Live Transactions",
       "live_badge": "LIVE",
       "tabs": {
-        "all_bets": "All Bets",
-        "my_bets": "My Bets",
+        "all_bets": "All Games",
+        "my_bets": "My Games",
         "all_wins": "All Wins"
       },
       "table": {
         "game": "Game",
         "user": "User",
+        "result": "Result",
         "amount": "Amount",
         "empty": "No live transactions yet..."
       }
