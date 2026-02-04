@@ -420,8 +420,10 @@ const Wallet = () => {
                   {tx.type === 'deposit' ? '+' : '-'}{Number(tx.amount).toLocaleString()} USDT
                 </p>
                 <p className={`text-xs capitalize ${tx.status === 'completed' ? 'text-emerald-500' :
-                  tx.status === 'pending' ? 'text-yellow-500' : 'text-red-500'
-                  }`}>{tx.status}</p>
+                  tx.status === 'pending' ? 'text-yellow-500' :
+                    tx.status === 'processing' ? 'text-blue-500' :
+                      tx.status === 'expired' ? 'text-gray-500' : 'text-red-500'
+                  }`}>{t(`transaction_status.${tx.status}`, tx.status)}</p>
               </div>
             </div>
           ))}

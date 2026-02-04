@@ -228,6 +228,14 @@
     "sign_in_success": "Signed in successfully.",
     "sign_in_failed": "Sign in failed. Please check your credentials."
   },
+  "transaction_status": {
+    "completed": "Successful",
+    "pending": "Pending",
+    "processing": "Processing",
+    "failed": "Failed",
+    "expired": "Expired",
+    "rejected": "Rejected"
+  },
   "game_details": {
     "loading_game": "LOADING GAME...",
     "game_not_found": "Game Not Found",
