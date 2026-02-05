@@ -76,8 +76,8 @@ export const getDepositCurrencies = async () => {
     // Return default currencies as fallback
     return {
       currencies: [
-        { code: 'USDT.TRC20', name: 'USDT (TRC20)', minAmount: 10, maxAmount: 10000 },
-        { code: 'USDT.ERC20', name: 'USDT (ERC20)', minAmount: 10, maxAmount: 10000 }
+        { code: 'USDT.TRC20', name: 'USDT (TRC20)', minAmount: 0.0001, maxAmount: 10000 },
+        { code: 'USDT.ERC20', name: 'USDT (ERC20)', minAmount: 0.0001, maxAmount: 10000 }
       ]
     };
   }
@@ -97,8 +97,8 @@ export const getWithdrawalCurrencies = async () => {
     // Return default currencies as fallback
     return {
       currencies: [
-        { code: 'USDT.TRC20', name: 'USDT (TRC20)', minAmount: 10, maxAmount: 10000, fee: 1 },
-        { code: 'USDT.ERC20', name: 'USDT (ERC20)', minAmount: 10, maxAmount: 10000, fee: 5 }
+        { code: 'USDT.TRC20', name: 'USDT (TRC20)', minAmount: 0.0001, maxAmount: 10000, fee: 0.0001 },
+        { code: 'USDT.ERC20', name: 'USDT (ERC20)', minAmount: 0.0001, maxAmount: 10000, fee: 0.0001 }
       ]
     };
   }

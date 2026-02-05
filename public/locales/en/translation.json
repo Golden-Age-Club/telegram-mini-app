@@ -96,7 +96,7 @@
     "select_network": "Select Network",
     "fee": "Fee",
     "deposit_amount": "Deposit Amount",
-    "min_deposit": "Min. Deposit: 10 USDT",
+    "min_deposit": "Min. Deposit: 0.01 USDT",
     "instant_arrival": "Instant Arrival",
     "creating_order": "Creating Order...",
     "proceed_to_pay": "Proceed to Pay",
