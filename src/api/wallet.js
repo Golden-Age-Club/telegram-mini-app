@@ -146,6 +146,35 @@ export const createWithdrawal = async (amount, walletAddress, currency = 'USDT.T
   }
 };
 
+/**
+ * Get withdrawal fee
+ * @param {string} network - Network (TRC20, ERC20, BEP20)
+ */
+export const getWithdrawFee = async (network) => {
+  try {
+    const response = await api.get(`${API_ENDPOINTS.WALLET.WITHDRAW}-fee`, { params: { network } });
+    return response.data || response;
+  } catch (error) {
+    console.error('❌ Wallet API Error - Withdraw Fee:', error);
+    throw error;
+  }
+};
+
+/**
+ * Validate wallet address
+ * @param {string} address - Address to validate
+ * @param {string} network - Network (TRC20, ERC20, BEP20)
+ */
+export const validateAddress = async (address, network) => {
+  try {
+    const response = await api.post('/api/wallet/validate-address', { address, network });
+    return response.data || response;
+  } catch (error) {
+    console.error('❌ Wallet API Error - Validate Address:', error);
+    throw error;
+  }
+};
+
 // Export all functions as default object
 export default {
   getBalance,
@@ -154,5 +183,7 @@ export default {
   getDepositCurrencies,
   getWithdrawalCurrencies,
   createDeposit,
-  createWithdrawal
+  createWithdrawal,
+  getWithdrawFee,
+  validateAddress
 };

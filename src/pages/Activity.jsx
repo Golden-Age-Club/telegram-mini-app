@@ -9,7 +9,8 @@ import {
     Settings,
     ChevronRight,
     ArrowLeft,
-    Filter
+    Filter,
+    ExternalLink
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { useLanguage } from '../contexts/LanguageContext.jsx';
@@ -109,7 +110,8 @@ const Activity = () => {
         }
     };
 
-    const getTransactionLabel = (type) => {
+    const getTransactionLabel = (type, amount) => {
+        if (type === 'game_win' && amount === 0) return 'Loss';
         const labels = {
             deposit: 'Deposit',
             withdrawal: 'Withdrawal',
@@ -165,8 +167,8 @@ const Activity = () => {
                             key={filter.id}
                             onClick={() => setActiveFilter(filter.id)}
                             className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${activeFilter === filter.id
-                                    ? 'bg-[var(--gold)] text-black shadow-lg shadow-yellow-900/20'
-                                    : 'text-gray-400 hover:text-white'
+                                ? 'bg-[var(--gold)] text-black shadow-lg shadow-yellow-900/20'
+                                : 'text-gray-400 hover:text-white'
                                 }`}
                         >
                             {filter.label}
@@ -201,7 +203,7 @@ const Activity = () => {
                                                 {getTransactionIcon(tx.type)}
                                             </div>
                                             <div>
-                                                <p className="text-sm font-bold text-white">{getTransactionLabel(tx.type)}</p>
+                                                <p className="text-sm font-bold text-white">{getTransactionLabel(tx.type, tx.amount)}</p>
                                                 <p className="text-xs text-[var(--text-muted)]">
                                                     {new Date(tx.created_at || Date.now()).toLocaleDateString()}
                                                 </p>
@@ -211,9 +213,9 @@ const Activity = () => {
                                             <div className="text-right">
                                                 {getAmountDisplay(tx)}
                                                 <p className={`text-xs capitalize ${tx.status === 'completed' ? 'text-emerald-500' :
-                                                        tx.status === 'pending' ? 'text-yellow-500' :
-                                                            tx.status === 'processing' ? 'text-blue-500' :
-                                                                tx.status === 'expired' ? 'text-gray-500' : 'text-red-500'
+                                                    tx.status === 'pending' ? 'text-yellow-500' :
+                                                        tx.status === 'processing' ? 'text-blue-500' :
+                                                            tx.status === 'expired' ? 'text-gray-500' : 'text-red-500'
                                                     }`}>
                                                     {t(`transaction_status.${tx.status}`, tx.status)}
                                                 </p>
@@ -229,13 +231,35 @@ const Activity = () => {
                                         <div className="px-4 pb-4 pt-2 border-t border-white/5 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
                                             <div className="grid grid-cols-2 gap-3 text-xs">
                                                 <div>
-                                                    <p className="text-[var(--text-muted)] mb-1">Transaction ID</p>
+                                                    <p className="text-[var(--text-muted)] mb-1">Internal Reference</p>
                                                     <p className="text-white font-mono text-[10px] break-all">{txId}</p>
                                                 </div>
                                                 <div>
                                                     <p className="text-[var(--text-muted)] mb-1">Date & Time</p>
                                                     <p className="text-white">{new Date(tx.created_at || Date.now()).toLocaleString()}</p>
                                                 </div>
+                                                {tx.txid && (
+                                                    <div className="col-span-2">
+                                                        <p className="text-[var(--text-muted)] mb-1">Blockchain Hash (TxID)</p>
+                                                        <div className="flex items-center justify-between gap-2 overflow-hidden">
+                                                            <p className="text-[var(--gold)] font-mono text-[10px] truncate">{tx.txid}</p>
+                                                            <a
+                                                                href={
+                                                                    tx.network === 'TRC20' ? `https://tronscan.org/#/transaction/${tx.txid}` :
+                                                                        tx.network === 'ERC20' ? `https://etherscan.io/tx/${tx.txid}` :
+                                                                            tx.network === 'BEP20' ? `https://bscscan.com/tx/${tx.txid}` :
+                                                                                `https://etherscan.io/tx/${tx.txid}`
+                                                                }
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-[var(--gold)] hover:underline flex items-center gap-1 flex-shrink-0"
+                                                            >
+                                                                <ExternalLink size={10} />
+                                                                Verify
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                )}
                                                 {tx.merchant_order_id && (
                                                     <div>
                                                         <p className="text-[var(--text-muted)] mb-1">Order ID</p>
@@ -245,7 +269,13 @@ const Activity = () => {
                                                 {tx.currency && (
                                                     <div>
                                                         <p className="text-[var(--text-muted)] mb-1">Currency</p>
-                                                        <p className="text-white">{tx.currency.split('.')[0]}</p>
+                                                        <p className="text-white">{tx.currency.split('.')[0]} {tx.network && `(${tx.network})`}</p>
+                                                    </div>
+                                                )}
+                                                {tx.fee > 0 && (
+                                                    <div>
+                                                        <p className="text-[var(--text-muted)] mb-1">Network Fee</p>
+                                                        <p className="text-red-400 font-mono text-[10px]">{tx.fee} USDT</p>
                                                     </div>
                                                 )}
                                                 {tx.game_name && (

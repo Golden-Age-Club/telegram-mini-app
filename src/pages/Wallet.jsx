@@ -13,7 +13,8 @@ import {
   ChevronRight,
   AlertCircle,
   QrCode,
-  RefreshCw
+  RefreshCw,
+  ExternalLink
 } from 'lucide-react';
 import { useApi } from '../contexts/ApiContext.jsx';
 import { toast } from 'sonner';
@@ -48,7 +49,46 @@ const Wallet = () => {
   // Withdraw state
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [withdrawAddress, setWithdrawAddress] = useState('');
+  const [withdrawNetwork, setWithdrawNetwork] = useState('trc20');
+  const [withdrawFee, setWithdrawFee] = useState(0);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
+  const [isAddressValid, setIsAddressValid] = useState(null); // null, true, false
+  const [isCheckingAddress, setIsCheckingAddress] = useState(false);
+
+  // Fetch fee and validate address
+  useEffect(() => {
+    const fetchFee = async () => {
+      try {
+        const res = await walletApi.getWithdrawFee(withdrawNetwork.toUpperCase());
+        if (res.code === 10000 && res.data) {
+          setWithdrawFee(res.data.fee || 0);
+        }
+      } catch (e) {
+        console.error('Failed to fetch fee:', e);
+      }
+    };
+    if (activeTab === 'withdraw') fetchFee();
+  }, [withdrawNetwork, activeTab]);
+
+  useEffect(() => {
+    const validate = async () => {
+      if (!withdrawAddress) {
+        setIsAddressValid(null);
+        return;
+      }
+      try {
+        setIsCheckingAddress(true);
+        const res = await walletApi.validateAddress(withdrawAddress, withdrawNetwork.toUpperCase());
+        setIsAddressValid(res.code === 10000 && res.data?.valid);
+      } catch (e) {
+        setIsAddressValid(false);
+      } finally {
+        setIsCheckingAddress(false);
+      }
+    };
+    const timer = setTimeout(validate, 2000);
+    return () => clearTimeout(timer);
+  }, [withdrawAddress, withdrawNetwork]);
 
   // Expanded transaction state
   const [expandedTxId, setExpandedTxId] = useState(null);
@@ -56,6 +96,7 @@ const Wallet = () => {
   // Deposit API state
   const [isCreatingDeposit, setIsCreatingDeposit] = useState(false);
   const [depositData, setDepositData] = useState(null);
+  const [isNetworkDropdownOpen, setIsNetworkDropdownOpen] = useState(false);
 
   const networks = [
     { id: 'trc20', name: 'USDT.TRC20', label: 'TRC20', fee: '1.00 USDT' },
@@ -174,15 +215,18 @@ const Wallet = () => {
   const isValidWithdrawAddress = withdrawAddress.trim().length > 0;
 
   const handleWithdraw = async () => {
-    if (!isValidWithdrawAmount || !isValidWithdrawAddress || isWithdrawing) return;
+    if (!isValidWithdrawAmount || isAddressValid !== true || isWithdrawing) return;
 
     setIsWithdrawing(true);
     try {
-      const result = await createWithdrawal(withdrawParsedAmount, withdrawAddress.trim());
+      const currencyString = `USDT.${withdrawNetwork.toUpperCase()}`;
+      const result = await createWithdrawal(withdrawParsedAmount, withdrawAddress.trim(), currencyString);
       if (result?.success) {
         toast.success(t('wallet_page.withdrawal_success'));
         setWithdrawAmount('');
         setWithdrawAddress('');
+        setIsAddressValid(null);
+        checkAuthStatus(); // Refresh balance
         loadTransactions();
       } else {
         toast.error(result?.error || t('wallet_page.withdrawal_failed'));
@@ -229,16 +273,38 @@ const Wallet = () => {
                 </div>
               </div>
 
-              <div className="relative group p-4 bg-white rounded-2xl shadow-inner">
-                <img
-                  src={qrCodeUrl}
-                  alt="Deposit QR Code"
-                  className="w-48 h-48 object-contain mix-blend-multiply"
-                />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 rounded-2xl backdrop-blur-sm">
-                  <QrCode className="w-12 h-12 text-white" />
+              {depositData?.payment_url && (
+                <div className="w-full bg-white rounded-2xl overflow-hidden shadow-inner h-96 relative">
+                  <iframe
+                    src={depositData.payment_url}
+                    className="w-full h-full border-none"
+                    title="Payment Instructions"
+                  />
+                  <div className="absolute top-2 right-2 flex gap-2">
+                    <a
+                      href={depositData.payment_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 bg-black/50 backdrop-blur-md rounded-lg text-white hover:bg-black/70 transition-colors"
+                    >
+                      <ExternalLink size={16} />
+                    </a>
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {(!depositData?.payment_url || !depositData) && (
+                <div className="relative group p-4 bg-white rounded-2xl shadow-inner">
+                  <img
+                    src={qrCodeUrl}
+                    alt="Deposit QR Code"
+                    className="w-48 h-48 object-contain mix-blend-multiply"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 rounded-2xl backdrop-blur-sm">
+                    <QrCode className="w-12 h-12 text-white" />
+                  </div>
+                </div>
+              )}
 
               <div className="w-full space-y-3">
                 <div className="text-left">
@@ -277,30 +343,55 @@ const Wallet = () => {
 
     return (
       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
-        <div className="space-y-4">
+        <div className="space-y-3 relative z-[100]">
           <label className="block text-sm font-medium text-[var(--text-muted)] ml-1">{t('wallet_page.select_network')}</label>
-          <div className="grid grid-cols-1 gap-2">
-            {networks.map((net) => (
-              <button
-                key={net.id}
-                onClick={() => setSelectedNetwork(net.id)}
-                className={`relative flex items-center justify-between p-4 rounded-xl border transition-all ${selectedNetwork === net.id
-                  ? 'bg-[var(--gold)]/10 border-[var(--gold)] shadow-[0_0_15px_rgba(255,215,0,0.1)]'
-                  : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10'
-                  }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedNetwork === net.id ? 'border-[var(--gold)]' : 'border-gray-500'}`}>
-                    {selectedNetwork === net.id && <div className="w-2 h-2 rounded-full bg-[var(--gold)]" />}
-                  </div>
-                  <div className="text-left">
-                    <span className={`block text-sm font-bold ${selectedNetwork === net.id ? 'text-[var(--gold)]' : 'text-white'}`}>{net.name}</span>
-                    <span className="text-xs text-gray-500">{t('wallet_page.fee')}: ~{net.fee}</span>
-                  </div>
+
+          <div className="relative">
+            <button
+              onClick={() => setIsNetworkDropdownOpen(!isNetworkDropdownOpen)}
+              className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-[var(--gold)]/50 transition-all active:scale-[0.99]"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-[var(--gold)]/10 flex items-center justify-center">
+                  <Zap size={16} className="text-[var(--gold)]" />
                 </div>
-                {selectedNetwork === net.id && <Check className="w-5 h-5 text-[var(--gold)]" />}
-              </button>
-            ))}
+                <div className="text-left">
+                  <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-tight">Priority Network</p>
+                  <p className="text-sm font-bold text-white leading-none mt-0.5">
+                    {networks.find(n => n.id === selectedNetwork)?.name || 'Choose Network'}
+                  </p>
+                </div>
+              </div>
+              <ChevronRight className={`w-5 h-5 text-gray-400 transition-transform ${isNetworkDropdownOpen ? '-rotate-90' : 'rotate-90'}`} />
+            </button>
+
+            {isNetworkDropdownOpen && (
+              <>
+                <div className="fixed inset-0 z-[-1]" onClick={() => setIsNetworkDropdownOpen(false)} />
+                <div className="absolute top-full left-0 w-full mt-2 p-2 bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl animate-in fade-in zoom-in-95 duration-200 z-50">
+                  {networks.map((net) => (
+                    <button
+                      key={net.id}
+                      onClick={() => {
+                        setSelectedNetwork(net.id);
+                        setIsNetworkDropdownOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between p-3 rounded-xl transition-all ${selectedNetwork === net.id ? 'bg-[var(--gold)]/10 text-[var(--gold)]' : 'hover:bg-white/5 text-gray-400'
+                        }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-2 h-2 rounded-full ${selectedNetwork === net.id ? 'bg-[var(--gold)]' : 'bg-gray-600'}`} />
+                        <div className="text-left">
+                          <p className="text-sm font-bold">{net.label}</p>
+                          <p className="text-[10px] opacity-60">USDT on {net.label}</p>
+                        </div>
+                      </div>
+                      {selectedNetwork === net.id && <Check size={16} />}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -340,11 +431,22 @@ const Wallet = () => {
 
   const renderWithdraw = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      <div className="p-4 rounded-xl bg-yellow-500/5 border border-yellow-500/10 flex gap-3">
-        <AlertCircle className="w-5 h-5 text-yellow-500 shrink-0" />
-        <p className="text-xs text-yellow-200/80 leading-relaxed">
-          {t('wallet_page.withdraw_warning_intro')} <strong>TRC20</strong> {t('wallet_page.withdraw_warning_text')}
-        </p>
+      <div className="space-y-3">
+        <label className="block text-sm font-medium text-[var(--text-muted)] ml-1">Select Network</label>
+        <div className="grid grid-cols-3 gap-2">
+          {networks.map((net) => (
+            <button
+              key={net.id}
+              onClick={() => setWithdrawNetwork(net.id)}
+              className={`py-3 rounded-xl border text-xs font-bold transition-all ${withdrawNetwork === net.id
+                ? 'bg-[var(--gold)] text-black border-[var(--gold)] shadow-lg shadow-yellow-900/20'
+                : 'bg-white/5 text-gray-400 border-white/10 hover:border-white/20'
+                }`}
+            >
+              {net.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -363,27 +465,43 @@ const Wallet = () => {
         </div>
         <div className="flex justify-between px-1">
           <span className="text-xs text-gray-500">{t('wallet_page.available')}: {user?.balance?.toLocaleString() || '0'} USDT</span>
+          {withdrawFee > 0 && (
+            <span className="text-xs text-amber-500">Fee: {withdrawFee} USDT</span>
+          )}
         </div>
       </div>
 
       <div className="space-y-4">
-        <label className="block text-sm font-medium text-[var(--text-muted)] ml-1">{t('wallet_page.wallet_address_trc20')}</label>
+        <label className="block text-sm font-medium text-[var(--text-muted)] ml-1">
+          {withdrawNetwork.toUpperCase()} Wallet Address
+        </label>
         <div className="relative">
           <input
             type="text"
             value={withdrawAddress}
             placeholder={t('wallet_page.paste_address_placeholder')}
             onChange={(e) => setWithdrawAddress(e.target.value)}
-            className="w-full bg-black/40 border border-white/10 rounded-2xl pl-12 pr-5 py-4 text-sm font-mono text-white placeholder-white/20 focus:outline-none focus:border-[var(--gold)] focus:ring-1 focus:ring-[var(--gold)]/50 transition-all"
+            className={`w-full bg-black/40 border rounded-2xl pl-12 pr-12 py-4 text-sm font-mono text-white placeholder-white/20 focus:outline-none transition-all ${isAddressValid === true ? 'border-emerald-500/50 focus:border-emerald-500' :
+              isAddressValid === false ? 'border-red-500/50 focus:border-red-500' :
+                'border-white/10 focus:border-[var(--gold)]'
+              }`}
           />
           <WalletIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-muted)]" />
+          <div className="absolute right-4 top-1/2 -translate-y-1/2">
+            {isCheckingAddress && <RefreshCw className="w-4 h-4 text-gray-500 animate-spin" />}
+            {!isCheckingAddress && isAddressValid === true && <Check className="w-5 h-5 text-emerald-500" />}
+            {!isCheckingAddress && isAddressValid === false && <AlertCircle className="w-5 h-5 text-red-500" />}
+          </div>
         </div>
+        {isAddressValid === false && (
+          <p className="text-[10px] text-red-500 ml-1">Invalid {withdrawNetwork.toUpperCase()} address format</p>
+        )}
       </div>
 
       <button
         onClick={handleWithdraw}
-        disabled={!isValidWithdrawAmount || !isValidWithdrawAddress || isWithdrawing}
-        className={`w-full py-4 rounded-xl font-bold text-lg uppercase tracking-wide shadow-lg transform transition-all ${isValidWithdrawAmount && isValidWithdrawAddress && !isWithdrawing
+        disabled={!isValidWithdrawAmount || isAddressValid !== true || isWithdrawing}
+        className={`w-full py-4 rounded-xl font-bold text-lg uppercase tracking-wide shadow-lg transform transition-all ${isValidWithdrawAmount && isAddressValid === true && !isWithdrawing
           ? 'bg-gradient-to-r from-[var(--gold)] to-amber-600 text-black shadow-[0_0_20px_rgba(255,215,0,0.2)] active:scale-[0.98]'
           : 'bg-white/5 text-gray-500 border border-white/10 cursor-not-allowed'
           }`}
@@ -432,10 +550,14 @@ const Wallet = () => {
                         {tx.type === 'deposit' ? '+' : '-'}{Number(tx.amount).toLocaleString()} USDT
                       </p>
                       <p className={`text-xs capitalize ${tx.status === 'completed' ? 'text-emerald-500' :
-                        tx.status === 'pending' ? 'text-yellow-500' :
-                          tx.status === 'processing' ? 'text-blue-500' :
+                        (tx.status === 'awaiting_deposit' || tx.status === 'pending') ? 'text-yellow-500' :
+                          (tx.status === 'awaiting_approval' || tx.status === 'processing') ? 'text-blue-500' :
                             tx.status === 'expired' ? 'text-gray-500' : 'text-red-500'
-                        }`}>{t(`transaction_status.${tx.status}`, tx.status)}</p>
+                        }`}>
+                        {tx.status === 'awaiting_deposit' ? 'Awaiting Deposit' :
+                          tx.status === 'awaiting_approval' ? 'Awaiting Approval' :
+                            t(`transaction_status.${tx.status}`, tx.status)}
+                      </p>
                     </div>
                     <ChevronRight
                       className={`w-5 h-5 text-gray-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
@@ -448,13 +570,35 @@ const Wallet = () => {
                   <div className="px-4 pb-4 pt-2 border-t border-white/5 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
                     <div className="grid grid-cols-2 gap-3 text-xs">
                       <div>
-                        <p className="text-[var(--text-muted)] mb-1">Transaction ID</p>
+                        <p className="text-[var(--text-muted)] mb-1">Internal Reference</p>
                         <p className="text-white font-mono text-[10px] break-all">{txId}</p>
                       </div>
                       <div>
                         <p className="text-[var(--text-muted)] mb-1">Date & Time</p>
                         <p className="text-white">{new Date(tx.created_at || Date.now()).toLocaleString()}</p>
                       </div>
+                      {tx.txid && (
+                        <div className="col-span-2">
+                          <p className="text-[var(--text-muted)] mb-1">Blockchain Hash (TxID)</p>
+                          <div className="flex items-center justify-between gap-2 overflow-hidden">
+                            <p className="text-[var(--gold)] font-mono text-[10px] truncate">{tx.txid}</p>
+                            <a
+                              href={
+                                tx.network === 'TRC20' ? `https://tronscan.org/#/transaction/${tx.txid}` :
+                                  tx.network === 'ERC20' ? `https://etherscan.io/tx/${tx.txid}` :
+                                    tx.network === 'BEP20' ? `https://bscscan.com/tx/${tx.txid}` :
+                                      `https://etherscan.io/tx/${tx.txid}` // Default
+                              }
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[var(--gold)] hover:underline flex items-center gap-1 flex-shrink-0"
+                            >
+                              <ExternalLink size={10} />
+                              Verify
+                            </a>
+                          </div>
+                        </div>
+                      )}
                       {tx.merchant_order_id && (
                         <div>
                           <p className="text-[var(--text-muted)] mb-1">Order ID</p>
@@ -464,7 +608,13 @@ const Wallet = () => {
                       {tx.currency && (
                         <div>
                           <p className="text-[var(--text-muted)] mb-1">Currency</p>
-                          <p className="text-white">{tx.currency.split('.')[0]}</p>
+                          <p className="text-white">{tx.currency.split('.')[0]} {tx.network && `(${tx.network})`}</p>
+                        </div>
+                      )}
+                      {tx.fee > 0 && (
+                        <div>
+                          <p className="text-[var(--text-muted)] mb-1">Network Fee</p>
+                          <p className="text-red-400 font-mono text-[10px]">{tx.fee} USDT</p>
                         </div>
                       )}
                       {tx.wallet_address && (
