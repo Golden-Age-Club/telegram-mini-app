@@ -258,7 +258,7 @@ const Activity = () => {
                                                 <div>
                                                     <p className="text-sm font-bold text-white">{getTransactionLabel(tx.type, tx.amount)}</p>
                                                     <p className="text-[10px] text-[var(--text-muted)]">
-                                                        {new Date(tx.created_at || Date.now()).toLocaleDateString()} • {new Date(tx.created_at || Date.now()).toLocaleTimeString([], { hour: '2-2-digit', minute: '2-2-digit' })}
+                                                        {new Date(tx.created_at || Date.now()).toLocaleDateString()} • {new Date(tx.created_at || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                     </p>
                                                 </div>
                                             </div>
