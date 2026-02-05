@@ -67,6 +67,7 @@ export const AuthProvider = ({ children }) => {
           await autoLoginWithTelegram();
         }
       } else {
+        console.log('ℹ️ No existing token found, checking Telegram environment');
         setIsAuthenticated(false);
         // Try to auto-login with Telegram if available
         await autoLoginWithTelegram();
@@ -90,6 +91,8 @@ export const AuthProvider = ({ children }) => {
     if (tg && tg.initData && tg.initData.length > 0) {
       console.log('📡 Telegram environment detected, attempting auto-login...');
       await loginWithTelegram();
+    } else {
+      console.log('ℹ️ No Telegram initData found (Not in Telegram or Desktop environment)');
     }
   };
 
@@ -101,8 +104,11 @@ export const AuthProvider = ({ children }) => {
       // Get Telegram WebApp initData
       const tg = window.Telegram?.WebApp;
       if (!tg || !tg.initData) {
+        console.warn('⚠️ Telegram WebApp not available or no initData during login check');
         throw new Error('Telegram WebApp not available or no initData');
       }
+
+      console.log('🔑 Calling login API with Telegram data...');
 
       const result = await authApi.login(tg.initData);
 
