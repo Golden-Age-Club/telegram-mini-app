@@ -42,10 +42,10 @@ const BetHistory = () => {
   const getLabel = (type) => {
     switch (type) {
       case 'deposit': return 'Deposit';
-      case 'withdrawal': return 'Withdrawal';
-      case 'game_win': return 'Game Win';
-      case 'game_bet': return 'Game Bet';
-      case 'game_refund': return 'Refund';
+      case 'withdrawal': return 'Withdraw';
+      case 'game_win': return 'Bills';
+      case 'game_bet': return 'Bills';
+      case 'game_refund': return 'Bills';
       default: return type?.replace('_', ' ') || 'Transaction';
     }
   };
@@ -83,13 +83,13 @@ const BetHistory = () => {
       {/* Header */}
       <div className="sticky top-0 z-20 bg-black/80 backdrop-blur-xl border-b border-white/5">
         <div className="px-4 h-14 flex items-center gap-4">
-          <button 
+          <button
             onClick={() => navigate(-1)}
             className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center active:scale-95 transition-all"
           >
             <ChevronLeft className="w-5 h-5 text-white" />
           </button>
-          <h1 className="text-lg font-bold text-white">Bet History</h1>
+          <h1 className="text-lg font-bold text-white">Bills History</h1>
         </div>
       </div>
 
@@ -112,7 +112,7 @@ const BetHistory = () => {
         ) : (
           <div className="space-y-3">
             {transactions.map((tx) => (
-              <div 
+              <div
                 key={tx._id || tx.transaction_id}
                 className="bg-[#111] rounded-xl p-4 border border-white/5 flex items-center justify-between"
               >

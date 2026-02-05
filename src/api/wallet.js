@@ -29,11 +29,13 @@ export const getBalance = async () => {
  * @param {number} limit - Items per page (default: 20)
  * @param {string} type - Transaction type filter (optional)
  */
-export const getTransactions = async (page = 1, limit = 20, type = null) => {
+export const getTransactions = async (page = 1, limit = 20, type = null, startDate = null, endDate = null) => {
   try {
     console.log('📡 Wallet API: Get transactions');
     const params = { page, limit };
     if (type) params.type = type;
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
 
     const response = await api.get(API_ENDPOINTS.WALLET.TRANSACTIONS, { params });
     console.log('✅ Wallet API Response - Transactions:', response);

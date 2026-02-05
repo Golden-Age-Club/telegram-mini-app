@@ -56,8 +56,16 @@ const router = createBrowserRouter([
         element: <BetHistory />
       },
       {
-        path: 'activity',
+        path: 'transactions',
         element: <Activity />
+      },
+      {
+        path: 'transactions/:tab',
+        element: <Activity />
+      },
+      {
+        path: 'activity',
+        element: <Navigate to="/transactions" replace />
       }
     ]
   }

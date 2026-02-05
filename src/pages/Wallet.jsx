@@ -728,7 +728,7 @@ const Wallet = () => {
         <div className="flex items-center justify-between">
           <span className="font-bold text-white text-xl">{t('myWallet')}</span>
           <button
-            onClick={() => navigate('/activity')}
+            onClick={() => navigate('/transactions')}
             className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors"
           >
             <History className="w-5 h-5 text-gray-400" />
