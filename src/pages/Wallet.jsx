@@ -245,6 +245,19 @@ const Wallet = () => {
     navigate({ pathname: location.pathname, search: params.toString() }, { replace: true });
   };
 
+  const getTransactionLabel = (type, amount) => {
+    if (type === 'game_win' && amount === 0) return 'Loss';
+    const labels = {
+      deposit: 'Deposit',
+      withdrawal: 'Withdraw',
+      game_bet: 'Bills',
+      game_win: 'Bills',
+      game_refund: 'Bills',
+      adjustment: 'Adjustment'
+    };
+    return labels[type] || type;
+  };
+
   // ---------------- RENDER HELPERS ----------------
 
   const renderDeposit = () => {
@@ -540,7 +553,7 @@ const Wallet = () => {
                       {tx.type === 'deposit' ? <ArrowDownCircle size={20} /> : <ArrowUpCircle size={20} />}
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-white capitalize">{tx.type}</p>
+                      <p className="text-sm font-bold text-white capitalize">{getTransactionLabel(tx.type, tx.amount)}</p>
                       <p className="text-xs text-[var(--text-muted)]">{new Date(tx.created_at || Date.now()).toLocaleDateString()}</p>
                     </div>
                   </div>

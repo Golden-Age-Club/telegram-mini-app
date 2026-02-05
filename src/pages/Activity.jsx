@@ -114,10 +114,10 @@ const Activity = () => {
         if (type === 'game_win' && amount === 0) return 'Loss';
         const labels = {
             deposit: 'Deposit',
-            withdrawal: 'Withdrawal',
-            game_bet: 'Game Bet',
-            game_win: 'Game Win',
-            game_refund: 'Refund',
+            withdrawal: 'Withdraw',
+            game_bet: 'Bills',
+            game_win: 'Bills',
+            game_refund: 'Bills',
             adjustment: 'Adjustment'
         };
         return labels[type] || type;
