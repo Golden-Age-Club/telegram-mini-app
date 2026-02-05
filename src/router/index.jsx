@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import Layout from '../components/Layout.jsx';
+import ErrorBoundary from '../components/ErrorBoundary.jsx';
 import Landing from '../pages/Landing.jsx';
 import Home from '../pages/Home.jsx';
 import Game from '../pages/Game.jsx';
@@ -14,6 +15,7 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <Layout />,
+    errorElement: <ErrorBoundary />,
     children: [
       {
         index: true,
