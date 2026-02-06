@@ -125,7 +125,24 @@
     "recent_deposits": "Recent Deposits",
     "recent_withdrawals": "Recent Withdrawals"
   },
+  "game_card": {
+    "hot": "HOT",
+    "new": "NEW",
+    "live": "LIVE"
+  },
+  "providers": {
+    "unknown": "Unknown Provider",
+    "goldenAge": "Golden Age",
+    "pgSoft": "PG Soft",
+    "pragmaticPlay": "Pragmatic Play",
+    "jili": "Jili",
+    "evolution": "Evolution",
+    "egt": "EGT"
+  },
   "landing": {
+    "banner": {
+      "alt": "Banner {{index}}"
+    },
     "quick_actions": {
       "deposit": "Deposit",
       "withdraw": "Withdraw",

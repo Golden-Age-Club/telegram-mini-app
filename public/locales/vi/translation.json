@@ -124,6 +124,9 @@
     "history_tab": "History"
   },
   "landing": {
+    "banner": {
+      "alt": "Banner {{index}}"
+    },
     "quick_actions": {
       "deposit": "Nạp tiền",
       "withdraw": "Rút tiền",
@@ -240,5 +243,19 @@
     "premium": "Cao Cấp",
     "launch_failed": "Khởi chạy trò chơi thất bại",
     "launch_error": "Lỗi khi khởi chạy trò chơi"
+  },
+  "game_card": {
+    "hot": "HOT",
+    "new": "MỚI",
+    "live": "TRỰC TIẾP"
+  },
+  "providers": {
+    "unknown": "Nhà cung cấp không xác định",
+    "goldenAge": "Golden Age",
+    "pgSoft": "PG Soft",
+    "pragmaticPlay": "Pragmatic Play",
+    "jili": "Jili",
+    "evolution": "Evolution",
+    "egt": "EGT"
   }
 }

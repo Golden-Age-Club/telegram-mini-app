@@ -240,5 +240,19 @@
     "premium": "优质",
     "launch_failed": "启动游戏失败",
     "launch_error": "启动游戏出错"
+  },
+  "game_card": {
+    "hot": "热门",
+    "new": "最新",
+    "live": "直播"
+  },
+  "providers": {
+    "unknown": "未知供应商",
+    "goldenAge": "黄金时代",
+    "pgSoft": "PG电子",
+    "pragmaticPlay": "Pragmatic Play",
+    "jili": "Jili",
+    "evolution": "Evolution",
+    "egt": "EGT"
   }
 }

@@ -1,11 +1,13 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay, EffectFade } from 'swiper/modules';
+import { useLanguage } from '../../contexts/LanguageContext';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
 
 const BannerSlider = () => {
+  const { t } = useLanguage();
   const banners = [
     '/assets/banner-actThroughtDZ.webp',
     '/assets/banner-yessc2.webp',
@@ -41,7 +43,7 @@ const BannerSlider = () => {
                   {/* Main Image - Contained to fit perfectly */}
                   <img
                       src={src}
-                      alt={`Golden Age banner ${idx + 1}`}
+                      alt={t('landing.banner.alt', { index: idx + 1 })}
                       className="relative w-full h-full object-contain z-10"
                   />
                   

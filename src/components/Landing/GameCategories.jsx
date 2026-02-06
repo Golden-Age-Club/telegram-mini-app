@@ -7,6 +7,13 @@ import { useLanguage } from '../../contexts/LanguageContext.jsx';
 import { useApi } from '../../contexts/ApiContext.jsx';
 import GameCard from '../GameCard';
 
+const toCamelCase = (str) => {
+  if (!str) return '';
+  return str
+    .toLowerCase()
+    .replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase());
+};
+
 const GameCategories = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
@@ -51,10 +58,11 @@ const GameCategories = () => {
     // Use provider_title for grouping, fallback to provider_code or Unknown
     const providerTitle = game.provider_title || game.provider_code || 'Unknown';
     if (providerTitle) {
-      if (!gamesByProvider[providerTitle]) {
-        gamesByProvider[providerTitle] = [];
+      const key = providerTitle === 'Unknown' ? 'unknown' : providerTitle;
+      if (!gamesByProvider[key]) {
+        gamesByProvider[key] = [];
       }
-      gamesByProvider[providerTitle].push(game);
+      gamesByProvider[key].push(game);
     }
   });
 
@@ -63,7 +71,10 @@ const GameCategories = () => {
   return (
     <div className="w-full max-w-md space-y-8 pb-8">
       {providerTitles.map((providerTitle) => {
-        const typeName = providerTitle;
+        const typeName = providerTitle === 'unknown' 
+          ? t('providers.unknown') 
+          : t(`providers.${toCamelCase(providerTitle)}`, providerTitle);
+        
         const typeGames = gamesByProvider[providerTitle] || [];
 
         const pages = [];

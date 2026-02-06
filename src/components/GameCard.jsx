@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
 import { Play, Flame, Star, Trophy, Radio } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
+
+const toCamelCase = (str) => {
+  if (!str) return '';
+  return str
+    .toLowerCase()
+    .replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase());
+};
 
 const GameCard = ({ 
   game, 
@@ -9,6 +17,7 @@ const GameCard = ({
   showStats = false,
   isLoading = false
 }) => {
+  const { t } = useLanguage();
   const [imageLoaded, setImageLoaded] = useState(false);
 
   if (isLoading) {
@@ -40,7 +49,7 @@ const GameCard = ({
       return (
         <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-red-600 to-rose-600 rounded-md text-[10px] font-bold text-white shadow-lg shadow-red-900/20 z-10 border border-white/10">
           <Flame size={10} className="fill-white" />
-          <span>HOT</span>
+          <span>{t('game_card.hot')}</span>
         </div>
       );
     }
@@ -49,7 +58,7 @@ const GameCard = ({
       return (
         <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-md text-[10px] font-bold text-white shadow-lg shadow-emerald-900/20 z-10 border border-white/10">
           <Star size={10} className="fill-white" />
-          <span>NEW</span>
+          <span>{t('game_card.new')}</span>
         </div>
       );
     }
@@ -61,7 +70,7 @@ const GameCard = ({
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
           </span>
-          <span>LIVE</span>
+          <span>{t('game_card.live')}</span>
         </div>
       );
     }
@@ -96,10 +105,14 @@ const GameCard = ({
           
           <div className="flex-1 text-left min-w-0">
             <div className="text-sm font-bold text-white truncate group-hover:text-[var(--gold)] transition-colors">
-              {game.name}
+              {t(toCamelCase(game.name), game.name)}
             </div>
             <div className="text-[10px] text-gray-400 truncate flex items-center gap-1">
-              {(game.provider || game.provider_title) && <span className="uppercase tracking-wider opacity-70">{game.provider || game.provider_title}</span>}
+              {(game.provider || game.provider_title) && (
+                <span className="uppercase tracking-wider opacity-70">
+                  {t(`providers.${toCamelCase(game.provider || game.provider_title)}`, game.provider || game.provider_title)}
+                </span>
+              )}
             </div>
           </div>
           
@@ -177,10 +190,10 @@ const GameCard = ({
       <div className="absolute bottom-0 left-0 w-full p-3 transform translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
         <div className="text-left">
             <h3 className="text-sm font-bold text-white truncate drop-shadow-md group-hover:text-[var(--gold)] transition-colors">
-                {game.name}
+                {t(toCamelCase(game.name), game.name)}
             </h3>
             <p className="text-[10px] text-gray-300 font-medium uppercase tracking-wider truncate opacity-80">
-                {game.provider || game.provider_title || 'Golden Age'}
+                {t(`providers.${toCamelCase(game.provider || game.provider_title || 'Golden Age')}`, game.provider || game.provider_title || 'Golden Age')}
             </p>
         </div>
       </div>
