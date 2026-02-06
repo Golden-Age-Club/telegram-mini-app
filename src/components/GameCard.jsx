@@ -105,12 +105,16 @@ const GameCard = ({
           
           <div className="flex-1 text-left min-w-0">
             <div className="text-sm font-bold text-white truncate group-hover:text-[var(--gold)] transition-colors">
-              {t(toCamelCase(game.name), game.name)}
+              {t([
+                `games.${toCamelCase(game.name)}`,
+                toCamelCase(game.name),
+                game.name
+              ], { defaultValue: game.name })}
             </div>
             <div className="text-[10px] text-gray-400 truncate flex items-center gap-1">
               {(game.provider || game.provider_title) && (
                 <span className="uppercase tracking-wider opacity-70">
-                  {t(`providers.${toCamelCase(game.provider || game.provider_title)}`, game.provider || game.provider_title)}
+                  {t(`providers.${toCamelCase(game.provider || game.provider_title)}`, { defaultValue: game.provider || game.provider_title })}
                 </span>
               )}
             </div>
@@ -190,10 +194,14 @@ const GameCard = ({
       <div className="absolute bottom-0 left-0 w-full p-3 transform translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
         <div className="text-left">
             <h3 className="text-sm font-bold text-white truncate drop-shadow-md group-hover:text-[var(--gold)] transition-colors">
-                {t(toCamelCase(game.name), game.name)}
+                {t([
+                  `games.${toCamelCase(game.name)}`,
+                  toCamelCase(game.name),
+                  game.name
+                ], { defaultValue: game.name })}
             </h3>
             <p className="text-[10px] text-gray-300 font-medium uppercase tracking-wider truncate opacity-80">
-                {t(`providers.${toCamelCase(game.provider || game.provider_title || 'Golden Age')}`, game.provider || game.provider_title || 'Golden Age')}
+                {t(`providers.${toCamelCase(game.provider || game.provider_title || 'Golden Age')}`, { defaultValue: game.provider || game.provider_title || 'Golden Age' })}
             </p>
         </div>
       </div>
