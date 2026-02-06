@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
@@ -12,6 +12,58 @@ const toCamelCase = (str) => {
   return str
     .toLowerCase()
     .replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase());
+};
+
+const ProviderTitle = ({ title }) => {
+  const { t, currentLanguage, i18n, translateText } = useLanguage();
+  const [translated, setTranslated] = useState(title);
+
+  useEffect(() => {
+    if (!title) return;
+    if (title === 'unknown') {
+        setTranslated(t('providers.unknown'));
+        return;
+    }
+
+    const translateTitle = async () => {
+      // 1. Static check
+      const camelKey = toCamelCase(title);
+      const key = `providers.${camelKey}`;
+      if (i18n.exists(key)) {
+        setTranslated(t(key));
+        return;
+      }
+
+      // 2. English check
+      if (currentLanguage === 'en') {
+        setTranslated(title);
+        return;
+      }
+
+      // 3. Cache check
+      const cacheKey = `trans_provider_${currentLanguage}_${title}`;
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        setTranslated(cached);
+        return;
+      }
+
+      // 4. Dynamic fetch
+      try {
+        const data = await translateText(title, currentLanguage);
+        if (data.translated) {
+          setTranslated(data.translated);
+          localStorage.setItem(cacheKey, data.translated);
+        }
+      } catch (err) {
+        setTranslated(title);
+      }
+    };
+
+    translateTitle();
+  }, [title, currentLanguage, i18n, t, translateText]);
+
+  return <>{translated}</>;
 };
 
 const GameCategories = () => {
@@ -71,10 +123,6 @@ const GameCategories = () => {
   return (
     <div className="w-full max-w-md space-y-8 pb-8">
       {providerTitles.map((providerTitle) => {
-        const typeName = providerTitle === 'unknown' 
-          ? t('providers.unknown') 
-          : t(`providers.${toCamelCase(providerTitle)}`, providerTitle);
-        
         const typeGames = gamesByProvider[providerTitle] || [];
 
         const pages = [];
@@ -89,7 +137,9 @@ const GameCategories = () => {
             <div className="px-4 flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                   <div className="w-1 h-5 rounded-full bg-[var(--gold)]"></div>
-                  <span className="text-lg font-bold text-white tracking-tight">{typeName}</span>
+                  <span className="text-lg font-bold text-white tracking-tight">
+                    <ProviderTitle title={providerTitle} />
+                  </span>
                   <span className="text-xs font-medium text-gray-500 bg-white/5 px-2 py-0.5 rounded-full">{typeGames.length}</span>
               </div>
               

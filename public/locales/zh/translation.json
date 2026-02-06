@@ -254,5 +254,13 @@
     "jili": "Jili",
     "evolution": "Evolution",
     "egt": "EGT"
+  },
+  "start_game": {
+    "initializing": "正在初始化安全会话...",
+    "live": "实时",
+    "secure": "安全",
+    "back": "退出游戏",
+    "session": "游戏会话",
+    "footer_hint": "正在进行真钱游戏。祝好运！"
   }
 }

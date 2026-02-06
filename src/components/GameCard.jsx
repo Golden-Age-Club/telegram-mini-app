@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play, Flame, Star, Trophy, Radio } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -17,8 +17,58 @@ const GameCard = ({
   showStats = false,
   isLoading = false
 }) => {
-  const { t } = useLanguage();
+  const { t, currentLanguage, i18n, translateText } = useLanguage();
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [translatedName, setTranslatedName] = useState(game?.name || '');
+  const [translatedProvider, setTranslatedProvider] = useState(game?.provider || game?.provider_title || '');
+
+  useEffect(() => {
+    if (!game) return;
+
+    const translateField = async (text, setter, type) => {
+      if (!text) return;
+
+      // 1. Check if static translation exists
+      const camelKey = toCamelCase(text);
+      // For providers, check 'providers.Key', for games check 'Key'
+      const key = type === 'provider' ? `providers.${camelKey}` : camelKey;
+      
+      if (i18n.exists(key)) {
+        setter(t(key));
+        return;
+      }
+
+      // 2. If language is English, use original
+      if (currentLanguage === 'en') {
+        setter(text);
+        return;
+      }
+
+      // 3. Check local storage cache
+      const cacheKey = `trans_${type}_${currentLanguage}_${text}`;
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        setter(cached);
+        return;
+      }
+
+      // 4. Fetch dynamic translation from context API
+      try {
+        const data = await translateText(text, currentLanguage);
+        if (data.translated) {
+            setter(data.translated);
+            localStorage.setItem(cacheKey, data.translated);
+        }
+      } catch (err) {
+        console.error(`Translation fetch error for ${text}:`, err);
+        setter(text); // Fallback
+      }
+    };
+
+    translateField(game.name, setTranslatedName, 'game');
+    translateField(game.provider || game.provider_title, setTranslatedProvider, 'provider');
+
+  }, [game, currentLanguage, i18n, t, translateText]);
 
   if (isLoading) {
     return (
@@ -103,18 +153,18 @@ const GameCard = ({
             </div>
           </div>
           
-          <div className="flex-1 text-left min-w-0">
+          {/* <div className="flex-1 text-left min-w-0">
             <div className="text-sm font-bold text-white truncate group-hover:text-[var(--gold)] transition-colors">
-              {t(toCamelCase(game.name), game.name)}
+              {translatedName}
             </div>
             <div className="text-[10px] text-gray-400 truncate flex items-center gap-1">
               {(game.provider || game.provider_title) && (
                 <span className="uppercase tracking-wider opacity-70">
-                  {t(`providers.${toCamelCase(game.provider || game.provider_title)}`, game.provider || game.provider_title)}
+                  {translatedProvider}
                 </span>
               )}
             </div>
-          </div>
+          </div> */}
           
           <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 group-hover:bg-[var(--gold)] group-hover:text-black transition-all">
             <Play size={14} fill="currentColor" />
@@ -190,10 +240,10 @@ const GameCard = ({
       <div className="absolute bottom-0 left-0 w-full p-3 transform translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
         <div className="text-left">
             <h3 className="text-sm font-bold text-white truncate drop-shadow-md group-hover:text-[var(--gold)] transition-colors">
-                {t(toCamelCase(game.name), game.name)}
+                {translatedName}
             </h3>
             <p className="text-[10px] text-gray-300 font-medium uppercase tracking-wider truncate opacity-80">
-                {t(`providers.${toCamelCase(game.provider || game.provider_title || 'Golden Age')}`, game.provider || game.provider_title || 'Golden Age')}
+                {translatedProvider}
             </p>
         </div>
       </div>

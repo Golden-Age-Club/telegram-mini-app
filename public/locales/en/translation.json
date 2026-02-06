@@ -268,5 +268,13 @@
     "premium": "Premium",
     "launch_failed": "Failed to launch game",
     "launch_error": "Error launching game"
+  },
+  "start_game": {
+    "initializing": "Initializing Secure Session...",
+    "live": "Live",
+    "secure": "Secure",
+    "back": "Exit Game",
+    "session": "Game Session",
+    "footer_hint": "Playing for real money. Good luck!"
   }
 }
