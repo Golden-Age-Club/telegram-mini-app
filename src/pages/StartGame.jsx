@@ -38,7 +38,7 @@ const StartGame = () => {
   }
 
   return (
-    <div className="w-full px-4 py-6 flex flex-col gap-5 animate-in fade-in duration-500 max-w-5xl mx-auto h-[calc(100vh-80px)]">
+    <div className="w-full px-4 py-6 flex flex-col gap-5 animate-in fade-in duration-500 max-w-5xl mx-auto h-screen">
       
       {/* Header Info */}
       <div className="flex items-center justify-between px-1">
