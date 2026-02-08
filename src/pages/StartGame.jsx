@@ -38,18 +38,18 @@ const StartGame = () => {
   }
 
   return (
-    <div className="relative w-full h-screen bg-black overflow-hidden">
+    <div className="relative w-full h-[100dvh] bg-black overflow-hidden flex flex-col">
       <iframe
         src={gameUrl}
         title="Game Session"
-        className="w-full h-full border-0"
+        className="w-full h-full border-0 flex-1"
         allowFullScreen
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
       />
       
       <button 
         onClick={() => navigate('/')}
-        className="absolute top-4 right-4 z-10 p-2.5 rounded-full bg-black/60 text-white border border-white/10 backdrop-blur-md hover:bg-black/80 transition-all active:scale-95 shadow-lg"
+        className="absolute top-4 left-4 z-50 p-2.5 rounded-full bg-black/60 text-white border border-white/10 backdrop-blur-md hover:bg-black/80 transition-all active:scale-95 shadow-lg"
       >
         <Home className="w-5 h-5 text-[var(--gold)]" />
       </button>
