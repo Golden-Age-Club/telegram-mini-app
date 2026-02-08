@@ -27,9 +27,8 @@ const Profile = () => {
   const tg = window.Telegram?.WebApp;
   const navigate = useNavigate();
   const location = useLocation();
-  const { t, changeLanguage, currentLanguage, languages } = useLanguage();
+  const { t, languages, currentLanguage } = useLanguage();
   const { user, logout, isAuthenticated } = useAuth();
-  const [showLanguageModal, setShowLanguageModal] = useState(false);
 
   // Helper to open auth modals
   const setModal = (type) => {
@@ -103,16 +102,6 @@ const Profile = () => {
               {t('profile_page.guest.log_in')}
             </button>
           </div>
-
-          <div className="pt-6 border-t border-white/5">
-             <button 
-               onClick={() => setShowLanguageModal(true)}
-               className="flex items-center justify-center gap-2 text-xs text-gray-500 hover:text-white transition-colors"
-             >
-               <Globe className="w-3 h-3" />
-               <span>{t('profile_page.guest.change_language')}</span>
-             </button>
-          </div>
         </div>
       </div>
     );
@@ -141,12 +130,7 @@ const Profile = () => {
     {
       title: t('profile_page.menu.settings'),
       items: [
-        { 
-          icon: Globe, 
-          label: t('language'), 
-          value: languages.find(l => l.code === currentLanguage)?.name,
-          action: () => setShowLanguageModal(true)
-        },
+        { icon: Globe, label: t('language'), value: languages?.find(l => l.code === currentLanguage)?.name || 'English' },
         { icon: Bell, label: t('profile_page.menu.notifications'), value: t('profile_page.menu.on') },
         { icon: Shield, label: t('profile_page.menu.security'), value: t('profile_page.menu.2fa') },
       ]
@@ -241,6 +225,9 @@ const Profile = () => {
             </h3>
             <div className="rounded-2xl bg-[#0a0a0a] border border-white/5 overflow-hidden">
               {group.items.map((item, i) => (
+                item.custom ? (
+                  <div key={i}>{item.component}</div>
+                ) : (
                 <button
                   key={i}
                   onClick={() => {
@@ -273,69 +260,12 @@ const Profile = () => {
                   
                   {!item.value && <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-gray-400" />}
                 </button>
+                )
               ))}
             </div>
           </div>
         ))}
       </div>
-
-      {/* Language Modal (Reused) */}
-      {showLanguageModal && (
-        <div
-          className="fixed inset-0 z-[80] bg-black/60 backdrop-blur-sm flex items-end justify-center"
-          onClick={() => setShowLanguageModal(false)}
-        >
-          <div
-            className="w-full max-w-sm max-h-[70vh] bg-[#111] rounded-t-3xl border-t border-white/10 shadow-2xl px-4 pt-4 pb-8"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="font-bold text-white text-lg">{t('language')}</h3>
-                <p className="text-xs text-gray-400">Select your preferred language</p>
-              </div>
-              <button
-                onClick={() => setShowLanguageModal(false)}
-                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
-              >
-                <X className="w-4 h-4 text-white" />
-              </button>
-            </div>
-            <div className="space-y-2 overflow-y-auto max-h-[50vh] pr-1">
-              {languages.map((lang) => (
-                <button
-                  key={lang.code}
-                  onClick={() => {
-                    tg?.HapticFeedback?.selectionChanged();
-                    changeLanguage(lang.code);
-                    setShowLanguageModal(false);
-                  }}
-                  className={`w-full p-4 flex items-center gap-4 rounded-xl transition-all border ${
-                    currentLanguage === lang.code
-                      ? 'bg-[var(--gold)]/10 border-[var(--gold)]/50 shadow-[0_0_15px_rgba(255,215,0,0.1)]'
-                      : 'bg-white/5 border-transparent hover:bg-white/10'
-                  }`}
-                >
-                  <span className="text-2xl">{lang.flag}</span>
-                  <div className="flex-1 text-left">
-                    <span className={`block text-sm ${currentLanguage === lang.code ? 'text-[var(--gold)] font-bold' : 'text-white font-medium'}`}>
-                      {lang.name}
-                    </span>
-                    <span className="text-[10px] text-gray-500 uppercase tracking-widest">
-                      {lang.code}
-                    </span>
-                  </div>
-                  {currentLanguage === lang.code && (
-                    <div className="w-6 h-6 rounded-full bg-[var(--gold)] flex items-center justify-center">
-                      <Check className="w-3.5 h-3.5 text-black stroke-[3]" />
-                    </div>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

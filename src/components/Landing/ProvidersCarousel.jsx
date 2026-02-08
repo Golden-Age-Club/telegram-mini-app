@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Globe } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, FreeMode } from 'swiper/modules';
@@ -6,6 +6,52 @@ import 'swiper/css';
 import 'swiper/css/free-mode';
 import { useLanguage } from '../../contexts/LanguageContext.jsx';
 import { useApi } from '../../contexts/ApiContext.jsx';
+
+const toCamelCase = (str) => {
+  if (!str) return '';
+  return str
+    .toLowerCase()
+    .replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase());
+};
+
+const ProviderItem = ({ provider }) => {
+    const { t, i18n } = useLanguage();
+    const [translatedTitle, setTranslatedTitle] = useState(provider.title);
+
+    useEffect(() => {
+        const camelKey = toCamelCase(provider.title);
+        const key = `providers.${camelKey}`;
+        if (i18n.exists(key)) {
+            setTranslatedTitle(t(key));
+        } else {
+            setTranslatedTitle(provider.title);
+        }
+    }, [provider.title, i18n, t]);
+
+    return (
+        <SwiperSlide key={provider.code || provider.id}>
+            <div className="aspect-[3/2] rounded-xl bg-white/5 border border-white/10 p-2 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300 hover:bg-white/10 group/item overflow-hidden relative">
+                {provider.logo_b ? (
+                    <img 
+                        src={provider.logo_b.replace(/`/g, '').trim()} 
+                        alt={translatedTitle}
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                            e.target.style.display = 'none';
+                            const span = e.target.parentElement.querySelector('span');
+                            if (span) span.style.display = 'block';
+                        }}
+                    />
+                ) : null}
+                <span 
+                    className={`text-[10px] font-bold text-gray-400 group-hover/item:text-white text-center break-words leading-tight ${provider.logo_b ? 'hidden' : 'block'}`}
+                >
+                    {translatedTitle}
+                </span>
+            </div>
+        </SwiperSlide>
+    );
+};
 
 const providerPriority = (provider) => {
   const code = provider?.code || '';
@@ -71,27 +117,7 @@ const ProvidersCarousel = () => {
             className="!overflow-visible"
         >
             {providers.map((provider) => (
-                <SwiperSlide key={provider.code || provider.id}>
-                    <div className="aspect-[3/2] rounded-xl bg-white/5 border border-white/10 p-2 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-300 hover:bg-white/10 group/item overflow-hidden relative">
-                        {provider.logo_b ? (
-                            <img 
-                                src={provider.logo_b.replace(/`/g, '').trim()} 
-                                alt={provider.title}
-                                className="w-full h-full object-contain"
-                                onError={(e) => {
-                                    e.target.style.display = 'none';
-                                    const span = e.target.parentElement.querySelector('span');
-                                    if (span) span.style.display = 'block';
-                                }}
-                            />
-                        ) : null}
-                        <span 
-                            className={`text-[10px] font-bold text-gray-400 group-hover/item:text-white text-center break-words leading-tight ${provider.logo_b ? 'hidden' : 'block'}`}
-                        >
-                            {provider.title}
-                        </span>
-                    </div>
-                </SwiperSlide>
+                <ProviderItem key={provider.code || provider.id} provider={provider} />
             ))}
         </Swiper>
         

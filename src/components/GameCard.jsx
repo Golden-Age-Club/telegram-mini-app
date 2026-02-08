@@ -30,8 +30,8 @@ const GameCard = ({
 
       // 1. Check if static translation exists
       const camelKey = toCamelCase(text);
-      // For providers, check 'providers.Key', for games check 'Key'
-      const key = type === 'provider' ? `providers.${camelKey}` : camelKey;
+      // For providers, check 'providers.Key', for games check 'gameNames.Key'
+      const key = type === 'provider' ? `providers.${camelKey}` : `gameNames.${camelKey}`;
       
       if (i18n.exists(key)) {
         setter(t(key));

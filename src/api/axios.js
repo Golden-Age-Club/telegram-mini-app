@@ -4,17 +4,17 @@ import { getCookie, removeCookie } from './cookies';
 export const backendUrl = () => {
   // Allow overriding via environment variable (e.g. for custom domains to bypass region blocks)
   // We ignore the default localhost value to ensure the fallback logic works if the env var isn't customized for prod
-  // if (import.meta.env.VITE_API_BASE_URL && import.meta.env.VITE_API_BASE_URL !== 'http://localhost:8000') {
-  //   return import.meta.env.VITE_API_BASE_URL;
-  // }
-
-  if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname;
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      return 'http://localhost:8000';
-    }
+  if (import.meta.env.VITE_API_BASE_URL && import.meta.env.VITE_API_BASE_URL !== 'http://localhost:8000') {
+    return import.meta.env.VITE_API_BASE_URL;
   }
-  return 'https://golden-age-club-f8a5bb71b60a.herokuapp.com';
+
+  // if (typeof window !== 'undefined') {
+  //   const hostname = window.location.hostname;
+  //   if (hostname === 'localhost' || hostname === '127.0.0.1') {
+  //     return 'http://localhost:8000';
+  //   }
+  // }
+  // return 'https://golden-age-club-f8a5bb71b60a.herokuapp.com';
 };
 
 const api = axios.create({
